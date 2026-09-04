@@ -25,11 +25,11 @@ function updatePlayerPosition(key: string) {
             break
         case "left":
         case "a":
-            playerState({ x: player().x - 1, y: player().y })
+            playerState({ x: player().x - 2, y: player().y })
             break
         case "right":
         case "d":
-            playerState({ x: player().x + 1, y: player().y })
+            playerState({ x: player().x + 2, y: player().y })
             break
     }
 }

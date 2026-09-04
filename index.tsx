@@ -18,20 +18,24 @@ const App = () => {
     })
 
     return <box style={{ borderStyle: "double",flexDirection: "column", justifyContent: "space-between",width:`100%`,height:`100%`,borderColor:"#35f306" }}> 
-        <box style={{flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`70%`}}>
-            <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`80%`,height:`100%`,borderColor:"#35f306" }}>
-                <text
-                    position="relative"
-                    left={player().x}
-                    top={player().y}
-                    >🦸</text>
+        <box style={{flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`}}>
+            <box style={{borderStyle:"rounded", flexDirection: "column", justifyContent: "space-between",width:`80%`,height:`70%`,borderColor:"#35f306" }}>
+                <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`80%`,height:`100%`,borderColor:"#35f306" }}>
+                    <text
+                        position="relative"
+                        left={player().x}
+                        top={player().y}
+                        >🦸</text>
+                </box>
+                <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`30%`,borderColor:"#35f306" }}>
+                    <text>Controls: W/A/S/D or Arrow Keys to move, ESC to exit</text>
+                </box>
             </box>
             <box style={{borderStyle:"rounded", flexDirection: "column", justifyContent: "space-between",width:`20%`,height:`100%`,borderColor:"#35f306" }}>
-                <text>Log:</text>
+                <box style={{borderStyle:"rounded", flexDirection: "column", justifyContent: "space-between",width:`20%`,height:`100%`,borderColor:"#35f306" }}>
+                    <text>Log:</text>
+                </box>
             </box>
-        </box>
-        <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`30%`,borderColor:"#35f306" }}>
-            <text>Controls: W/A/S/D or Arrow Keys to move, ESC to exit</text>
         </box>
     </box>
     
