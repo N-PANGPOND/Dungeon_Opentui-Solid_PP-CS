@@ -6,3 +6,4 @@
 |5.Patsakorn | Focus| 68162110265-3 |
 |6.Harirak   | TON  | 65162110472-5 |
 |7.Sattawat  | HART | 68162110253-5 |
+|8.Chotirat  | CHO  | 68162110075-3 |
