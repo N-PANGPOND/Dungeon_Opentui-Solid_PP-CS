@@ -4,3 +4,4 @@
 |3.Peeranat | TEN | 68162110281-9 |
 |4.Pongsatorn| Pee | 68162110470-9 |
 |5.Patsakorn | Focus | 68162110265-3 |
+|6.Harirak  | TON  | 65162110472-5 |
