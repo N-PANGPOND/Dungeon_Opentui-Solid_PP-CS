@@ -12,5 +12,5 @@
 |8.Chotirat    | CHO   | 68162110075-3 | Doc             |
 |9.Apiwatthana | Boss  | 68162110496-5 | Doc             |
 |10.Siraphat   | Pun   | 68162110297-7 | Doc             |
-|11.Nanphiphat | Pump  | 67162110529-1 | Presentation Lead |
+|11.Nanphiphat    | Pump  | 67162110529-1 | Presentation Lead |
 |12.Phatcharathon | Time  | 68162110290-7 | code         |
