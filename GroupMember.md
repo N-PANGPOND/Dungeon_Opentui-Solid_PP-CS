@@ -12,3 +12,4 @@
 |8.Chotirat    | CHO   | 68162110075-3 |
 |9.Apiwatthana | Boss  | 68162110496-5 |
 |10.Siraphat   | Pun   | 68162110297-7 |
+|11.Nanphiphat | Pump  | 67162110529-1 |
