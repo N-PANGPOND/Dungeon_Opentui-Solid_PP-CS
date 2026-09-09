@@ -1,11 +1,11 @@
 import { render,useKeyboard, useRenderer } from "@opentui/solid"
 import { useplayer } from "./manager"
 import { onCleanup, onMount } from "solid-js"
-import sound from "sound-play";
-import path from "path";
+// import sound from "sound-play";
+// import path from "path";
 
 // ระบุที่อยู่ไฟล์เสียงให้ถูกต้อง
-const soundPath = path.join(process.cwd(), "alert.mp3");
+// const soundPath = path.join(process.cwd(), "alert.mp3");
 
 function test() {
     const renderer = useRenderer()
@@ -18,10 +18,47 @@ function test() {
 
 }
 const { player: player, updatePlayerPosition } = useplayer()
-let timer: NodeJS.Timeout
 const App = () => {
 
-    const backgroundFill = "🟦".repeat(1800);
+let backgroundFill = `⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+⬜⬛🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🔳🔳🔳🔳⬛⬛⬛🔳🔳🔳🔳🔳⬜
+⬜⬛🔳🔳🔳⬛⬛⬛⬛🔳🔳🔳⬛🔳🔳⬛⬛🔳🔳⬛⬛⬛⬛⬛🔳🔳🔳🔳🔳⬛⬛🔳⬛⬛⬛🔳🔳🔳🔳🔳⬜
+⬜⬛🔳🔳🔳⬛⬛⬛⬛🔳🔳🔳⬛⬛🔳⬛⬛🔳🔳🔳⬛🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛🔳⬛⬛⬛🔳🔳🔳🔳🔳⬜
+⬜⬛⬛🔳⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛⬛🔳⬛🔳🔳⬛⬛🔳⬛⬛🔳⬛⬛⬛🔳🔳🔳🔳🔳⬜
+⬜⬛⬛🔳⬛⬛🔳⬛⬛🔳⬛⬛⬛⬛🔳⬛⬛🔳🔳⬛⬛⬛🔳⬛🔳🔳⬛⬛🔳🔳🔳🔳⬛⬛⬛⬛⬛🔳⬛⬛⬜
+⬜⬛⬛🔳⬛⬛🔳⬛⬛🔳⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛⬛🔳⬛🔳🔳⬛⬛⬛🔳🔳🔳🔳⬛⬛⬛⬛🔳⬛⬛⬜
+⬜🔳🔳🔳🔳🔳🔳⬛🔳🔳🔳⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛⬛🔳⬛🔳🔳⬛⬛⬛⬛⬛🔳🔳🔳⬛⬛🔳🔳🔳⬛⬜
+⬜⬛⬛⬛⬛⬛⬛⬛🔳🔳🔳⬛⬛⬛🔳⬛🔳🔳🔳⬛⬛⬛🔳🔳🔳🔳⬛⬛🔳🔳⬛⬛🔳🔳🔳🔳🔳🔳🔳⬛⬜
+⬜⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛🔳⬛🔳⬛🔳⬛🔳🔳🔳🔳⬛🔳⬛⬛🔳🔳⬛⬛⬛⬛🔳🔳🔳⬛⬛⬛⬜
+⬜🔳🔳🔳🔳⬛⬛⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛🔳⬛🔳🔳🔳🔳⬛🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜
+⬜🔳🔳🔳🔳⬛🔳🔳⬛⬛⬛⬛⬛⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛⬛⬛⬛🔳⬛⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳⬜
+⬜⬛🔳🔳⬛⬛🔳🔳🔳🔳🔳🔳🔳⬛🔳⬛🔳🔳🔳⬛🔳🔳🔳⬛⬛⬛⬛🔳⬛⬛⬛🔳⬛⬛⬛⬛⬛🔳⬛⬛⬜
+⬜🔳🔳🔳🔳⬛🔳🔳⬛🔳🔳🔳🔳⬛🔳⬛🔳⬛🔳⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛🔳🔳🔳🔳🔳⬛⬛⬜
+⬜🔳🔳🔳🔳⬛⬛⬛⬛🔳⬛⬛🔳⬛🔳⬛🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛⬜
+⬜🔳🔳🔳🔳⬛⬛⬛⬛🔳⬛⬛🔳⬛🔳⬛⬛⬛⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛⬛⬛⬛⬛⬜
+⬜🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛🔳🔳🔳⬛🔳🔳🔳⬛⬛⬛🔳⬛⬛⬛⬛⬛🔳🔳🔳⬛⬛🔳⬛🔳🔳⬛🔳🔳⬜
+⬜⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛🔳⬛🔳⬛🔳🔳🔳🔳🔳⬛⬛⬛🔳🔳🔳⬛⬛🔳⬛🔳🔳⬛🔳🔳⬜
+⬜🔳🔳🔳⬛🔳🔳🔳⬛🔳🔳🔳🔳🔳🔳🔳🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛⬛⬛🔳🔳🔳⬛⬛🔳🔳🔳🔳🔳🔳🔳⬜
+⬜🔳🔳🔳⬛🔳🔳🔳⬛⬛⬛⬛🔳⬛⬛⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳🔳🔳🔳🔳⬛⬛🔳⬛🔳🔳⬛🔳🔳⬜
+⬜⬛🔳⬛⬛⬛🔳⬛⬛⬛⬛⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛🔳🔳🔳⬛⬛🔳⬛🔳🔳⬛🔳🔳⬜
+⬜⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛🔳🔳🔳⬛🔳⬛🔳⬛🔳⬛🔳⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛⬜
+⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛🔳⬛⬛⬛⬛⬛🔳🔳🔳🔳🔳⬛🔳🔳🔳🔳⬛⬛⬛🔳⬛⬛⬛⬛🔳🔳⬜
+⬜⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛🔳⬛⬛⬛⬛🔳⬛⬜
+⬜⬛🔳🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛🔳⬛⬛⬛⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬜
+⬜⬛⬛🔳⬛⬛⬛🔳⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛🔳🔳🔳⬛🔳🔳⬛🔳⬛⬛🔳⬛⬛⬛🔳🔳⬛🔳⬛⬜
+⬜⬛⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛🔳🔳🔳⬛⬛🔳🔳⬛🔳🔳⬜
+⬜⬛⬛⬛⬛⬛⬛🔳⬛🔳🔳🔳🔳🔳🔳🔳🔳🔳🔳⬛⬛🔳🔳🔳⬛🔳🔳⬛⬛⬛🔳🔳🔳⬛⬛⬛⬛⬛⬛⬛⬜
+⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜`;
+
+function formatMap(mapString: string): string {
+    return mapString
+        .replace(/⬜/g, "██")  // เปลี่ยนขอบนอกเป็นกำแพง
+        .replace(/⬛/g, "██")  // เปลี่ยนกำแพงด้านใน
+        .replace(/🔳/g, "  "); // เปลี่ยนทางเดินเป็นช่องว่าง
+}
+
+// 3. นำไปใช้งาน
+backgroundFill = formatMap(backgroundFill);
     test()
     
 
@@ -29,7 +66,7 @@ const App = () => {
         <box style={{ borderStyle: "double",flexDirection: "column", justifyContent: "space-between",width:120,height:40,borderColor:"#35f306" }}> 
             <box style={{flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`}}>
                 <box style={{ flexDirection: "column", justifyContent: "space-between",width:`80%`,height:`100%` }}>
-                    <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`,borderColor:"#35f306"}}>
+                    <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`,borderColor:"#35f306",overflow: "hidden" }}>
                         <text>{backgroundFill}</text>
                         <text
                             position="absolute"
