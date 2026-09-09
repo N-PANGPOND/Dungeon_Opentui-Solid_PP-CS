@@ -10,9 +10,6 @@
     "jsx": "preserve",
     "jsxImportSource": "@opentui/solid",
     "allowJs": true,
-    "types": [
-      "bun"
-    ],
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
