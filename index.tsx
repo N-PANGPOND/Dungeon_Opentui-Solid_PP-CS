@@ -7,14 +7,8 @@ import path from "path";
 // ระบุที่อยู่ไฟล์เสียงให้ถูกต้อง
 const soundPath = path.join(process.cwd(), "alert.mp3");
 
-
-const { player: player, updatePlayerPosition } = useplayer()
-let timer: NodeJS.Timeout
-const App = () => {
-
+function test() {
     const renderer = useRenderer()
-    const backgroundFill = "🟦".repeat(1800);
-
     useKeyboard((key) => {
       if (key.name === "escape") {
         renderer.destroy()
@@ -22,11 +16,20 @@ const App = () => {
       if (["up", "down", "left", "right","w","a","s","d"].includes(key.name)) updatePlayerPosition(key.name)
     })
 
+}
+const { player: player, updatePlayerPosition } = useplayer()
+let timer: NodeJS.Timeout
+const App = () => {
+
+    const backgroundFill = "🟦".repeat(1800);
+    test()
+    
+
     return <box style={{ flexDirection: "column", justifyContent: "center",alignItems: "center",width:`100%`,height:`100%` }}> 
         <box style={{ borderStyle: "double",flexDirection: "column", justifyContent: "space-between",width:120,height:40,borderColor:"#35f306" }}> 
             <box style={{flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`}}>
                 <box style={{ flexDirection: "column", justifyContent: "space-between",width:`80%`,height:`100%` }}>
-                    <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`,borderColor:"#35f306",overflow: "hidden" }}>
+                    <box style={{borderStyle:"rounded", flexDirection: "row", justifyContent: "space-between",width:`100%`,height:`100%`,borderColor:"#35f306"}}>
                         <text>{backgroundFill}</text>
                         <text
                             position="absolute"
