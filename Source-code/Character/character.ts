@@ -1,3 +1,5 @@
+import { AttackingType,DefensiveType } from "../Type-Enum/enum";
+import type { MonsterType } from "../Type-Enum/type";
 
 export class Character {
     private maxHp: number;
@@ -18,10 +20,10 @@ export class Character {
         this.coin = coin;
     }
 
-takeDamage(amount: number): void {
+    takeDamage(amount: number): void {
         this.hp = Math.max(this.hp - amount);
     }
-isDead(): boolean {
+    isDead(): boolean {
         return this.hp <= 0;
     }   
     
@@ -42,5 +44,36 @@ isDead(): boolean {
     }
     getAgi(): number {
         return this.agi;
+    }
+    getCoin(): number {
+        return this.coin;
+    }
+}
+
+class Monster extends Character {
+    private MonsterType : MonsterType;
+
+    constructor(maxHp: number, atk: number, def: number, luc: number, agi: number, coin: number, monsterType: MonsterType) {
+        super(maxHp, atk, def, luc, agi, coin);
+        this.MonsterType = monsterType;
+    }
+    coinDrop():number {
+        return this.getCoin();
+    }
+    decideAttackingAction(): AttackingType {
+        let AttackPercentage: number = 0
+        let StrikePercentage: number = 0
+        let RunPercentage: number = 0
+
+        switch (this.MonsterType) {
+            case 'NORMAL MONS':
+                return AttackingType.Attack;
+            case 'ELITE MONS':
+                return AttackingType.Strike;
+            case 'BOSS':
+                return AttackingType.UseItem;
+            default:
+                return AttackingType.Attack;
+        }
     }
 }
