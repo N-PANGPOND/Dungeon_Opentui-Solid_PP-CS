@@ -1,3 +1,5 @@
+import { Inventory } from "../Item-Inventory/Inventory";
+import { Item } from "../Item-Inventory/Item";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import type { MonsterType,stats } from "../Type-Enum/type";
 
@@ -137,5 +139,59 @@ class Monster extends Character {
         } else {
             return DefensiveType.Run;
         }
+    }
+}
+
+
+
+class Player extends Character {
+    public Position: { x: number; y: number };
+
+    private inventory: Inventory = new Inventory();
+
+    constructor(
+        stats: any,
+        position: { x: number; y: number }
+    ) {
+        super(stats);
+        this.Position = position;
+    }
+
+    public adjustCoin(amount: number): void {
+        const newCoin = this.getCoin() + amount;
+        this.setCoin(newCoin);
+    }
+
+    private setCoin(amount: number): void {
+        (this as any).coin = amount;
+    }
+
+    public getInventory(): Inventory {
+        return this.inventory;
+    }
+
+    public override getCoin(): number {
+        return (this as any).coin;
+    }
+
+    public addItem(item: Item): void {
+        this.inventory.addItem(item);
+    }
+
+   public removeItem(item: Item): void {
+    const index = this.inventory.getItems().indexOf(item);
+
+    if (index !== -1) {
+        this.inventory.removeItem(index);
+    }
+}
+
+    public getRunnance(): number {
+        // ยังต้องกำหนดว่าค่า Runnance มาจากอะไร
+        return 0;
+    }
+
+    public getPosition(): { x: number; y: number } {
+        return this.Position;
     }
 }
