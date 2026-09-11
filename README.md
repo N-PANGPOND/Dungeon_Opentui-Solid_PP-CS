@@ -31,7 +31,7 @@
 
 | FR-01    ระบบเดิน    ผู้เล่นต้องสามารถเดินได้ ไม่ทะลุกำแพง |
 
-| FR-02    สุ่มอีเวนต์    ระหว่างเดินมีโอกาสเจอ Monster, Trap, Treasure, Potion, Merchant (Shop), Nothing โดยกำหนด probability |ของแต่ละแบบได้
+| FR-02    สุ่มอีเวนต์ ระหว่างเดินมีโอกาสเจอ Monster, Trap, Treasure, Potion, Merchant (Shop), Nothing โดยกำหนด probability ของแต่ละแบบได้ |   
 
 | FR-03    ระบบต่อสู้    Turn-based; Attacker เลือกได้จาก Attack/Strike/Use Item/Run, Defender เลือกได้จาก Defend/Counter/Use Item/Run |
 
@@ -49,10 +49,9 @@
 
 | FR-10    ระบบ Mob Decide    Monster ตัดสินใจเลือก action เองได้ระหว่าง Combat |
 
-| FR-11    ระบบหยุดเกม (Pause)   กด P เพื่อหยุดทุกอย่างชั่วคราว ไม่รับ key อื่นจนกว่าจะกด P ซ้ำเพื่อเล่นต่อ 
-(แยกจาก Q ที่ใช้ Quit ออกจากเกมถาวร) |
+| FR-11    ระบบหยุดเกม (Pause)   กด P เพื่อหยุดทุกอย่างชั่วคราว ไม่รับ key อื่นจนกว่าจะกด P ซ้ำเพื่อเล่นต่อ (แยกจาก Q ที่ใช้ Quit ออกจากเกมถาวร) |
 
-| FR-13    ระบบปรับความยากตามระยะทาง    คำนวณระยะจากแต่ละจุดถึง Exit แล้วปรับความเก่งของ Monster ตาม (ใกล้ Exit = ยาก, ใกล้ Start = ง่าย)
+| FR-13    ระบบปรับความยากตามระยะทาง คำนวณระยะจากแต่ละจุดถึง Exit แล้วปรับความเก่งของ Monster ตาม (ใกล้ Exit = ยาก, ใกล้ Start = ง่าย) |
 
 | FR-14    เงื่อนไขจบเกม    Victory เมื่อเดินถึง Exit, Game Over เมื่อ HP <= 0 |
 
