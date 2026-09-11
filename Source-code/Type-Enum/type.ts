@@ -7,6 +7,16 @@ export type Position = {
   y: number;
 };
 
+export type stats = {
+    maxHp: number;
+    hp: number;
+    atk: number;
+    def: number;
+    luc: number;
+    agi: number;
+    coin: number;
+};
+
 export type item = {
     name : string
     description: string; 

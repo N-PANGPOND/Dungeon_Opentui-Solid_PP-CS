@@ -1,5 +1,5 @@
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
-import type { MonsterType } from "../Type-Enum/type";
+import type { MonsterType,stats } from "../Type-Enum/type";
 
 export class Character {
     private maxHp: number;
@@ -10,14 +10,14 @@ export class Character {
     private agi: number;
     private coin: number;
 
-    constructor(maxHp: number, atk: number, def: number, luc: number, agi: number, coin: number) {
-        this.maxHp = maxHp;
-        this.hp = maxHp;
-        this.atk = atk;
-        this.def = def;
-        this.luc = luc;
-        this.agi = agi;
-        this.coin = coin;
+    constructor(stats: stats) {
+        this.maxHp = stats.maxHp;
+        this.hp = stats.hp;
+        this.atk = stats.atk;
+        this.def = stats.def;
+        this.luc = stats.luc;
+        this.agi = stats.agi;
+        this.coin = stats.coin;
     }
 
     takeDamage(amount: number): void {
@@ -50,11 +50,23 @@ export class Character {
     }
 }
 
+class MonsterFactory {
+    createMonster(distToExit: number): Monster {
+        if (distToExit < 3) {
+            return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'BOSS');
+        }else if (distToExit < 25) { 
+            return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'ELITE MONS');
+        } else {
+            return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'NORMAL MONS');
+        }
+    }
+}
+
 class Monster extends Character {
     private MonsterType : MonsterType;
 
-    constructor(maxHp: number, atk: number, def: number, luc: number, agi: number, coin: number, monsterType: MonsterType) {
-        super(maxHp, atk, def, luc, agi, coin);
+    constructor(stats: stats, monsterType: MonsterType) {
+        super(stats);
         this.MonsterType = monsterType;
     }
     coinDrop():number {
