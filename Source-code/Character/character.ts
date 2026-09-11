@@ -67,13 +67,63 @@ class Monster extends Character {
 
         switch (this.MonsterType) {
             case 'NORMAL MONS':
-                return AttackingType.Attack;
+                AttackPercentage = 0.6
+                StrikePercentage = 0.3
+                RunPercentage = 0.1
+                break;
             case 'ELITE MONS':
-                return AttackingType.Strike;
+                AttackPercentage = 0.5
+                StrikePercentage = 0.4
+                RunPercentage = 0.1
+                break;
             case 'BOSS':
-                return AttackingType.UseItem;
+                AttackPercentage = 0.4
+                StrikePercentage = 0.4
+                RunPercentage = 0.2
+                break;
             default:
-                return AttackingType.Attack;
+                throw new Error("Invalid Monster Type");}
+        let Sum = AttackPercentage + StrikePercentage + RunPercentage;
+        let randomValue = Math.random() * Sum;
+        if (randomValue < AttackPercentage) {
+            return AttackingType.Attack;
+        } else if (randomValue < AttackPercentage + StrikePercentage) {
+            return AttackingType.Strike;
+        } else {
+            return AttackingType.Run;
+        }
+    }
+    decideDefensiveAction(): DefensiveType {
+        let DefendPercentage: number = 0
+        let CounterPercentage: number = 0
+        let RunPercentage: number = 0
+        switch (this.MonsterType) {
+            case 'NORMAL MONS':
+                DefendPercentage = 0.5
+                CounterPercentage = 0.3
+                RunPercentage = 0.2
+                break;
+            case 'ELITE MONS':
+                DefendPercentage = 0.4
+                CounterPercentage = 0.4
+                RunPercentage = 0.2
+                break;
+            case 'BOSS':
+                DefendPercentage = 0.3
+                CounterPercentage = 0.4
+                RunPercentage = 0.3
+                break;
+            default:
+                throw new Error("Invalid Monster Type");
+        }
+        let Sum = DefendPercentage + CounterPercentage + RunPercentage;
+        let randomValue = Math.random() * Sum;
+        if (randomValue < DefendPercentage) {
+            return DefensiveType.Defend;
+        } else if (randomValue < DefendPercentage + CounterPercentage) {
+            return DefensiveType.Counter;
+        } else {
+            return DefensiveType.Run;
         }
     }
 }
