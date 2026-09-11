@@ -10,7 +10,6 @@ export type position = {
 
 const [player, playerState] = createSignal<position>({ x: 2, y: 2 })
 
-let lastTime = performance.now()
 const speed = 0.1
 let direction = 1
 function updatePlayerPosition(key: string) {
