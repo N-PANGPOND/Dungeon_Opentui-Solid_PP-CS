@@ -7,6 +7,19 @@ export type Position = {
   y: number;
 };
 
+export type Weights = {
+    [key in MonsterType]: {
+        Attack: number;
+        Strike: number;
+        Run: number;
+    } 
+} | { [key in MonsterType]: {
+        Defend: number;
+        Counter: number;
+        Run: number;
+    } }
+
+
 export type stats = {
     maxHp: number;
     hp: number;

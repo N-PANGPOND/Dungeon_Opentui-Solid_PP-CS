@@ -1,7 +1,8 @@
 import { Inventory } from "../Item-Inventory/Inventory";
 import { Item } from "../Item-Inventory/Item";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
-import type { MonsterType,stats } from "../Type-Enum/type";
+import type { MonsterType,stats, Weights } from "../Type-Enum/type";
+import { getRandomAction } from "../pure-function";
 
 export class Character {
     private maxHp: number;
@@ -24,6 +25,12 @@ export class Character {
 
     takeDamage(amount: number): void {
         this.hp = Math.max(this.hp - amount);
+    }
+    heal(amount: number): void {
+        if (amount <= 0 || this.isDead()) {
+            throw new Error("Invalid heal amount or character is dead");
+        }
+        this.hp = Math.min(this.maxHp, this.hp + amount);
     }
     isDead(): boolean {
         return this.hp <= 0;
@@ -75,74 +82,30 @@ class Monster extends Character {
         return this.getCoin();
     }
     decideAttackingAction(): AttackingType {
-        let AttackPercentage: number = 0
-        let StrikePercentage: number = 0
-        let RunPercentage: number = 0
+        const weights : Weights = {
+            'NORMAL MONS': { Attack: 0.65, Strike: 0.25, Run: 0.10 },
+            'ELITE MONS': { Attack: 0.6, Strike: 0.37, Run: 0.03 },
+            'BOSS': { Attack: 0.5, Strike: 0.5, Run: 0 }
+        };
 
-        switch (this.MonsterType) {
-            case 'NORMAL MONS':
-                AttackPercentage = 0.6
-                StrikePercentage = 0.3
-                RunPercentage = 0.1
-                break;
-            case 'ELITE MONS':
-                AttackPercentage = 0.5
-                StrikePercentage = 0.4
-                RunPercentage = 0.1
-                break;
-            case 'BOSS':
-                AttackPercentage = 0.4
-                StrikePercentage = 0.4
-                RunPercentage = 0.2
-                break;
-            default:
-                throw new Error("Invalid Monster Type");}
-        let Sum = AttackPercentage + StrikePercentage + RunPercentage;
-        let randomValue = Math.random() * Sum;
-        if (randomValue < AttackPercentage) {
-            return AttackingType.Attack;
-        } else if (randomValue < AttackPercentage + StrikePercentage) {
-            return AttackingType.Strike;
-        } else {
-            return AttackingType.Run;
-        }
+        const { Attack: AttackPercentage, Strike: StrikePercentage, Run: RunPercentage } = weights[this.MonsterType];
+        let Sumweights = AttackPercentage + StrikePercentage + RunPercentage;
+        let randomValue = Math.random() * Sumweights;
+        return getRandomAction(this.MonsterType, randomValue, weights) as AttackingType;
     }
     decideDefensiveAction(): DefensiveType {
-        let DefendPercentage: number = 0
-        let CounterPercentage: number = 0
-        let RunPercentage: number = 0
-        switch (this.MonsterType) {
-            case 'NORMAL MONS':
-                DefendPercentage = 0.5
-                CounterPercentage = 0.3
-                RunPercentage = 0.2
-                break;
-            case 'ELITE MONS':
-                DefendPercentage = 0.4
-                CounterPercentage = 0.4
-                RunPercentage = 0.2
-                break;
-            case 'BOSS':
-                DefendPercentage = 0.3
-                CounterPercentage = 0.4
-                RunPercentage = 0.3
-                break;
-            default:
-                throw new Error("Invalid Monster Type");
-        }
-        let Sum = DefendPercentage + CounterPercentage + RunPercentage;
-        let randomValue = Math.random() * Sum;
-        if (randomValue < DefendPercentage) {
-            return DefensiveType.Defend;
-        } else if (randomValue < DefendPercentage + CounterPercentage) {
-            return DefensiveType.Counter;
-        } else {
-            return DefensiveType.Run;
-        }
+        const weights : Weights = {
+            'NORMAL MONS': { Defend: 0.5, Counter: 0.3, Run: 0.2 },
+            'ELITE MONS': { Defend: 0.4, Counter: 0.4, Run: 0.2 },
+            'BOSS': { Defend: 0.3, Counter: 0.4, Run: 0.3 }
+        };
+
+        const { Defend: DefendPercentage, Counter: CounterPercentage, Run: RunPercentage } = weights[this.MonsterType];
+        let Sumweights = DefendPercentage + CounterPercentage + RunPercentage;
+        let randomValue = Math.random() * Sumweights;
+        return getRandomAction(this.MonsterType, randomValue, weights) as DefensiveType;
     }
 }
-
-
 
 class Player extends Character {
     public Position: { x: number; y: number };
