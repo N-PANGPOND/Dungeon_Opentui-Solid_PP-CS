@@ -15,10 +15,10 @@ export class GameLoop {
     public start(): void {
         this.isRunning = true;
         this.consoleIO.Clear();
-        this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
+       // this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
     }
 
-    public handleInput(key: string): void {
+    /*public handleInput(key: string): void {
         if (!this.isRunning) {
             return;
         }
@@ -58,7 +58,7 @@ export class GameLoop {
 
         this.consoleIO.Clear();
         this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
-    }
+    }*/
 
     public end(): void {
         this.isRunning = false;
