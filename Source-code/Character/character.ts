@@ -33,9 +33,15 @@ export class Character {
         this.hp = Math.min(this.maxHp, this.hp + amount);
     }
     IncreaseATK(amount: number): void {
+        if (amount <= 0 || this.isDead()) {
+            throw new Error("Invalid ATK increase amount or character is dead");
+        }
         this.atk += amount;
     }
     IncreaseDEF(amount: number): void {
+        if (amount <= 0 || this.isDead()) {
+            throw new Error("Invalid DEF increase amount or character is dead");
+        }
         this.def += amount;
     }
     isDead(): boolean {
@@ -114,13 +120,12 @@ class Monster extends Character {
 }
 
 class Player extends Character {
-    public Position: { x: number; y: number };
-
+    public Position: Position;
     private inventory: Inventory = new Inventory();
 
     constructor(
         stats: stats,
-        position: { x: number; y: number }
+        position: Position
     ) {
         super(stats);
         this.Position = position;
@@ -139,10 +144,6 @@ class Player extends Character {
         return this.inventory;
     }
 
-    public override getCoin(): number {
-        return (this as any).coin;
-    }
-
     public addItem(item: Item): void {
         this.inventory.addItem(item);
     }
@@ -155,12 +156,11 @@ class Player extends Character {
     }
 }
 
-    public getRunnance(): number {
-        // ยังต้องกำหนดว่าค่า Runnance มาจากอะไร
-        return 0;
+    public getRunChance(): number {
+        return (this.getAgi() + this.getLuc())*0.005;
     }
 
-    public getPosition(): { x: number; y: number } {
+    public getPosition(): Position {
         return this.Position;
     }
 }
