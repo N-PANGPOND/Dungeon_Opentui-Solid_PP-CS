@@ -1,5 +1,6 @@
 import type { MonsterType, Weights } from "./Type-Enum/type";
 import { AttackingType,DefensiveType } from "./Type-Enum/enum";
+import { Character} from "./Character/character";   
     
 export function getRandomAction(monsterType: MonsterType, randomValue: number,weights: Weights): AttackingType | DefensiveType {
     const monsterWeights = weights[monsterType];
@@ -14,4 +15,10 @@ export function getRandomAction(monsterType: MonsterType, randomValue: number,we
     }
     throw new Error("Invalid random value or monster type");
 }
+ export function EvadeCheck (character: Character, randomValue : number ): boolean {
+    const evadeChance = character.getAgi();
+    
+    return randomValue < evadeChance;
+}
 
+    
