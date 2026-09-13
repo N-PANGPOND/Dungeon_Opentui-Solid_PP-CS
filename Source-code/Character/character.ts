@@ -32,6 +32,12 @@ export class Character {
         }
         this.hp = Math.min(this.maxHp, this.hp + amount);
     }
+    IncreaseATK(amount: number): void {
+        this.atk += amount;
+    }
+    IncreaseDEF(amount: number): void {
+        this.def += amount;
+    }
     isDead(): boolean {
         return this.hp <= 0;
     }   
@@ -113,7 +119,7 @@ class Player extends Character {
     private inventory: Inventory = new Inventory();
 
     constructor(
-        stats: any,
+        stats: stats,
         position: { x: number; y: number }
     ) {
         super(stats);

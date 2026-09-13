@@ -25,54 +25,60 @@ export class Item {
 
 
 export class Itemfactory {
-
     public static CreatePOTION(): Item {
-        return new Item('POTION', 'Restores 50 HP', 10,() => {
-            
-          effect: () => {
-            const healAmount = 20;
-           
-
-          }
-        });
-    }
+    return new Item(
+        "POTION",
+        "Restores 50 HP",
+        20,
+        (target: Character) => {
+            const healAmount = 50;
+            target.heal(healAmount);
+        }
+    );
+ }
     public static CreateHIGH_POTION(): Item {
-        return new Item('HIGH POTION', 'Restores 100 HP', 20,() => {
-            effect: () => {
-                const healAmount = 50;
-                // Implement the effect of the high potion here
-            }
-          
-        });
-    }
+    return new Item(
+        "HIGH_POTION",
+        "Restores 100 HP",
+        50,
+        (target: Character) => {
+            const healAmount = 100;
+            target.heal(healAmount);
+        }
+    );
+ }
     public static CreatePOTION_ATK(): Item {
-        return new Item('POTION ATK', 'Increases attack by 10 for 5 turns', 15,() => {
-            // Implement the effect of the attack potion here
-            effect: () => {
-                const attackIncrease = 10;
-                const duration = 5; // Number of turns the effect lasts
-                // Apply the attack increase to the character for the specified duration
-            }
-          
-        });
-    }
+    return new Item(
+        "POTION_ATK",
+        "Increase ATK by 10",
+        75,
+        (target: Character) => {
+            const attackAmount = 10;
+            target.IncreaseATK(attackAmount);
+        }
+    );
+ }
     public static CreatePOTION_DEF(): Item {
-        return new Item('POTION DEF', 'Increases defense by 10 for 5 turns', 15,() => {
-            // Implement the effect of the defense potion here
-            effect: () => {
-                const defenseIncrease = 10;
-                const duration = 5; // Number of turns the effect lasts
-                // Apply the defense increase to the character for the specified duration
-            }
-        });
-    }
-    public static CreateSMOKE_BOMB(): Item {
-        return new Item('SMOKE BOMB', 'Escapes from combat', 30,() => {
-            // Implement the effect of the smoke bomb here
-            effect: () => {
-                // Implement the smoke bomb effect here
-            }
-        });
-    }
+    return new Item(
+        "POTION_DEF",
+        "Increase DEF by 10",
+        75,
+        (target: Character) => {
+            const defenseAmount = 10;
+            target.IncreaseDEF(defenseAmount);
+        }
+    );
 
+ }
+    public static CreateSMOKE_BOMB(): Item {
+    return new Item(
+        "SMOKE_BOMB",
+        "Escape from battle",
+        100,
+        (target: Character) => {
+            // Implement escape logic here
+            console.log(`${target} used SMOKE_BOMB to escape!`);
+        }
+    );
+ }
 }
