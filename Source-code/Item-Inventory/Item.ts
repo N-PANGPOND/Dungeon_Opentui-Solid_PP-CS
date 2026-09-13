@@ -28,10 +28,10 @@ export class Itemfactory {
     public static CreatePOTION(): Item {
     return new Item(
         "POTION",
-        "Restores 50 HP",
+        "Restores 25 HP",
         20,
         (target: Character) => {
-            const healAmount = 50;
+            const healAmount = 25;
             target.heal(healAmount);
         }
     );
@@ -39,10 +39,10 @@ export class Itemfactory {
     public static CreateHIGH_POTION(): Item {
     return new Item(
         "HIGH_POTION",
-        "Restores 100 HP",
+        "Restores 50 HP",
         50,
         (target: Character) => {
-            const healAmount = 100;
+            const healAmount = 50;
             target.heal(healAmount);
         }
     );
@@ -50,10 +50,10 @@ export class Itemfactory {
     public static CreatePOTION_ATK(): Item {
     return new Item(
         "POTION_ATK",
-        "Increase ATK by 10",
+        "Increase ATK by 5",
         75,
         (target: Character) => {
-            const attackAmount = 10;
+            const attackAmount = 5;
             target.IncreaseATK(attackAmount);
         }
     );
@@ -61,10 +61,10 @@ export class Itemfactory {
     public static CreatePOTION_DEF(): Item {
     return new Item(
         "POTION_DEF",
-        "Increase DEF by 10",
-        75,
+        "Increase DEF by 5",
+        70,
         (target: Character) => {
-            const defenseAmount = 10;
+            const defenseAmount = 5;
             target.IncreaseDEF(defenseAmount);
         }
     );
