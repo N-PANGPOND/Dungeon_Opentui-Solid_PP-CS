@@ -3,7 +3,7 @@
 |-----------------|------------------------------|
 | ชื่อโปรเจกต์       | Dungeon Escape               |
 | วัตถุประสงค์       | นันทนาการ เเละ การทำ Project   |
-| ผู้ใช้งานเป้าหมาย   | กลุ่ม CsRmuti                  |
+| ผู้ใช้งานเป้าหมาย   | กลุ่ม CS Rmuti                  |
 | ขอบเขต (Scope)  | Game Console Terminal 2d PC  |
 
 ## 2.Requirements
@@ -394,7 +394,7 @@ KL-03	Combat Animation	ไม่มี Animation ระหว่างการ�
 KL-04	Monster AI	Monster ใช้ Rule-based Decision Logic
 KL-05	Map	รูปแบบและขนาดของ Dungeon ถูกกำหนดโดย Configuration
 KL-06	JSON Persistence	การบันทึกข้อมูลใช้ JSON File และมีขอบเขตตามโครงสร้างข้อมูลที่กำหนด
-KL-07
+KL-07 Random Event	ผลของ Encounter มีความไม่แน่นอนตาม Probability
 ```
 
 # example
