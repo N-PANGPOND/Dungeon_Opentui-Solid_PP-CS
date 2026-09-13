@@ -103,25 +103,45 @@ Resolve Event // จัดการ Event
 
 ## 3.2 Combat
 
-  # เมื่อพบ Monster เกมจะเข้าสู่ระบบ Combat แบบ Turn-based โดย Player และ Monster จะผลัดกันเลือก Action ในแต่ละ Turn
-  
+## เมื่อพบ Monster เกมจะเข้าสู่ระบบ Combat แบบ Turn-based โดย Player และ Monster จะผลัดกันเลือก Action ในแต่ละ Turn
+ 
+ #####  Action นั้นมี 2 Phase คือ การโจมตี เเละ การป้องกัน โดยที่ ถ้า Player โจมตี Monster จะป้องกัน ถ้า Monster โจมตี Player จะป้องกัน 
+ 
+ ##### Player จะเป็นคนเริ่ม Turn ก่อนเสมอ
+
 ผู้เล่นสามารถเลือก Action:
-  
+
+เป็นฝ่ายโจมตี  
 ```text
 Attack // โจมตีปกติ
 Strike // โจมตีพิเศษ
 Use Item // ใช้ไอเทม
 Run // หนี
   ```
-  # Turn ของ Monster สามารถเลือก Action ได้ดังนี้ โดยระบบจะสุ่ม Action ตาม Probability ของ Monster แต่ละประเภท
+เป็นฝ่ายป้องกัน 
+  ```text
+Defend // ป้องกัน
+Counter // สวนกลับ
+Use Item // ใช้ไอเทม
+Run // หนี
+  ```
+  #### Turn ของ Monster สามารถเลือก Action ได้ดังนี้ โดยระบบจะสุ่ม Action ตาม Probability ของ Monster แต่ละประเภท
 
+Monster สามารถเลือก Action:
+
+เป็นฝ่ายโจมตี
 ```text
 Attack // โจมตีปกติ
+Strike // โจมตีพิเศษ
+Run // หนี
+  ```
+เป็นฝ่ายป้องกัน 
+  ```text
 Defend // ป้องกัน
 Counter // สวนกลับ
 Run // หนี
   ```
-# Combat จะดำเนินต่อจนกว่าฝ่ายใดฝ่ายหนึ่งจะ HP เหลือ 0 หรือผู้เล่นและมอนเตอร์สามารถ Run ได้สำเร็จ
+#### Combat จะดำเนินต่อจนกว่าฝ่ายใดฝ่ายหนึ่งจะ HP เหลือ 0 หรือผู้เล่นและมอนเตอร์สามารถ Run ได้สำเร็จ
 
 ---
 
