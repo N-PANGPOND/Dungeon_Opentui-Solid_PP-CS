@@ -5,9 +5,7 @@ import { Character} from "./Character/character";
 export function getRandomAction(monsterType: MonsterType, randomValue: number,weights: Weights): AttackingType | DefensiveType {
     const monsterWeights = weights[monsterType];
     let Sumweight = 0;
-    for (let i = 0; i < Object.keys(monsterWeights).length; i++) {
-        let action = Object.keys(monsterWeights)[i];
-        let weight = monsterWeights[action as keyof typeof monsterWeights];
+    for (const [action,weight] of Object.entries(monsterWeights)) {
         Sumweight += weight;
         if (randomValue < Sumweight) {
             return AttackingType[action as keyof typeof AttackingType] || DefensiveType[action as keyof typeof DefensiveType];
