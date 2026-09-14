@@ -1,74 +1,85 @@
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
+
+type PendingMenu = {
+    options: string[];
+    resolve: (value: string) => void;
+};
+
+
 export class ConsoleIO {
 
-    ShowMessage(type: string, text: string): void {
-        console.log(`[${type}] ${text}`);
+    private pendingMenu: PendingMenu | null = null;
+    private selectedIndex = 0;
+
+    constructor(
+        private setMessage:(value: string) => void,
+        private setStatus: (value: string) => void,
+        private setSelectedIndex: (index: number) => void,
+    ){}
+
+    public ShowMessage(type: string, text: string): void {
+        this.setMessage(`[${type}] ${text}`);
     }
 
-    Clear(): void {
-        console.clear();
+    public Clear(): void {
+        this.setMessage("");
+    }
+    
+    public ShowStatus(status: string): void {
+        this.setStatus(status);
     }
 
     //renderMap(map: DungeonMap, playerPos: Position): void {
         // ทำทีหลัง
     //}
 
-    showAttackingMenu(): AttackingType {
+    public handleMenuKey(keyName: string): boolean {
+        const menu = this.pendingMenu;
+        if(!menu) return false;
 
-        console.log("===== ATTACK MENU =====");
-        console.log("1. Attack");
-        console.log("2. Strike");
-        console.log("3. Use Item");
-        console.log("4. Run");
-
-        const choice = Number(prompt("Choose: "));
-
-        switch (choice) {
-            case 1:
-                return AttackingType.Attack;
-
-            case 2:
-                return AttackingType.Strike;
-
-            case 3:
-                return AttackingType.UseItem;
-
-            case 4:
-                return AttackingType.Run;
-
-            default:
-                console.log("Invalid choice!");
-                return this.showAttackingMenu();
+        if(keyName === "up"){
+            this.selectedIndex =
+            (this.selectedIndex - 1 + menu.options.length) % menu.options.length;
+            this.setSelectedIndex(this.selectedIndex);
+            return true;
         }
+        if(keyName === "down"){
+            this.selectedIndex =
+            (this.selectedIndex + 1) % menu.options.length;
+            this.setSelectedIndex(this.selectedIndex);
+            return true;
+        }
+        if (keyName === "return") {
+            const chosen = menu.options[this.selectedIndex];
+            if (chosen === undefined) return true;
+            menu.resolve(chosen);
+            this.pendingMenu = null;
+            return true;
+        }
+        return false;
     }
 
-    showDefensiveMenu(): DefensiveType {
+    public showAttackingMenu(): Promise<AttackingType> {
 
-        console.log("===== DEFENSIVE MENU =====");
-        console.log("1. Defend");
-        console.log("2. Counter");
-        console.log("3. Use Item");
-        console.log("4. Run");
-
-        const choice = Number(prompt("Choose: "));
-
-        switch (choice) {
-            case 1:
-                return DefensiveType.Defend;
-
-            case 2:
-                return DefensiveType.Counter;
-
-            case 3:
-                return DefensiveType.UseItem;
-
-            case 4:
-                return DefensiveType.Run;
-
-            default:
-                console.log("Invalid choice!");
-                return this.showDefensiveMenu();
-        }
+        const options = ["Attack", "Strike", "Use Item", "Run"];
+        this.selectedIndex = 0;
+        this.setSelectedIndex(0);
+        this.setMessage("↑↓ เลือก, Enter ยืนยัน");
+        return new Promise((resolve) => {
+            this.pendingMenu = { options, resolve: resolve as (value: string) => void };
+        }) as Promise<AttackingType>;
     }
+
+    public showDefensiveMenu(): Promise<DefensiveType> {
+
+        const options = ["Defend", "Counter", "Use Item", "Run"];
+        this.selectedIndex = 0;
+        this.setSelectedIndex(0);
+        this.setMessage("↑↓ เลือก, Enter ยืนยัน");
+        return new Promise((resolve) => {
+            this.pendingMenu = { options, resolve: resolve as (value: string) => void };
+        }) as Promise<DefensiveType>;
+    }
+
 }
