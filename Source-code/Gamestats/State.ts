@@ -1,49 +1,41 @@
-import { Player } from "./Player";
-import { GameScreen } from "./GameScreen";
-import { DungeonMap } from "./DungeonMap";
-import { Position } from "./Position";
-import { CombatSystem } from "./CombatSystem";
-import { Event } from "./Event";
+import { Player } from "../Character/character";
+import type { Position, gameScreen } from "../Type-Enum/type";
+import { DungeonMap } from"../DungeonMap/DungeonMap"
+//import { CombatSystem } 
+//import { Event }
 
 export type Direction = "up" | "down" | "left" | "right";
 
-export enum EndingType {
-  NONE,      // ยังไม่ถึง exit เกมยังไม่จบ
-  GOOD_END,  // ถึง exit + ช่วยภรรยาแล้ว
-  BAD_END,   // ถึง exit + ไม่ได้ช่วยภรรยา
-}
-
 export class GameState {
-  // ---- Public fields ----
+  // Public 
   public player: Player;
-  public gameScreen: GameScreen;
+  public gameScreen: gameScreen;
   public currentMap: DungeonMap;
-  public exploredTiles: Set<Position>;
+  public exploredTiles: Set<Position>; // Set of explored tile positions in the format "x,y"
 
-  // ---- Private fields ----
+  //  Private 
   private isGetWife: boolean;
-  private combatSystem: CombatSystem;
-  private eventSystem: Event;
+ // private combatSystem: CombatSystem;
+ // private eventSystem: GameEvent;
   private isPause: boolean;
 
-  constructor(player: Player, gameScreen: GameScreen, currentMap: DungeonMap) {
+  constructor(player: Player, gameScreen: gameScreen, currentMap: DungeonMap) {
     this.player = player;
     this.gameScreen = gameScreen;
     this.currentMap = currentMap;
     this.exploredTiles = new Set<Position>();
-
     this.isGetWife = false;
-    this.combatSystem = new CombatSystem();
-    this.eventSystem = new Event();
+   // this.combatSystem = new CombatSystem();
+  //this.eventSystem = new GameEvent();
     this.isPause = false;
   }
 
-  // ---- Private methods ----
+  // Private methods
   private Pause(): void {
     this.isPause = !this.isPause;
   }
 
-  // ---- Public methods ----
+  // Public methods
   public movePlayer(direction: Direction): boolean {
     if (this.isPause) return false;
 
@@ -80,16 +72,23 @@ export class GameState {
   }
 
   public checkTileEvent(): void {
-    const pos: Position = this.player.Position;
+    const chance = Math.random();
+    if (chance < 0.40) {
+      // 40% ไม่มีอะไรเกิดขึ้น
+      return;
+    } else if (chance < 0.70) {
+      // 30% เกิดการต่อสู้
+      this.gameScreen = "COMBAT";
 
-  }
-  public checkEnding(): EndingType {
-    const reachedExit =
-      this.currentMap.getDistanceToExit(this.player.Position) === 0;
- 
-    if (!reachedExit) return EndingType.NONE;
- 
-    return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
+    }else if (chance < 0.90) {
+      // 20% เกิดเหตุการณ์พิเศษ
+      this.gameScreen = "EVENT";
+      // this.eventSystem.triggerEvent(this.player);
+    }else {
+      // 10% เกิดการซื้อขาย
+      this.gameScreen = "SHOP";
+    
+    }
   }
 
   public isGameOver(): boolean {
@@ -97,6 +96,6 @@ export class GameState {
   }
 
   public isVictory(): boolean {
-    return this.checkEnding() === EndingType.GOOD_END;
-}
+     return this.currentMap.getDistanceToExit(this.player.Position) === 0;
   }
+}
