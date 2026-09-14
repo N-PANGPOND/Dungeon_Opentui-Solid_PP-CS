@@ -1,12 +1,11 @@
 import type { MonsterType, Weights } from "./Type-Enum/type";
 import { AttackingType,DefensiveType } from "./Type-Enum/enum";
+import { Character} from "./Character/character";   
     
 export function getRandomAction(monsterType: MonsterType, randomValue: number,weights: Weights): AttackingType | DefensiveType {
     const monsterWeights = weights[monsterType];
     let Sumweight = 0;
-    for (let i = 0; i < Object.keys(monsterWeights).length; i++) {
-        let action = Object.keys(monsterWeights)[i];
-        let weight = monsterWeights[action as keyof typeof monsterWeights];
+    for (const [action,weight] of Object.entries(monsterWeights)) {
         Sumweight += weight;
         if (randomValue < Sumweight) {
             return AttackingType[action as keyof typeof AttackingType] || DefensiveType[action as keyof typeof DefensiveType];
@@ -14,4 +13,10 @@ export function getRandomAction(monsterType: MonsterType, randomValue: number,we
     }
     throw new Error("Invalid random value or monster type");
 }
+ export function EvadeCheck (character: Character, randomValue : number ): boolean {
+    const evadeChance = character.getAgi();
+    
+    return randomValue < evadeChance;
+}
 
+    
