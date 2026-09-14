@@ -1,14 +1,14 @@
 export enum AttackingType {
     Attack="Attack",
     Strike="Strike",
-    UseItem="UseItem",
+    UseItem="Use Item",
     Run="Run"
 };
 
 export enum DefensiveType {
     Defend = "Defend",
     Counter = "Counter",
-    UseItem = "UseItem",
+    UseItem = "Use Item",
     Run = "Run"
 }
 

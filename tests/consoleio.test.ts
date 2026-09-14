@@ -1,122 +1,117 @@
-import { describe, expect, it, mock, beforeEach, afterEach } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { ConsoleIO } from "../Source-code/ConsoleIO/ConsoleIO";
 import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
 
+const makeIO = () => {
+    const setMessage = mock((_value: string) => {});
+    const setStatus = mock((_value: string) => {});
+    const setSelectedIndex = mock((_index: number) => {});
+    const io = new ConsoleIO(setMessage, setStatus, setSelectedIndex);
+    return { io, setMessage, setStatus, setSelectedIndex };
+};
+
 describe("ConsoleIO", () => {
-    let io: ConsoleIO;
-
-    beforeEach(() => {
-        io = new ConsoleIO();
+    it("ShowMessage ควรส่ง [type] text ไปที่ setMessage", () => {
+        const { io, setMessage } = makeIO();
+        io.ShowMessage("SYSTEM", "Test message");
+        expect(setMessage).toHaveBeenCalledWith("[SYSTEM] Test message");
     });
 
-    afterEach(() => {
-        mock.restore();
+    it("Clear ควรส่งข้อความว่างไปที่ setMessage", () => {
+        const { io, setMessage } = makeIO();
+        io.Clear();
+        expect(setMessage).toHaveBeenCalledWith("");
     });
 
-    describe("ShowMessage", () => {
-        it("ควรแสดงข้อความในรูปแบบ [type] text", () => {
-            const logSpy = mock(() => {});
-            const originalLog = console.log;
-            console.log = logSpy as unknown as typeof console.log;
-
-            try {
-                io.ShowMessage("SYSTEM", "Test message");
-
-                expect(logSpy).toHaveBeenCalledTimes(1);
-                expect(logSpy).toHaveBeenCalledWith("[SYSTEM] Test message");
-            } finally {
-                console.log = originalLog;
-            }
-        });
+    it("ShowStatus ควรส่ง status ไปที่ setStatus", () => {
+        const { io, setStatus } = makeIO();
+        io.ShowStatus("HP: 100/100");
+        expect(setStatus).toHaveBeenCalledWith("HP: 100/100");
     });
 
-    describe("Clear", () => {
-        it("ควรเรียก console.clear()", () => {
-            const clearSpy = mock(() => {});
-            const originalClear = console.clear;
-            console.clear = clearSpy as unknown as typeof console.clear;
-
-            try {
-                io.Clear();
-
-                expect(clearSpy).toHaveBeenCalledTimes(1);
-            } finally {
-                console.clear = originalClear;
-            }
-        });
+    it("ถ้ายังไม่มี menu handleMenuKey ควรคืน false", () => {
+        const { io } = makeIO();
+        expect(io.handleMenuKey("down")).toBe(false);
     });
 
-    describe("showAttackingMenu", () => {
-        it("input 1 ควรได้ Attack", () => {
-            globalThis.prompt = mock(() => "1");
-
-            expect(io.showAttackingMenu()).toBe(AttackingType.Attack);
-        });
-
-        it("input 2 ควรได้ Strike", () => {
-            globalThis.prompt = mock(() => "2");
-
-            expect(io.showAttackingMenu()).toBe(AttackingType.Strike);
-        });
-
-        it("input 3 ควรได้ UseItem", () => {
-            globalThis.prompt = mock(() => "3");
-
-            expect(io.showAttackingMenu()).toBe(AttackingType.UseItem);
-        });
-
-        it("input 4 ควรได้ Run", () => {
-            globalThis.prompt = mock(() => "4");
-
-            expect(io.showAttackingMenu()).toBe(AttackingType.Run);
-        });
-
-        it("input ไม่ถูกต้องควรถามใหม่จนกว่าจะได้ input ที่ถูกต้อง", () => {
-            let callCount = 0;
-            globalThis.prompt = mock(() => {
-                callCount += 1;
-                return callCount === 1 ? "99" : "1";
-            });
-
-            expect(io.showAttackingMenu()).toBe(AttackingType.Attack);
-            expect(globalThis.prompt).toHaveBeenCalledTimes(2);
-        });
+    it("attacking menu เริ่มที่ Attack", async () => {
+        const { io, setSelectedIndex, setMessage } = makeIO();
+        const p = io.showAttackingMenu();
+        expect(setSelectedIndex).toHaveBeenCalledWith(0);
+        expect(setMessage).toHaveBeenCalledWith("↑↓ เลือก, Enter ยืนยัน");
+        io.handleMenuKey("return");
+        await expect(p).resolves.toBe(AttackingType.Attack);
     });
 
-    describe("showDefensiveMenu", () => {
-        it("input 1 ควรได้ Defend", () => {
-            globalThis.prompt = mock(() => "1");
+    it("attacking menu down 1/2/3 ครั้งควรได้ Strike/Use Item/Run", async () => {
+        const { io } = makeIO();
 
-            expect(io.showDefensiveMenu()).toBe(DefensiveType.Defend);
-        });
+        let p = io.showAttackingMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("return");
+        await expect(p).resolves.toBe(AttackingType.Strike);
 
-        it("input 2 ควรได้ Counter", () => {
-            globalThis.prompt = mock(() => "2");
+        p = io.showAttackingMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("return");
+        await expect(p).resolves.toBe(AttackingType.UseItem);
 
-            expect(io.showDefensiveMenu()).toBe(DefensiveType.Counter);
-        });
+        p = io.showAttackingMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
+        io.handleMenuKey("return");
+        await expect(p).resolves.toBe(AttackingType.Run);
+    });
 
-        it("input 3 ควรได้ UseItem", () => {
-            globalThis.prompt = mock(() => "3");
+    it("attacking menu up จาก index 0 ต้องวนไป index 3", () => {
+        const { io, setSelectedIndex } = makeIO();
+        io.showAttackingMenu();
+        setSelectedIndex.mockClear();
+        expect(io.handleMenuKey("up")).toBe(true);
+        expect(setSelectedIndex).toHaveBeenCalledWith(3);
+    });
 
-            expect(io.showDefensiveMenu()).toBe(DefensiveType.UseItem);
-        });
+    it("attacking menu down จาก index 3 ต้องวนกลับ index 0", () => {
+        const { io, setSelectedIndex } = makeIO();
+        io.showAttackingMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
+        setSelectedIndex.mockClear();
+        expect(io.handleMenuKey("down")).toBe(true);
+        expect(setSelectedIndex).toHaveBeenCalledWith(0);
+    });
 
-        it("input 4 ควรได้ Run", () => {
-            globalThis.prompt = mock(() => "4");
+    it("key ที่ไม่เกี่ยวกับ menu ควรคืน false", () => {
+        const { io } = makeIO();
+        io.showAttackingMenu();
+        expect(io.handleMenuKey("x")).toBe(false);
+    });
 
-            expect(io.showDefensiveMenu()).toBe(DefensiveType.Run);
-        });
+    it("เมื่อกด return แล้ว menu ควรถูกปิด", async () => {
+        const { io } = makeIO();
+        const p = io.showAttackingMenu();
+        io.handleMenuKey("return");
+        await expect(p).resolves.toBe(AttackingType.Attack);
+        expect(io.handleMenuKey("down")).toBe(false);
+    });
 
-        it("input ไม่ถูกต้องควรถามใหม่จนกว่าจะได้ input ที่ถูกต้อง", () => {
-            let callCount = 0;
-            globalThis.prompt = mock(() => {
-                callCount += 1;
-                return callCount === 1 ? "99" : "1";
-            });
+    it("defensive menu เริ่มที่ Defend", async () => {
+        const { io } = makeIO();
+        const p = io.showDefensiveMenu();
+        io.handleMenuKey("return");
+        await expect(p).resolves.toBe(DefensiveType.Defend);
+    });
 
-            expect(io.showDefensiveMenu()).toBe(DefensiveType.Defend);
-            expect(globalThis.prompt).toHaveBeenCalledTimes(2);
-        });
+    it("defensive menu down 1/2/3 ครั้งควรได้ Counter/Use Item/Run", async () => {
+        const { io } = makeIO();
+
+        let p = io.showDefensiveMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("return");
+        await expect(p).resolves.toBe(DefensiveType.Counter);
+
+        p = io.showDefensiveMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("return");
+        await expect(p).resolves.toBe(DefensiveType.UseItem);
+
+        p = io.showDefensiveMenu();
+        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
+        io.handleMenuKey("return");
+        await expect(p).resolves.toBe(DefensiveType.Run);
     });
 });
