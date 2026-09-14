@@ -1,4 +1,4 @@
-import { Player } from "./Player";
+import { Player } from "../Character/character";
 import { GameScreen } from "./GameScreen";
 import { DungeonMap } from "./DungeonMap";
 import { Position } from "./Position";

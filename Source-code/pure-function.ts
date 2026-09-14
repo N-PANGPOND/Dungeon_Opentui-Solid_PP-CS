@@ -19,4 +19,7 @@ export function getRandomAction(monsterType: MonsterType, randomValue: number,we
     return randomValue < evadeChance;
 }
 
-    
+export function calculateDamage(attacker: Character, defender: Character, AttackerAction: AttackingType, DefenderAction: DefensiveType): number {
+    // รอคนอื่นมาเติมสูตรคำนวณความเสียหาย
+    return 0;
+}
