@@ -11,10 +11,6 @@ class DungeonMap {
     }
 }
 
-
-
-
-
 export class CombatSystem {
     private player: Player;
     private monster: Monster;
@@ -46,6 +42,7 @@ export class CombatSystem {
         // ตันแล้วพี่น้อง
     }
 
+    // test
     checkEvasion(character: Character): boolean {
         const randomValue = Math.random();
         return EvadeCheck(character, randomValue);
