@@ -25,5 +25,5 @@ export function calculateDamage(damageSource: Character, damageTarget: Character
     }
     const critical = (damageSource.getLuc() * 0.01) > random ? 2 : 1 
     const damage = (damageSource.getAtk() - damageTarget.getDef()) * multiplier * critical
-    return damage;
+    return  damage < 0 ? 0 : damage ;
 }
