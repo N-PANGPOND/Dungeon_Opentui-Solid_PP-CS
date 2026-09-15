@@ -2,7 +2,7 @@ export type gameScreen = "EXPLORE" | "COMBAT" | "SHOP" | "INVENTORY" | "VICTORY"
 
 export type MonsterType = 'NORMAL MONS' | 'ELITE MONS' | 'BOSS'
 
-export type Position = {
+export type position = {
   x: number;
   y: number;
 };

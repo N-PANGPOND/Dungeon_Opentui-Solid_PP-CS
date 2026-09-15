@@ -1,5 +1,6 @@
-import type { GameState } from "../GameState/GameState";
+
 import type { ConsoleIO } from "../ConsoleIO/ConsoleIO";
+import type { GameState } from "../Gamestats/State";
 
 export class GameLoop {
     private isRunning: boolean;
@@ -15,7 +16,7 @@ export class GameLoop {
     public start(): void {
         this.isRunning = true;
         this.consoleIO.Clear();
-       // this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
+        // this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
     }
 
     /*public handleInput(key: string): void {
