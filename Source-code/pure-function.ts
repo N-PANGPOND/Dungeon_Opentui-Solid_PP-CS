@@ -19,7 +19,8 @@ export function getRandomAction(monsterType: MonsterType, randomValue: number,we
     return randomValue < evadeChance;
 }
 
-export function calculateDamage(attacker: Character, defender: Character, AttackerAction: AttackingType, DefenderAction: DefensiveType): number {
-    // รอคนอื่นมาเติมสูตรคำนวณความเสียหาย
-    return 0;
+export function calculateDamage(damageSource: Character, damageTarget: Character,multiplier:number,random:number): number {
+    const critical = (damageSource.getLuc() * 0.01) > random ? 2 : 1 
+    const damage = (damageSource.getAtk() - damageTarget.getDef()) * multiplier * critical
+    return damage;
 }
