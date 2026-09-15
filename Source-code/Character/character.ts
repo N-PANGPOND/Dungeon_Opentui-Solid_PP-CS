@@ -24,6 +24,9 @@ export class Character {
     }
 
     takeDamage(amount: number): void {
+        if (amount <= 0 || this.isDead()) {
+            throw new Error("Invalid TakeDamage amount or character is dead");
+        }
         this.hp = Math.max(0,this.hp - amount);
     }
     heal(amount: number): void {
