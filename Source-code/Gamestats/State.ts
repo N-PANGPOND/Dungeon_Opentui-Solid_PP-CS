@@ -1,5 +1,5 @@
 import { Player } from "../Character/character";
-import type { Position, gameScreen } from "../Type-Enum/type";
+import type { position, gameScreen } from "../Type-Enum/type";
 import { DungeonMap } from"../DungeonMap/DungeonMap"
 //import { CombatSystem } 
 //import { Event }
@@ -11,7 +11,7 @@ export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
   public currentMap: DungeonMap;
-  public exploredTiles: Set<Position>; // Set of explored tile positions in the format "x,y"
+  public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
 
   //  Private 
   private isGetWife: boolean;
@@ -23,7 +23,7 @@ export class GameState {
     this.player = player;
     this.gameScreen = gameScreen;
     this.currentMap = currentMap;
-    this.exploredTiles = new Set<Position>();
+    this.exploredTiles = new Set<position>();
     this.isGetWife = false;
    // this.combatSystem = new CombatSystem();
   //this.eventSystem = new GameEvent();
@@ -39,7 +39,7 @@ export class GameState {
   public movePlayer(direction: Direction): boolean {
     if (this.isPause) return false;
 
-    const nextPos: Position = {
+    const nextPos: position = {
       x: this.player.Position.x,
       y: this.player.Position.y,
     };
