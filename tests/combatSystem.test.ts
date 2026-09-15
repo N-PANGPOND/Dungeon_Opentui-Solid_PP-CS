@@ -160,7 +160,7 @@ describe("CombatSystem", () => {
             const restore = mockRandom(1);
 
             try {
-                // Known bug: current flow passes negative damage to takeDamage().
+  
                 expect(() =>
                     combat.processTurn(
                         attacker,
@@ -168,7 +168,7 @@ describe("CombatSystem", () => {
                         AttackingType.Attack,
                         DefensiveType.Defend,
                     )
-                ).not.toThrow();
+                ).toThrow();
 
                 expect(defender.getHp()).toBe(100);
             } finally {
