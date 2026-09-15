@@ -1,7 +1,7 @@
 import { Inventory } from "../Item-Inventory/Inventory";
 import { Item } from "../Item-Inventory/Item";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
-import type { MonsterType,stats, Weights } from "../Type-Enum/type";
+import type { MonsterType,stats, Weights,position } from "../Type-Enum/type";
 import { getRandomAction } from "../pure-function";
 
 export class Character {
@@ -71,8 +71,8 @@ export class Character {
     }
 }
 
-class MonsterFactory {
-    createMonster(distToExit: number): Monster {
+export class MonsterFactory {
+    public static createMonster(distToExit: number): Monster {
         if (distToExit < 3) {
             return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'BOSS');
         }else if (distToExit < 25) { 
@@ -82,8 +82,8 @@ class MonsterFactory {
         }
     }
 }
-
-class Monster extends Character {
+ 
+export class Monster extends Character {
     private MonsterType : MonsterType;
 
     constructor(stats: stats, monsterType: MonsterType) {
@@ -119,13 +119,13 @@ class Monster extends Character {
     }
 }
 
-class Player extends Character {
-    public Position: Position;
+export class Player extends Character {
+    public Position: position;
     private inventory: Inventory = new Inventory();
 
     constructor(
         stats: stats,
-        position: Position
+        position: position
     ) {
         super(stats);
         this.Position = position;
@@ -160,7 +160,7 @@ class Player extends Character {
         return (this.getAgi() + this.getLuc())*0.005;
     }
 
-    public getPosition(): Position {
+    public getPosition(): position {
         return this.Position;
     }
 }
