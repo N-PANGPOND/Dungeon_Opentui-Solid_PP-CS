@@ -2,16 +2,8 @@ import { Monster, Player,MonsterFactory, Character} from "../Character/character
 import { calculateDamage,EvadeCheck } from "../shared/pure-function"
 import type { MonsterType,stats, Weights,position } from "../Type-Enum/type";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
+import { DungeonMap } from "../DungeonMap/DungeonMap";
 
-class DungeonMap {
-    private exitPos : position;
-    constructor() {
-        this.exitPos = { x: 59, y: 59 };
-    }
-    getExitPos(): position {
-        return this.exitPos;
-    }
-}
 
 export class CombatSystem {
     private player: Player; 
@@ -37,7 +29,16 @@ export class CombatSystem {
                 }
                 this.processTurn(this.monster, this.player,this.monster.decideAttackingAction(),playerAction as DefensiveType);
             }
+            this.isPlayerAttacker = !this.isPlayerAttacker;
         }
+    }
+
+    isPlayerTurn(): boolean {
+        return this.isPlayerAttacker;
+    }
+
+    isBattleOver(): boolean {
+        return this.player.isDead() || this.monster.isDead();
     }
 
     calculateDamage(damageSource: Character, damageTarget: Character,multiplier:number): number {

@@ -1,4 +1,8 @@
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
+import type { Direction,logType } from "../Type-Enum/type";
+import { render, useKeyboard, useRenderer } from "@opentui/solid"
+import { GameState } from "../Game/State";
+
 
 
 type PendingMenu = {
@@ -16,10 +20,12 @@ export class ConsoleIO {
         private setMessage:(value: string) => void,
         private setStatus: (value: string) => void,
         private setSelectedIndex: (index: number) => void,
+        private addLog: (log: logType) => void = () => {},
     ){}
 
-    public ShowMessage(type: string, text: string): void {
-        this.setMessage(`[${type}] ${text}`);
+    public ShowMessage(log:logType): void {
+        this.addLog(log);
+        this.setMessage(`[${log.type}] ${log.text}`);
     }
 
     public Clear(): void {
@@ -34,7 +40,7 @@ export class ConsoleIO {
         // ทำทีหลัง
     //}
 
-    public handleMenuKey(keyName: string): boolean {
+    public handleMenuKey(keyName:string): boolean {
         const menu = this.pendingMenu;
         if(!menu) return false;
 

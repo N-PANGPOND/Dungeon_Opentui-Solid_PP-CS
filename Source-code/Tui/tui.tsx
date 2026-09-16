@@ -1,8 +1,21 @@
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
 import { useplayer } from "../shared/manager"
 import { onCleanup, onMount } from "solid-js"
+
 import path from "path"
 import { soundSystem } from "../System/SoundSystem"
+import { GameLoop } from "../Game/gameloop";
+import { MapObject } from "../Type-Enum/enum";
+import type { position,logType } from "../Type-Enum/type";
+import { createSignal, For } from "solid-js"
+
+
+
+const [log, logState] = createSignal<logType[]>([])
+const gameLoop = new GameLoop((entry) => {
+    logState((previousLogs) => [...previousLogs, entry])
+})
+gameLoop.start()
 
 const soundDir = path.join(import.meta.dir, "../assets/sound")
 
@@ -21,61 +34,34 @@ soundSystem.loadManifest({
     menuConfirm: path.join(soundDir, "menuConfirm.mp3"),
 })
 
-function test() {
+const Player = gameLoop.getGameState().player
+const map = gameLoop.getGameState().currentMap.getGrid()
+// const { player, updatePlayerPosition } = useplayer()
+
+const [player, playerState] = createSignal<position>(Player.getPosition())
+
+function formatMap(map: MapObject[][]): string {
+    return map.map(row => row.join('')).join('\n')
+        .replaceAll(MapObject.Wall, "██")
+        .replaceAll(MapObject.Floor, "  ")
+
+}
+const App = () => {
+    // 3. นำไปใช้งาน
+    let backGround = formatMap(map);
     const renderer = useRenderer()
-    useKeyboard((key) => {
+    useKeyboard( async (key) => {
         if (key.name === "escape") {
             renderer.destroy()
         }
-        if (["up", "down", "left", "right", "w", "a", "s", "d"].includes(key.name)) updatePlayerPosition(key.name)
+
+        const input = key.name.toLowerCase()
+        if (["up", "down", "left", "right", "w", "a", "s", "d", "c", "i", "r"].includes(input)) {
+            await gameLoop.handleInput(input)
+            playerState(Player.getPosition())
+        }
     })
-}
-
-const { player, updatePlayerPosition } = useplayer()
-
-const App = () => {
-
-    let x = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,],
-        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,],
-        [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
-        [0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0,],
-        [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0,],
-        [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0,],
-        [0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0,],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0,],
-        [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,],
-        [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
-        [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,],
-        [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0,],
-        [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0,],
-        [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0,],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0,],
-        [0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,],
-        [0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0,],
-        [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0,],
-        [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0,],
-        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0,],
-        [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0,],
-        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0,],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
-
-    ];
-    function formatMap(mapString: number[][]): string {
-        return mapString.map(row => row.join('')).join('\n')
-            .replaceAll("0", "██")  // เปลี่ยนขอบนอกเป็นกำแพง
-            .replaceAll("1", "  ")  // เปลี่ยนกำแพงด้านใน
-
-    }
-    // 3. นำไปใช้งาน
-    let backGround = formatMap(x);
-    // backGround = x.map(row => row.join('')).join('\n');
-    test()
-
+    
 
     return <box style={{ flexDirection: "column", justifyContent: "center", alignItems: "center", width: `100%`, height: `100%` }}>
         <box style={{ borderStyle: "double", flexDirection: "column", justifyContent: "space-between", width: 120, height: 40, borderColor: "#35f306" }}>
@@ -85,13 +71,19 @@ const App = () => {
                         <text>{backGround}</text>
                         <text
                             position="absolute"
-                            left={player().x}
+                            left={player().x *2}
                             top={player().y}
                         >🦸</text>
                     </box>
-                    <box style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
-                        <text>Controls: W/A/S/D or Arrow Keys to move, ESC to exit</text>
-                    </box>
+                    <scrollbox style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
+                        <For each={log()}>
+                            {(line) => (
+                            <text>
+                                {line.text}
+                            </text>
+                          )}
+                        </For>
+                    </scrollbox>
                 </box>
                 <box style={{ flexDirection: "column", justifyContent: "space-between", width: `20%`, height: `100%` }}>
                     <box style={{ borderStyle: "rounded", flexDirection: "column", justifyContent: "space-between", width: `100%`, height: `35%`, borderColor: "#35f306" }}>

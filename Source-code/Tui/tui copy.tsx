@@ -27,11 +27,15 @@ function test() {
         if (key.name === "escape") {
             renderer.destroy()
         }
-        if (["up", "down", "left", "right", "w", "a", "s", "d"].includes(key.name)) updatePlayerPosition(key.name)
+        if (["up", "down", "left", "right", "w", "a", "s", "d"].includes(key.name)) {
+            console.log(key.name)
+            updatePlayerPosition(key.name)
+        }
     })
-
 }
-const { player: player, updatePlayerPosition } = useplayer()
+
+const { player, updatePlayerPosition } = useplayer()
+
 const App = () => {
 
     let x = [

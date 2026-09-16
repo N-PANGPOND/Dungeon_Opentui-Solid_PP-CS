@@ -1,10 +1,11 @@
 import { Player } from "../Character/character";
-import type { position, gameScreen } from "../Type-Enum/type";
+import type { position, gameScreen,Direction } from "../Type-Enum/type";
 import { DungeonMap } from"../DungeonMap/DungeonMap"
-//import { CombatSystem } 
+import { CombatSystem } from "../System/CombatSystem"
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
+
 //import { Event }
 
-export type Direction = "up" | "down" | "left" | "right";
 
 export class GameState {
   public player: Player;
@@ -14,17 +15,17 @@ export class GameState {
 
   private isGetWife: boolean;
   private isPause: boolean;
-  // private combatSystem: CombatSystem;
+  private combatSystem: CombatSystem;
  // private eventSystem: GameEvent;
 
-  constructor(player: Player, gameScreen: gameScreen, currentMap: DungeonMap) {
-    this.player = player;
-    this.gameScreen = gameScreen;
+  constructor(currentMap: DungeonMap) {
+    this.gameScreen = "DUNGEON";
     this.currentMap = currentMap;
+    this.player = new Player({maxHp:160,hp:160,atk:30,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
     this.isGetWife = false;
     this.isPause = false;
-    // this.combatSystem = new CombatSystem();
+    this.combatSystem = new CombatSystem(this.player,this.currentMap);
    //this.eventSystem = new GameEvent();
   }
 
@@ -69,18 +70,41 @@ export class GameState {
 
   public checkTileEvent(): void {
     const chance = Math.random();
-    if (chance < 0.40) {
-      // 40% ไม่มีอะไรเกิดขึ้น
-      return;
-    } else if (chance < 0.70) {
-      // 30% เกิดการต่อสู้
+    if (chance >= 0.50) {
       this.gameScreen = "COMBAT";
+      
+    }
+  }
 
-    }else if (chance < 0.90) {
-    }else {
-      // 10% เกิดการซื้อขาย
-      this.gameScreen = "SHOP";
-    
+  public combatActionForKey(key: string): AttackingType | DefensiveType | undefined {
+    if (this.combatSystem.isPlayerTurn()) {
+      const actions: Record<string, AttackingType> = {
+        "1": AttackingType.Attack,
+        "2": AttackingType.Strike,
+        "3": AttackingType.UseItem,
+        "4": AttackingType.Run,
+      };
+      return actions[key];
+    }
+
+    const actions: Record<string, DefensiveType> = {
+      "1": DefensiveType.Defend,
+      "2": DefensiveType.Counter,
+      "3": DefensiveType.UseItem,
+      "4": DefensiveType.Run,
+    };
+    return actions[key];
+  }
+
+  public handleCombatAction(action: AttackingType | DefensiveType): void {
+    if (this.gameScreen !== "COMBAT") return;
+
+    this.combatSystem.startbattle(action);
+
+    if (this.player.isDead()) {
+      this.gameScreen = "GAMEOVER";
+    } else if (this.combatSystem.isBattleOver()) {
+      this.gameScreen = "DUNGEON";
     }
   }
 
