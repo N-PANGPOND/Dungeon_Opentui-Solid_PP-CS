@@ -92,14 +92,14 @@ const App = () => {
                     </box>
                     <box style={{ borderStyle: "rounded", flexDirection: "column", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
                         <text>Action :</text>
-                        <text>  "1" : Attack
-                                "2" : Strike
-                                "3" : UseItem
-                                "4" : Run
-                                "5" : Defend
-                                "6" : Counter
-                                "7" : UseItem
-                                "8" : Run </text>
+                        <text>  "1" : Attack</text>
+                        <text>  "2" : Strike</text>
+                        <text>  "3" : UseItem</text>
+                        <text>  "4" : Run</text>
+                        <text>  "5" : Defend</text>
+                        <text>  "6" : Counter</text>
+                        <text>  "7" : UseItem</text>
+                        <text>  "8" : Run</text>
                     </box>
                 </box>
             </box>
