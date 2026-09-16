@@ -1,8 +1,8 @@
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
-import { useplayer } from "./manager"
+import { useplayer } from "../shared/manager"
 import { onCleanup, onMount } from "solid-js"
 import path from "path"
-import { soundSystem } from "./SoundSystem/Soundsystem"
+import { soundSystem } from "../System/SoundSystem"
 
 const soundDir = path.join(import.meta.dir, "../assets/sound")
 

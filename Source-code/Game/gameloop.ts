@@ -1,6 +1,6 @@
 
 import type { ConsoleIO } from "../ConsoleIO/ConsoleIO";
-import type { GameState } from "../Gamestats/State";
+import type { GameState } from "./State";
 
 export class GameLoop {
     private isRunning: boolean;
