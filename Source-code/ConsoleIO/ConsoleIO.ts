@@ -10,6 +10,58 @@ type PendingMenu = {
     resolve: (value: string) => void;
 };
 
+export type GameInputIntent =
+    | { type: "MOVE"; direction: Direction }
+    | { type: "COMBAT_ACTION"; action: AttackingType | DefensiveType }
+    | { type: "OPEN_INVENTORY" }
+    | { type: "PAUSE" }
+    | { type: "QUIT" }
+    | { type: "UNKNOWN" };
+
+export function parseKeyIntent(key: string): GameInputIntent {
+    const normalizedKey = key.toLowerCase().replace(/^arrow[-_]?/, "");
+
+    switch (normalizedKey) {
+        case "up":
+        case "w":
+            return { type: "MOVE", direction: "up" };
+        case "down":
+        case "s":
+            return { type: "MOVE", direction: "down" };
+        case "left":
+        case "a":
+            return { type: "MOVE", direction: "left" };
+        case "right":
+        case "d":
+            return { type: "MOVE", direction: "right" };
+        case "1":
+            return { type: "COMBAT_ACTION", action: AttackingType.Attack };
+        case "2":
+            return { type: "COMBAT_ACTION", action: AttackingType.Strike };
+        case "3":
+            return { type: "COMBAT_ACTION", action: AttackingType.UseItem };
+        case "4":
+            return { type: "COMBAT_ACTION", action: AttackingType.Run };
+        case "5":
+            return { type: "COMBAT_ACTION", action: DefensiveType.Defend };
+        case "6":
+            return { type: "COMBAT_ACTION", action: DefensiveType.Counter };
+        case "7":
+            return { type: "COMBAT_ACTION", action: DefensiveType.UseItem };
+        case "8":
+            return { type: "COMBAT_ACTION", action: DefensiveType.Run };
+        case "i":
+            return { type: "OPEN_INVENTORY" };
+        case "p":
+            return { type: "PAUSE" };
+        case "q":
+        case "escape":
+            return { type: "QUIT" };
+        default:
+            return { type: "UNKNOWN" };
+    }
+}
+
 
 export class ConsoleIO {
 

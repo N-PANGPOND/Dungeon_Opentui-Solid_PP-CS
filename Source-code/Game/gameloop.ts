@@ -1,5 +1,6 @@
 import { mapSystem } from "../System/mapSystem";
-import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
+import { ConsoleIO, parseKeyIntent } from "../ConsoleIO/ConsoleIO";
+import type { GameInputIntent } from "../ConsoleIO/ConsoleIO";
 import { GameState } from "./State";
 import type { logType } from "../Type-Enum/type";
 
@@ -10,7 +11,7 @@ export class GameLoop {
 
     constructor(addLog: (log: logType) => void = () => {}) {
         this.isRunning = false;
-        this.gameState = new GameState(mapSystem.prototype.randomMaps());
+        this.gameState = new GameState(mapSystem.prototype.randomMaps(),addLog);
         this.consoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog);
     }
 
@@ -25,32 +26,24 @@ export class GameLoop {
         if (!this.isRunning) {
             return;
         }
+        const intent: GameInputIntent = parseKeyIntent(key);
 
-        if (this.gameState.gameScreen === "COMBAT") {
-            const action = this.gameState.combatActionForKey(key);
-            if (action !== undefined) {
-                this.gameState.handleCombatAction(action);
-            }
-            return;
-        }
-
-        switch (key) {
-            case "up":
-            case "w":
-                console.log("Im in W")
-                this.gameState.movePlayer("up");
+        switch (intent.type) {
+            case "MOVE":
+                this.gameState.movePlayer(intent.direction);
                 break;
-            case "down":
-            case "s":
-                this.gameState.movePlayer("down");
+            case "COMBAT_ACTION":
+                if (this.gameState.gameScreen === "COMBAT") {
+                    this.gameState.handleCombatAction(intent.action);
+                }
                 break;
-            case "left":
-            case "a":
-                this.gameState.movePlayer("left");
-                break;
-            case "right":
-            case "d":
-                this.gameState.movePlayer("right");
+            case "QUIT":
+                this.end();
+                return;
+            case "OPEN_INVENTORY":
+            case "PAUSE":
+            case "UNKNOWN":
+                // TODO: Implement this input intent.
                 break;
         }
 

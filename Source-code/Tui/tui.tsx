@@ -50,16 +50,13 @@ const App = () => {
     // 3. นำไปใช้งาน
     let backGround = formatMap(map);
     const renderer = useRenderer()
-    useKeyboard( async (key) => {
+    useKeyboard((key) => {
         if (key.name === "escape") {
             renderer.destroy()
         }
-
         const input = key.name.toLowerCase()
-        if (["up", "down", "left", "right", "w", "a", "s", "d", "c", "i", "r"].includes(input)) {
-            await gameLoop.handleInput(input)
-            playerState(Player.getPosition())
-        }
+        gameLoop.handleInput(input)
+        playerState(Player.getPosition())
     })
     
 
@@ -75,7 +72,8 @@ const App = () => {
                             top={player().y}
                         >🦸</text>
                     </box>
-                    <scrollbox style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
+                    <scrollbox stickyScroll={true} stickyStart="bottom" style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
+                    {/* <scrollbox style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}> */}
                         <For each={log()}>
                             {(line) => (
                             <text>
