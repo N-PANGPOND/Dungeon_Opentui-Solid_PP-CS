@@ -10,6 +10,9 @@ export class Item {
             this.Addeffects(target);
         }
     }
+    public getPrice(): number {
+        return this.item.price;
+    }
 
     constructor(item: item, Addeffects?:(target: Character)=> void) {
         this.item = item;
