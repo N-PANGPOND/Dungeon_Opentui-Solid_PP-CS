@@ -3,7 +3,7 @@
 // แสดง HP bar, ATK, DEF, Coin — ไม่คำนวณค่าใด ๆ เอง
 // =============================================================
 
-import { theme, renderBar, hpBarColor, pad } from "../theme";
+import { theme, renderBar, hpBarColor, pad, fmtNum } from "../theme";
 import type { PlayerUIProps } from "../uiTypes";
 
 interface PlayerPanelProps {
@@ -16,7 +16,7 @@ export const PlayerPanel = (props: PlayerPanelProps) => {
   // HP Bar
   const hpBar   = () => renderBar(p().hp, p().maxHp, 14);
   const hpColor = () => hpBarColor(p().hp, p().maxHp);
-  const hpText  = () => `${p().hp} / ${p().maxHp}`;
+  const hpText  = () => `${fmtNum(p().hp)} / ${fmtNum(p().maxHp)}`;
 
   return (
     <box
