@@ -1,11 +1,11 @@
 import { MapObject } from "../Type-Enum/enum";
-import type { Position } from "../Type-Enum/type";
+import type { position } from "../Type-Enum/type";
 
 
 export type MapConfig = {
-    spawnPos: Position;
-    wifePos: Position;
-    exitPos: Position;
+    spawnPos: position;
+    wifePos: position;
+    exitPos: position;
     layout: number[][];
 };
 
@@ -14,9 +14,9 @@ export class DungeonMap {
     private width: number;
     private height: number;
 
-    public readonly startPos: Position;
-    public readonly wifePos: Position;
-    public readonly exitPos: Position;
+    public readonly startPos: position;
+    public readonly wifePos: position;
+    public readonly exitPos: position;
 
     constructor(config: MapConfig) {
         if (config.layout.length === 0 || config.layout[0]?.length === 0) {
@@ -37,7 +37,7 @@ export class DungeonMap {
         this.exitPos = config.exitPos;
     }
 
-    private isInBounds(pos: Position): boolean {
+    private isInBounds(pos: position): boolean {
         return pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y < this.height;
     }
 
@@ -49,7 +49,7 @@ export class DungeonMap {
         return this.height;
     }
 
-    getTile(pos: Position): MapObject {
+    getTile(pos: position): MapObject {
         if (pos.x === this.exitPos.x && pos.y === this.exitPos.y) {
             return MapObject.Exit;
         }
@@ -61,11 +61,23 @@ export class DungeonMap {
         return this.grid[pos.y]![pos.x]!;
     }
 
-    isWalkable(pos: Position): boolean {
+    isWalkable(pos: position): boolean {
         return this.getTile(pos) !== MapObject.Wall;
     }
 
-    getDistanceToExit(pos: Position): number {
+    getDistanceToExit(pos: position): number {
         return Math.abs(pos.x - this.exitPos.x) + Math.abs(pos.y - this.exitPos.y);
+    }
+    getGrid():MapObject[][] {
+        return this.grid
+    }
+    getStartPos():position{
+        return this.startPos
+    }
+    getExitPos():position{
+        return this.exitPos
+    }
+    getWifePos():position{
+        return this.wifePos
     }
 }

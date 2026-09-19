@@ -2,7 +2,7 @@ import { Inventory } from "../Item-Inventory/Inventory";
 import { Item } from "../Item-Inventory/Item";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import type { MonsterType,stats, Weights,position } from "../Type-Enum/type";
-import { getRandomAction } from "../pure-function";
+import { getRandomAction } from "../shared/pure-function";
 
 export class Character {
     private maxHp: number;
