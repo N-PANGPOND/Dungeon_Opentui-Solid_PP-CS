@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import {
     getRandomAction,
-    EvadeCheck
-} from "../Source-code/pure-function";
+    EvadeCheck,
+    calculateDamage
+} from "../Source-code/shared/pure-function";
 
 import {
     AttackingType,

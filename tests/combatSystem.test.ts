@@ -1,5 +1,5 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
-import { CombatSystem } from "../Source-code/combatSystem/CombatSystem";
+import { CombatSystem } from "../Source-code/System/CombatSystem";
 import { Character, Player } from "../Source-code/Character/character";
 import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
 
