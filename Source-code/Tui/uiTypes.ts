@@ -1,6 +1,7 @@
-﻿// =============================================================
+// =============================================================
 // uiTypes.ts — UI-specific types for Dungeon TUI
-// ใช้ mock data เพื่อทดสอบ UI โดยไม่ขึ้นกับ Game Logic
+// กำหนด shape ของ props ที่ component ต้องการ
+// ข้อมูลจริงมาจาก Game Logic ผ่าน tui.tsx เท่านั้น
 // =============================================================
 
 import type { MapObject } from "../Type-Enum/enum";
@@ -47,10 +48,8 @@ export interface DungeonViewUIProps {
   exitPos: { x: number; y: number };
 }
 
-// ─── Game Screen ───────────────────────────────────────────────────────────
-// mirrors Type-Enum/type.ts gameScreen — ใช้ import จาก type.ts จริง ๆ ใน tui.tsx
-
-export type UIScreen = "DUNGEON" | "COMBAT" | "GAMEOVER" | "VICTORY" | "PAUSE" | "MENU";
+// mirrors Type-Enum/type.ts gameScreen exactly
+export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
 
 // ─── Combat Props ──────────────────────────────────────────────────────────
 
@@ -61,31 +60,7 @@ export interface CombatUIProps {
   lastLog?: string;
 }
 
-// ─── Mock Data (สำหรับทดสอบ UI) ────────────────────────────────────────────
-
-export const MOCK_PLAYER: PlayerUIProps = {
-  name: "HERO",
-  hp: 120,
-  maxHp: 160,
-  atk: 30,
-  def: 5,
-  coin: 50,
-  position: { x: 5, y: 5 },
-};
-
-export const MOCK_INVENTORY: InventoryUIProps = {
-  items: [
-    { name: "POTION", description: "Restores 25 HP" },
-    { name: "HIGH_POTION", description: "Restores 50 HP" },
-    { name: "POTION_ATK", description: "Increase ATK by 5" },
-  ],
-  maxSlots: 8,
-};
-
-export const MOCK_ENEMY: EnemyUIProps = {
-  name: "GOBLIN",
-  hp: 42,
-  maxHp: 60,
-  atk: 12,
-  def: 3,
-};
+// ─── Combat Action Labels ──────────────────────────────────────────────────
+// Combat แบบผลัดกัน: ถึงตา player โจมตี -> ใช้ชุด "attack", ถึงตา monster โจมตี -> ใช้ชุด "defend"
+// UI แสดงเป็นปุ่ม 1-4 เหมือนกันทั้งสองชุด (gameBridge แปลงเป็น key ที่ Game Logic ต้องการให้)
+export type CombatPhase = "attack" | "defend";
