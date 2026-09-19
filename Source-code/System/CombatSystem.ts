@@ -1,23 +1,15 @@
 import { Monster, Player,MonsterFactory, Character} from "../Character/character";
-import { calculateDamage,EvadeCheck } from "../pure-function"
-import type { MonsterType,stats, Weights,position } from "../Type-Enum/type";
+import { calculateDamage,EvadeCheck } from "../shared/pure-function"
+import type { MonsterType,stats, Weights,position,logType } from "../Type-Enum/type";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
+import { DungeonMap } from "../DungeonMap/DungeonMap";
 
-class DungeonMap {
-    private exitPos : position;
-    constructor() {
-        this.exitPos = { x: 59, y: 59 };
-    }
-    getExitPos(): position {
-        return this.exitPos;
-    }
-}
 
 export class CombatSystem {
     private player: Player; 
     private monster: Monster;
     private isPlayerAttacker: boolean;
-    constructor(player: Player,DungeonMap:DungeonMap) { 
+    constructor(player: Player,DungeonMap:DungeonMap, private addLog: (log: logType) => void = () => {}) { 
         this.player = player;
         let distToExit:number = ((DungeonMap.getExitPos().x - this.player.getPosition().x) + (DungeonMap.getExitPos().y - this.player.getPosition().y));
         this.monster = MonsterFactory.createMonster(distToExit);
@@ -30,14 +22,38 @@ export class CombatSystem {
                     throw new Error("Player is Attacking But Action Is Not AttackingType");
                 }
                 const monsterAction : DefensiveType = this.monster.decideDefensiveAction()
+                this.addLog({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
                 this.processTurn(this.player, this.monster,playerAction as AttackingType,monsterAction);
             } else {
                 if (!Object.values(DefensiveType).includes(playerAction as DefensiveType)) {
                     throw new Error("Player is Defensive But Action Is Not DefensiveType");
                 }
-                this.processTurn(this.monster, this.player,this.monster.decideAttackingAction(),playerAction as DefensiveType);
+                const monsterAction = this.monster.decideAttackingAction();
+                this.addLog({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
+                this.processTurn(this.monster, this.player,monsterAction,playerAction as DefensiveType);
             }
+            this.isPlayerAttacker = !this.isPlayerAttacker;
         }
+    }
+
+    isPlayerTurn(): boolean {
+        return this.isPlayerAttacker;
+    }
+
+    isBattleOver(): boolean {
+        return this.player.isDead() || this.monster.isDead();
+    }
+
+    getMonsterStats(): stats {
+        return {
+            maxHp: this.monster.getMaxHp(),
+            hp: this.monster.getHp(),
+            atk: this.monster.getAtk(),
+            def: this.monster.getDef(),
+            luc: this.monster.getLuc(),
+            agi: this.monster.getAgi(),
+            coin: this.monster.getCoin(),
+        };
     }
 
     calculateDamage(damageSource: Character, damageTarget: Character,multiplier:number): number {
@@ -66,8 +82,17 @@ export class CombatSystem {
         const isCounter = defensiveAct === DefensiveType.Counter && AttackerAct === AttackingType.Strike;
         const damageTarget = isCounter ? Attacker : defensive;
         const damageSource = isCounter ? defensive : Attacker;
-        
-        damageTarget.takeDamage(this.calculateDamage(damageSource,damageTarget,multiplier));
+        const damage = this.calculateDamage(damageSource, damageTarget, multiplier);
+        const hpBefore = damageTarget.getHp();
+
+        damageTarget.takeDamage(damage);
+
+        const targetName = damageTarget === this.player ? "Player" : "Monster";
+        const sourceName = damageSource === this.player ? "Player" : "Monster";
+        this.addLog({
+            type: "System",
+            text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
+        });
     }
 
     // test
