@@ -28,6 +28,10 @@ export const theme = {
     exit:         "#60a5fa",
     wall:         "#64748b",
     floor:        "#1e293b",
+    // Convenience aliases used by GameOverScreen/VictoryScreen
+    hp:           "#22c55e",
+    atk:          "#f59e0b",
+    def:          "#06b6d4",
   },
 
   border: {
@@ -84,6 +88,12 @@ export function hpBarColor(current: number, max: number): string {
   if (pct >= 0.6) return theme.colors.hpHigh;
   if (pct >= 0.3) return theme.colors.hpMid;
   return theme.colors.hpLow;
+}
+
+// แสดงตัวเลขให้อ่านง่าย — damage multiplier (0.25, 0.5, 1.5) ทำให้ HP เป็นทศนิยมได้
+// เช่น 93.75 -> "93.8", 100 -> "100"
+export function fmtNum(value: number): string {
+  return String(Math.round(value * 10) / 10);
 }
 
 export function pad(str: string, length: number, char: string = " "): string {

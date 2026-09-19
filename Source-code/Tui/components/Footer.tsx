@@ -8,19 +8,25 @@ import type { UIScreen } from "../uiTypes";
 
 interface FooterProps {
   screen: UIScreen;
+  isPlayerTurn?: boolean; // ใช้เฉพาะตอน COMBAT — true = ตา player โจมตี (default)
 }
 
 function dungeonHints(): string {
-  return "  W/A/S/D: Move    I: Inventory    1-4: Combat Actions    ESC: Quit";
+  return "  W/A/S/D: Move    I: Inventory    ESC/Q: Quit";
 }
 
-function combatHints(): string {
-  return "  1: Attack    2: Strike    3: Use Item    4: Run    ESC: Quit";
+function combatHints(attacking: boolean): string {
+  return attacking
+    ? "  1: Attack    2: Strike    3: Use Item    4: Run    ESC/Q: Quit"
+    : "  1: Defend    2: Counter   3: Use Item    4: Run    ESC/Q: Quit";
 }
 
 export const Footer = (props: FooterProps) => {
   const hints = () =>
-    pad(props.screen === "COMBAT" ? combatHints() : dungeonHints(), 114);
+    pad(
+      props.screen === "COMBAT" ? combatHints(props.isPlayerTurn ?? true) : dungeonHints(),
+      114
+    );
 
   return (
     <box
