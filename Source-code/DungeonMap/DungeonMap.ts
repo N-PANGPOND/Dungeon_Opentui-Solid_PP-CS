@@ -68,4 +68,16 @@ export class DungeonMap {
     getDistanceToExit(pos: position): number {
         return Math.abs(pos.x - this.exitPos.x) + Math.abs(pos.y - this.exitPos.y);
     }
+    getGrid():MapObject[][] {
+        return this.grid
+    }
+    getStartPos():position{
+        return this.startPos
+    }
+    getExitPos():position{
+        return this.exitPos
+    }
+    getWifePos():position{
+        return this.wifePos
+    }
 }

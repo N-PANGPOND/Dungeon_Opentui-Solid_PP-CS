@@ -1,11 +1,17 @@
-export type gameScreen = "EXPLORE" | "COMBAT" | "SHOP" | "INVENTORY" | "VICTORY" | "GAMEOVER";
+export type gameScreen = "DUNGEON" |"EXPLORE" | "COMBAT" | "Merchant " | "INVENTORY" | "VICTORY" | "GAMEOVER";
 
 export type MonsterType = 'NORMAL MONS' | 'ELITE MONS' | 'BOSS'
+export type Direction = "up" | "down" | "left" | "right" | "w" | "a" | "s" | "d";
 
 export type position = {
   x: number;
   y: number;
 };
+
+export type logType = {
+    type : "System",
+    text : string 
+}
 
 export type Weights = {
     [key in MonsterType]: {

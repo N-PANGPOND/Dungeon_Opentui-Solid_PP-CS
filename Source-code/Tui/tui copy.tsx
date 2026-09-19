@@ -1,8 +1,8 @@
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
-import { useplayer } from "./manager"
+import { useplayer } from "../shared/manager"
 import { onCleanup, onMount } from "solid-js"
 import path from "path"
-import { soundSystem } from "./SoundSystem/Soundsystem"
+import { soundSystem } from "../System/SoundSystem"
 
 const soundDir = path.join(import.meta.dir, "../assets/sound")
 
@@ -27,11 +27,15 @@ function test() {
         if (key.name === "escape") {
             renderer.destroy()
         }
-        if (["up", "down", "left", "right", "w", "a", "s", "d"].includes(key.name)) updatePlayerPosition(key.name)
+        if (["up", "down", "left", "right", "w", "a", "s", "d"].includes(key.name)) {
+            console.log(key.name)
+            updatePlayerPosition(key.name)
+        }
     })
-
 }
-const { player: player, updatePlayerPosition } = useplayer()
+
+const { player, updatePlayerPosition } = useplayer()
+
 const App = () => {
 
     let x = [

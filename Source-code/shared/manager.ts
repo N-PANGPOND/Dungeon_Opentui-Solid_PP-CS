@@ -1,17 +1,12 @@
 import { createSignal } from "solid-js"
 
-
 export type position = {
     x: number
     y: number
 }
 
-
-
 const [player, playerState] = createSignal<position>({ x: 2, y: 2 })
 
-const speed = 0.1
-let direction = 1
 function updatePlayerPosition(key: string) {
     switch (key) {
         case "up":
@@ -32,10 +27,11 @@ function updatePlayerPosition(key: string) {
             break
     }
 }
+
 export const useplayer = () => {
     return {
-        player: player,
-        playerState: playerState,
+        player,
+        playerState,
         updatePlayerPosition
     }
 }

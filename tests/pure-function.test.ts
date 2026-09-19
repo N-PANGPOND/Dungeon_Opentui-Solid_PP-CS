@@ -1,11 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import {
     getRandomAction,
-    EvadeCheck,
-    calculateDamage,
+    EvadeCheck
 } from "../Source-code/pure-function";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
-import type { Weights } from "../Source-code/Type-Enum/type";
+
+import {
+    AttackingType,
+    DefensiveType
+} from "../Source-code/Type-Enum/enum";
+
+import type {
+    MonsterType,
+    Weights
+} from "../Source-code/Type-Enum/type";
+
 import { Character } from "../Source-code/Character/character";
 
 describe("pure-function.ts", () => {
