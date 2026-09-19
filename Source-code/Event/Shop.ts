@@ -13,12 +13,34 @@ export class Shop {
         ];
     }
 
-    public buy(item : Item): Item | undefined {
-        const index = this.items.indexOf(item);
-        if (index === -1) {
+   public buy(itemName: string): Item | undefined {
+        const item = this.items.find(
+            (item) => item.item.name === itemName
+        );
+
+        if (!item) {
             return undefined;
         }
-        return this.items.splice(index, 1)[0];
+
+        switch (itemName) {
+            case "POTION":
+                return Itemfactory.CreatePOTION();
+
+            case "HIGH_POTION":
+                return Itemfactory.CreateHIGH_POTION();
+
+            case "POTION_ATK":
+                return Itemfactory.CreatePOTION_ATK();
+
+            case "POTION_DEF":
+                return Itemfactory.CreatePOTION_DEF();
+
+            case "SMOKE_BOMB":
+                return Itemfactory.CreateSMOKE_BOMB();
+
+            default:
+                return undefined;
+        }
     }
 
     public sell(item: Item, inventory: Inventory): number {
@@ -32,7 +54,7 @@ export class Shop {
     inventory.removeItem(index);
     this.items.push(item);
 
-    return item.getPrice();
+    return item.getPrice() * 0.8;
 }
 
     public Leave(): void {
