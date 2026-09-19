@@ -1,114 +1,176 @@
-import { render, useKeyboard, useRenderer } from "@opentui/solid"
-import { useplayer } from "../shared/manager"
-import { onCleanup, onMount } from "solid-js"
+// =============================================================
+// tui.tsx — Dungeon TUI Entry Point
+// ประกอบ component ทั้งหมดและเชื่อมกับ Game Logic
+// =============================================================
 
-import path from "path"
-import { soundSystem } from "../System/SoundSystem"
+import { render, useKeyboard, useRenderer } from "@opentui/solid";
+import { createSignal, For } from "solid-js";
+import path from "path";
+
+import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
 import { MapObject } from "../Type-Enum/enum";
-import type { position,logType } from "../Type-Enum/type";
-import { createSignal, For } from "solid-js"
+import type { logType } from "../Type-Enum/type";
 
+// ─── UI Components ─────────────────────────────────────────────────────────
+import { theme } from "./theme";
+import { Header } from "./components/Header";
+import { DungeonView } from "./components/DungeonView";
+import { PlayerPanel } from "./components/PlayerPanel";
+import { InventoryPanel } from "./components/InventoryPanel";
+import { ActionPanel } from "./components/ActionPanel";
+import { ActionLog } from "./components/ActionLog";
+import { Footer } from "./components/Footer";
+import type { PlayerUIProps, InventoryUIProps, UIScreen } from "./uiTypes";
 
-
-const [log, logState] = createSignal<logType[]>([])
-const gameLoop = new GameLoop((entry) => {
-    logState((previousLogs) => [...previousLogs, entry])
-})
-gameLoop.start()
-
-const soundDir = path.join(import.meta.dir, "../assets/sound")
-
+// ─── Sound Setup ────────────────────────────────────────────────────────────
+const soundDir = path.join(import.meta.dir, "../assets/sound");
 soundSystem.loadManifest({
-    footstep: path.join(soundDir, "footstep.mp3"),
-    encounter: path.join(soundDir, "encounter.mp3"),
-    attack: path.join(soundDir, "attack.mp3"),
-    strike: path.join(soundDir, "strike.mp3"),
-    hit: path.join(soundDir, "hit.mp3"),
-    evade: path.join(soundDir, "evade.mp3"),
-    victory: path.join(soundDir, "victory.mp3"),
-    gameOver: path.join(soundDir, "gameover.mp3"),
-    coin: path.join(soundDir, "coin.mp3"),
-    potion: path.join(soundDir, "potion.mp3"),
-    menuSelect: path.join(soundDir, "menuSelect.mp3"),
-    menuConfirm: path.join(soundDir, "menuConfirm.mp3"),
-})
+  footstep:   path.join(soundDir, "footstep.mp3"),
+  encounter:  path.join(soundDir, "encounter.mp3"),
+  attack:     path.join(soundDir, "attack.mp3"),
+  strike:     path.join(soundDir, "strike.mp3"),
+  hit:        path.join(soundDir, "hit.mp3"),
+  evade:      path.join(soundDir, "evade.mp3"),
+  victory:    path.join(soundDir, "victory.mp3"),
+  gameOver:   path.join(soundDir, "gameover.mp3"),
+  coin:       path.join(soundDir, "coin.mp3"),
+  potion:     path.join(soundDir, "potion.mp3"),
+  menuSelect: path.join(soundDir, "menuSelect.mp3"),
+  menuConfirm:path.join(soundDir, "menuConfirm.mp3"),
+});
 
-const Player = gameLoop.getGameState().player
-const map = gameLoop.getGameState().currentMap.getGrid()
-// const { player, updatePlayerPosition } = useplayer()
+// ─── Game Setup ─────────────────────────────────────────────────────────────
+const [logs, setLogs] = createSignal<logType[]>([]);
 
-const [player, playerState] = createSignal<position>(Player.getPosition())
+const gameLoop = new GameLoop((entry: logType) => {
+  setLogs((prev) => [...prev, entry]);
+});
+gameLoop.start();
 
-function formatMap(map: MapObject[][]): string {
-    return map.map(row => row.join('')).join('\n')
-        .replaceAll(MapObject.Wall, "██")
-        .replaceAll(MapObject.Floor, "  ")
+const gameState = gameLoop.getGameState();
 
+// ─── Reactive State ──────────────────────────────────────────────────────────
+
+// Helper — ดึงข้อมูล player จาก Game Logic ออกมาเป็น UI props
+function getPlayerUIProps(): PlayerUIProps {
+  const p = gameState.player;
+  return {
+    name:     "HERO",
+    hp:       p.getHp(),
+    maxHp:    p.getMaxHp(),
+    atk:      p.getAtk(),
+    def:      p.getDef(),
+    coin:     p.getCoin(),
+    position: p.getPosition(),
+  };
 }
+
+// Helper — ดึง inventory จาก Game Logic
+function getInventoryUIProps(): InventoryUIProps {
+  const items = gameState.player.getInventory().getItems().map((item) => ({
+    name:        item.item.name,
+    description: item.item.description,
+  }));
+  return { items, maxSlots: 8 };
+}
+
+// ─── App Component ────────────────────────────────────────────────────────────
+
 const App = () => {
-    // 3. นำไปใช้งาน
-    let backGround = formatMap(map);
-    const renderer = useRenderer()
-    useKeyboard((key) => {
-        if (key.name === "escape") {
-            renderer.destroy()
-        }
-        const input = key.name.toLowerCase()
-        gameLoop.handleInput(input)
-        playerState(Player.getPosition())
-    })
-    
+  const renderer = useRenderer();
 
-    return <box style={{ flexDirection: "column", justifyContent: "center", alignItems: "center", width: `100%`, height: `100%` }}>
-        <box style={{ borderStyle: "double", flexDirection: "column", justifyContent: "space-between", width: 120, height: 40, borderColor: "#35f306" }}>
-            <box style={{ flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `100%` }}>
-                <box style={{ flexDirection: "column", justifyContent: "space-between", width: `80%`, height: `100%` }}>
-                    <box style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `100%`, borderColor: "#35f306", overflow: "hidden" }}>
-                        <text>{backGround}</text>
-                        <text
-                            position="absolute"
-                            left={player().x *2}
-                            top={player().y}
-                        >🦸</text>
-                    </box>
-                    <scrollbox stickyScroll={true} stickyStart="bottom" style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
-                    {/* <scrollbox style={{ borderStyle: "rounded", flexDirection: "row", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}> */}
-                        <For each={log()}>
-                            {(line) => (
-                            <text>
-                                {line.text}
-                            </text>
-                          )}
-                        </For>
-                    </scrollbox>
-                </box>
-                <box style={{ flexDirection: "column", justifyContent: "space-between", width: `20%`, height: `100%` }}>
-                    <box style={{ borderStyle: "rounded", flexDirection: "column", justifyContent: "space-between", width: `100%`, height: `35%`, borderColor: "#35f306" }}>
-                        <text>Status:</text>
-                    </box>
-                    <box style={{ borderStyle: "rounded", flexDirection: "column", justifyContent: "space-between", width: `100%`, height: `35%`, borderColor: "#35f306" }}>
-                        <text>Inventory:</text>
-                    </box>
-                    <box style={{ borderStyle: "rounded", flexDirection: "column", justifyContent: "space-between", width: `100%`, height: `30%`, borderColor: "#35f306" }}>
-                        <text>Action :</text>
-                        <text>  "1" : Attack</text>
-                        <text>  "2" : Strike</text>
-                        <text>  "3" : UseItem</text>
-                        <text>  "4" : Run</text>
-                        <text>  "5" : Defend</text>
-                        <text>  "6" : Counter</text>
-                        <text>  "7" : UseItem</text>
-                        <text>  "8" : Run</text>
-                    </box>
-                </box>
-            </box>
+  // Signals ที่ UI ใช้แสดงผล
+  const [player,    setPlayer]    = createSignal<PlayerUIProps>(getPlayerUIProps());
+  const [inventory, setInventory] = createSignal<InventoryUIProps>(getInventoryUIProps());
+  const [screen,    setScreen]    = createSignal<UIScreen>("DUNGEON");
+  const [map]                     = createSignal(gameState.currentMap.getGrid());
+  const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+
+  // Refresh ข้อมูลทั้งหมดจาก Game Logic
+  function refresh() {
+    setPlayer(getPlayerUIProps());
+    setInventory(getInventoryUIProps());
+    setScreen(gameState.gameScreen as UIScreen);
+  }
+
+  // Keyboard handler — ส่ง input ไปให้ Game Logic แล้ว refresh UI
+  useKeyboard((key) => {
+    if (key.name === "escape") {
+      renderer.destroy();
+      return;
+    }
+    gameLoop.handleInput(key.name.toLowerCase());
+    refresh();
+  });
+
+  return (
+    // ─── Outer centering wrapper ──────────────────────────────────────
+    <box
+      style={{
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      {/* ─── Main game window ─────────────────────────────────────────── */}
+      <box
+        style={{
+          borderStyle: theme.border.outer,
+          borderColor: theme.colors.borderOuter,
+          flexDirection: "column",
+          width: 120,
+          height: 40,
+        }}
+      >
+        {/* ─── Title header ─────────────────────────────────────────── */}
+        <Header floor={1} screen={screen()} />
+
+        {/* ─── Main content row ─────────────────────────────────────── */}
+        <box
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            height: 32,
+          }}
+        >
+          {/* ── Left: Map + Log ──────────────────────────────────────── */}
+          <box
+            style={{
+              flexDirection: "column",
+              width: 82,
+              height: 32,
+            }}
+          >
+            <DungeonView
+              grid={map()}
+              playerPos={player().position}
+              exitPos={exitPos()}
+            />
+            <ActionLog logs={logs()} />
+          </box>
+
+          {/* ── Right: Sidebar ────────────────────────────────────────── */}
+          <box
+            style={{
+              flexDirection: "column",
+              width: 36,
+              height: 32,
+            }}
+          >
+            <PlayerPanel player={player()} />
+            <InventoryPanel inventory={inventory()} />
+            <ActionPanel screen={screen()} />
+          </box>
         </box>
+
+        {/* ─── Footer key hints ─────────────────────────────────────── */}
+        <Footer screen={screen()} />
+      </box>
     </box>
+  );
+};
 
-}
-
-await render(App, {
-    // targetFps: 60,
-    // maxFps: 60
-}) 
+await render(App, {});
