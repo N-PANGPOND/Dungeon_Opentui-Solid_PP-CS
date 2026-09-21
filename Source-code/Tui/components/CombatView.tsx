@@ -39,7 +39,7 @@ export const CombatView = (props: CombatUIProps) => {
         borderColor: theme.colors.combat,
         flexDirection: "column",
         width: "100%",
-        height: 22,
+        height: 29,
         overflow: "hidden",
       }}
     >

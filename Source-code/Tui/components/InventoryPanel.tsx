@@ -25,7 +25,7 @@ export const InventoryPanel = (props: InventoryPanelProps) => {
         borderColor: theme.colors.borderPanel,
         flexDirection: "column",
         width: "100%",
-        height: 12,
+        height: 15,
         paddingLeft: 1,
         paddingTop: 1,
       }}

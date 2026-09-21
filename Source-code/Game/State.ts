@@ -81,10 +81,10 @@ export class GameState {
       action:() => void 
     }[] = [
       {name : "monster",weight : 0.25,action : () => this.eventCombat()},
-      {name : "Trap",weight : 0.08,action : () => this.eventTrap()},
+      {name : "Trap",weight : 0.07,action : () => this.eventTrap()},
       {name : "Treasure",weight : 0.10,action : () => this.eventTreasure()},
       {name : "Potion",weight : 0.04,action : () => this.eventPotion()},
-      {name : "shop",weight : 0.08,action : () => this.eventShop()},
+      {name : "shop",weight : 0.09,action : () => this.eventShop()},
       {name : "Nothing",weight : 0.50,action : () => this.eventNothing()}
     ]
     const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0)

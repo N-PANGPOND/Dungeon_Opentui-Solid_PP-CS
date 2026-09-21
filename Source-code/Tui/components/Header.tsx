@@ -3,15 +3,26 @@
 // แสดงชื่อเกมและ Floor ปัจจุบัน
 // =============================================================
 
-import { theme, center } from "../theme";
+import { theme, pad,center } from "../theme";
 
 interface HeaderProps {
-  floor?: number;
   screen?: string;
+  isPlayerTurn?: boolean;
+}
+
+function dungeonHints(): string {
+  return "  W/A/S/D: Move    I: Inventory    ESC/Q: Quit";
+}
+
+function combatHints(attacking: boolean): string {
+  return attacking
+    ? "  1: Attack    2: Strike    3: Use Item    4: Run    ESC/Q: Quit"
+    : "  1: Defend    2: Counter   3: Use Item    4: Run    ESC/Q: Quit";
 }
 
 export const Header = (props: HeaderProps) => {
-  const floor = () => props.floor ?? 1;
+  const hints = () => props.screen === "COMBAT" ? combatHints(props.isPlayerTurn ?? true) : dungeonHints()
+      
   const titleText = () => `${theme.icons.title}  ESCAPE DUNGEON  ${theme.icons.title}`;
 
   return (
@@ -29,7 +40,7 @@ export const Header = (props: HeaderProps) => {
       }}
     >
       <text fg={theme.colors.title}>{titleText()}</text>
-      <text fg={theme.colors.coin}>{`Floor ${floor()}`}</text>
+      <text fg={theme.colors.textDim}>{`${hints()}`}</text>
     </box>
   );
 };

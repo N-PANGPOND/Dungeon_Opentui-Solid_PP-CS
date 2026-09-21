@@ -149,27 +149,27 @@ const App = () => {
               borderStyle: theme.border.outer,
               borderColor: theme.colors.borderOuter,
               flexDirection: "column",
-              width: 120,
+              width: 132,
               height: 40,
             }}
           >
             {/* ─── Title header ─────────────────────────────────────── */}
-            <Header floor={1} screen={screen()} />
+            <Header screen={screen()} isPlayerTurn={attackTurn()} />
 
             {/* ─── Main content row ─────────────────────────────────── */}
             <box
               style={{
                 flexDirection: "row",
                 width: "100%",
-                height: 32,
+                height: 37,
               }}
             >
               {/* ── Left: Map (หรือ Combat) + Log ────────────────────── */}
               <box
                 style={{
                   flexDirection: "column",
-                  width: 82,
-                  height: 32,
+                  width: 94,
+                  height: 37,
                 }}
               >
                 <Show
@@ -207,7 +207,7 @@ const App = () => {
             </box>
 
             {/* ─── Footer key hints ─────────────────────────────────── */}
-            <Footer screen={screen()} isPlayerTurn={attackTurn()} />
+            {/* <Footer screen={screen()} isPlayerTurn={attackTurn()} /> */}
           </box>
         </Match>
       </Switch>

@@ -12,10 +12,10 @@ import { MapObject } from "../../Type-Enum/enum";
 import type { DungeonViewUIProps } from "../uiTypes";
 import { Show } from "solid-js";
 
-// พื้นที่ใช้งานได้ภายในกล่อง MAP (กล่องกว้าง 82 / สูง 22 หักขอบแล้ว)
+// พื้นที่ใช้งานได้ภายในกล่อง MAP (กล่องกว้าง 82 / สูง 22 หักขอบแล้ว) 
 // แต่ละช่องของแมพกว้าง 2 ตัวอักษร
-const VIEW_COLS = 40; // ช่อง
-const VIEW_ROWS = 20; // แถว
+const VIEW_COLS = 46; // ช่อง
+const VIEW_ROWS = 27; // แถว
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -71,7 +71,7 @@ export const DungeonView = (props: DungeonViewUIProps) => {
         borderColor: theme.colors.borderPanel,
         flexDirection: "column",
         width: "100%",
-        height: 22,
+        height: 29,
         overflow: "hidden",
       }}
     >

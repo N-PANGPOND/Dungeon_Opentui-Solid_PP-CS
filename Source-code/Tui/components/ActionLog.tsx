@@ -60,7 +60,7 @@ export const ActionLog = (props: ActionLogProps) => {
         borderColor: theme.colors.borderPanel,
         flexDirection: "column",
         width: "100%",
-        height: 10,
+        height: 6,
         overflow: "hidden",
       }}
     >
