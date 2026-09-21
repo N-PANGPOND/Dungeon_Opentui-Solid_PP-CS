@@ -59,31 +59,27 @@ export function parseKeyIntent(key: string): GameInputIntent {
 export class ConsoleIO {
 
     constructor(
-        private setMessage:(value: string) => void,
-        private setStatus: (value: string) => void,
-        private setInventory: (value: string) => void,
         private addLog: (log: logType) => void = () => {},
     ){}
 
     public ShowMessage(log:logType): void {
         this.addLog(log);
-        this.setMessage(`[${log.type}] ${log.text}`);
     }
 
-    public Clear(): void {
-        this.setMessage("");
-    }
+    // public Clear(): void {
+    //     this.setMessage("");
+    // }
     
-    public ShowStatus(status: string): void {
-        this.setStatus(status);
-    }
+    // public ShowStatus(status: string): void {
+    //     this.setStatus(status);
+    // }
 
     //renderMap(map: DungeonMap, playerPos: Position): void {
         // ทำทีหลัง
     //}
 
-   public ShowInventory(items: string[]): void {
-    this.setInventory(items.length > 0 ? items.join(", ") : "Inventory is empty.");
-   }
+//    public ShowInventory(items: string[]): void {
+//     this.setInventory(items.length > 0 ? items.join(", ") : "Inventory is empty.");
+//    }
 
 }
