@@ -13,6 +13,12 @@ export class Item {
     public getPrice(): number {
         return this.item.price;
     }
+    public getName(): string {
+        return this.item.name;
+    }
+    public getDesciption(): string {
+        return this.item.description;
+    }
 
     constructor(item: item, Addeffects?:(target: Character)=> void) {
         this.item = item;
