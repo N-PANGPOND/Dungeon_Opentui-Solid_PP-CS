@@ -2,6 +2,7 @@ import { Player } from "../Character/character";
 import type { position, gameScreen,Direction,logType } from "../Type-Enum/type";
 import { DungeonMap } from"../DungeonMap/DungeonMap"
 import { CombatSystem } from "../System/CombatSystem"
+import { Event } from "../Event/Event"
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
 
@@ -74,18 +75,63 @@ export class GameState {
   }
 
   public checkTileEvent(): void {
-    const chance = Math.random();
-    if (chance <= 0.28) {
-      this.ConsoleIO.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
-      this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
-      const monster = this.combatSystem.getMonsterStats();
-      this.ConsoleIO.ShowMessage({
-        type: "System",
-        text: `Monster stats: HP ${monster.hp}/${monster.maxHp}, ATK ${monster.atk}, DEF ${monster.def}, LUC ${monster.luc}, AGI ${monster.agi}, Coin ${monster.coin}`,
-      });
-      this.gameScreen = "COMBAT";
+    const tileEvents : {
+      name:string,
+      weight:number,
+      action:() => void 
+    }[] = [
+      {name : "monster",weight : 0.25,action : () => this.eventCombat()},
+      {name : "Trap",weight : 0.08,action : () => this.eventTrap()},
+      {name : "Treasure",weight : 0.10,action : () => this.eventTreasure()},
+      {name : "Potion",weight : 0.04,action : () => this.eventPotion()},
+      {name : "shop",weight : 0.08,action : () => this.eventShop()},
+      {name : "Nothing",weight : 0.50,action : () => this.eventNothing()}
+    ]
+    const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0)
+    let chance = Math.random()*totalWeight;
 
+    for (const event of tileEvents) {
+      if (chance < event.weight) {
+        event.action();
+        return;
+      }
+      chance -= event.weight;
     }
+  }
+
+  public eventTrap():void{
+    const damage = Event.prototype.Trap(this.player)
+    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอกับดัก เสีย Hp ${damage}!!`})
+  }
+
+  public eventTreasure():void{
+    const coin = Event.prototype.Treasure(this.player)
+    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอสมบัติ ได้ coin ${coin}!!`})
+  }
+  
+  public eventPotion():void{
+    const Potion = Event.prototype.Potion()
+    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอ Potion ${Potion.getName()}!!`})
+  }
+
+  public eventShop():void{
+    const Potion = Event.prototype.Shop()
+    this.ConsoleIO.ShowMessage({type: "System" , text: `ว้าว เจอ shop แต่กูไม่ให้ซื้อยังทำระบบไม่เสร็จ`})
+  }
+
+  public eventNothing():void{
+    this.ConsoleIO.ShowMessage({type: "System" , text: `ปกติดีไม่มีอะไรเกิดขึ้น`})
+  }
+
+  public eventCombat():void{
+    this.ConsoleIO.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
+    const monster = this.combatSystem.getMonsterStats();
+    this.ConsoleIO.ShowMessage({
+      type: "System",
+      text: `Monster stats: HP ${monster.hp}/${monster.maxHp}, ATK ${monster.atk}, DEF ${monster.def}, LUC ${monster.luc}, AGI ${monster.agi}, Coin ${monster.coin}`,
+    });
+    this.gameScreen = "COMBAT";
   }
 
   public handleCombatAction(action: AttackingType | DefensiveType): void {
