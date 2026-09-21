@@ -2,6 +2,7 @@ import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 import type { Direction,logType } from "../Type-Enum/type";
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
 import { GameState } from "../Game/State";
+import type { InventoryUIProps, PlayerUIProps } from "../Tui/uiTypes";
 
 export type GameInputIntent =
     | { type: "MOVE"; direction: Direction }
@@ -55,17 +56,49 @@ export function parseKeyIntent(key: string): GameInputIntent {
     }
 }
 
-
+export const INVENTORY_MAX_SLOTS = 8;
 export class ConsoleIO {
 
     constructor(
         private addLog: (log: logType) => void = () => {},
+        private addInventory: (items: InventoryUIProps) => void = () => {},
+        private addPlayer: (items: PlayerUIProps) => void = () => {},
     ){}
 
     public ShowMessage(log:logType): void {
         this.addLog(log);
     }
+    
+    public ShowInventory(gs: GameState): void {
+        this.addInventory(this.getInventoryUIProps(gs))
+    }
+    public ShowPlayer(gs: GameState): void {
+        this.addPlayer(this.getPlayerUIProps(gs))
+    }
 
+    public getPlayerUIProps(gs: GameState): PlayerUIProps {
+      const p = gs.player;
+      return {
+        name: "HERO",
+        hp: p.getHp(),
+        maxHp: p.getMaxHp(),
+        atk: p.getAtk(),
+        def: p.getDef(),
+        coin: p.getCoin(),
+        position: p.getPosition(),
+      };
+    }
+
+    public getInventoryUIProps(gs: GameState): InventoryUIProps {
+      const items = gs.player
+        .getInventory()
+        .getItems()
+        .map((item) => ({
+          name: item.item.name,
+          description: item.item.description,
+        }));
+      return { items, maxSlots: INVENTORY_MAX_SLOTS };
+    }
     // public Clear(): void {
     //     this.setMessage("");
     // }
@@ -78,8 +111,5 @@ export class ConsoleIO {
         // ทำทีหลัง
     //}
 
-//    public ShowInventory(items: string[]): void {
-//     this.setInventory(items.length > 0 ? items.join(", ") : "Inventory is empty.");
-//    }
 
 }
