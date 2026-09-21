@@ -27,31 +27,6 @@ export function resolveScreen(gs: GameState): UIScreen {
   return gs.gameScreen as UIScreen;
 }
 
-// ─── Player / Inventory ────────────────────────────────────────────────────
-
-export function getPlayerUIProps(gs: GameState): PlayerUIProps {
-  const p = gs.player;
-  return {
-    name: "HERO",
-    hp: p.getHp(),
-    maxHp: p.getMaxHp(),
-    atk: p.getAtk(),
-    def: p.getDef(),
-    coin: p.getCoin(),
-    position: p.getPosition(),
-  };
-}
-
-export function getInventoryUIProps(gs: GameState): InventoryUIProps {
-  const items = gs.player
-    .getInventory()
-    .getItems()
-    .map((item) => ({
-      name: item.item.name,
-      description: item.item.description,
-    }));
-  return { items, maxSlots: INVENTORY_MAX_SLOTS };
-}
 
 // ─── Combat ────────────────────────────────────────────────────────────────
 

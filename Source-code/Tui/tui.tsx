@@ -26,8 +26,6 @@ import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, UIScreen } from "./uiTypes";
 import {
-  getPlayerUIProps,
-  getInventoryUIProps,
   getEnemyUIProps,
   isPlayerAttackTurn,
   mapInputKey,
