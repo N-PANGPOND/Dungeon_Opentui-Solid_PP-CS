@@ -4,7 +4,6 @@ import { DungeonMap } from"../DungeonMap/DungeonMap"
 import { CombatSystem } from "../System/CombatSystem"
 import { Event } from "../Event/Event"
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
-import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
 
 
 //import { Event }
@@ -13,24 +12,20 @@ import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
 export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
-  public currentMap: DungeonMap;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
 
-  private ConsoleIO : ConsoleIO
   private isGetWife: boolean;
   private isPause: boolean;
   private combatSystem: CombatSystem;
  // private eventSystem: GameEvent;
 
-  constructor(currentMap: DungeonMap,addLog: (log: logType) => void = () => {}) {
+  constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
     this.gameScreen = "DUNGEON";
-    this.currentMap = currentMap;
     this.player = new Player({maxHp:160,hp:160,atk:30,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
     this.isGetWife = false;
     this.isPause = false;
-    this.ConsoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog)
-    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
    //this.eventSystem = new GameEvent();
   }
 
@@ -62,7 +57,7 @@ export class GameState {
     }
 
     if (!this.currentMap.isWalkable(nextPos)) {
-      this.ConsoleIO.ShowMessage({type:"System",text:"is Not Walkable"})
+      this.ShowMessage({type:"System",text:"is Not Walkable"})
       return false;
     }
 
@@ -101,33 +96,33 @@ export class GameState {
 
   public eventTrap():void{
     const damage = Event.prototype.Trap(this.player)
-    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอกับดัก เสีย Hp ${damage}!!`})
+    this.ShowMessage({type: "System" , text: `เจอกับดัก เสีย Hp ${damage}!!`})
   }
 
   public eventTreasure():void{
     const coin = Event.prototype.Treasure(this.player)
-    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอสมบัติ ได้ coin ${coin}!!`})
+    this.ShowMessage({type: "System" , text: `เจอสมบัติ ได้ coin ${coin}!!`})
   }
   
   public eventPotion():void{
     const Potion = Event.prototype.Potion()
-    this.ConsoleIO.ShowMessage({type: "System" , text: `เจอ Potion ${Potion.getName()}!!`})
+    this.ShowMessage({type: "System" , text: `เจอ Potion ${Potion.getName()}!!`})
   }
 
   public eventShop():void{
     const Potion = Event.prototype.Shop()
-    this.ConsoleIO.ShowMessage({type: "System" , text: `ว้าว เจอ shop แต่กูไม่ให้ซื้อยังทำระบบไม่เสร็จ`})
+    this.ShowMessage({type: "System" , text: `ว้าว เจอ shop แต่กูไม่ให้ซื้อยังทำระบบไม่เสร็จ`})
   }
 
   public eventNothing():void{
-    this.ConsoleIO.ShowMessage({type: "System" , text: `ปกติดีไม่มีอะไรเกิดขึ้น`})
+    this.ShowMessage({type: "System" , text: `ปกติดีไม่มีอะไรเกิดขึ้น`})
   }
 
   public eventCombat():void{
-    this.ConsoleIO.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
-    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
+    this.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
     const monster = this.combatSystem.getMonsterStats();
-    this.ConsoleIO.ShowMessage({
+    this.ShowMessage({
       type: "System",
       text: `Monster stats: HP ${monster.hp}/${monster.maxHp}, ATK ${monster.atk}, DEF ${monster.def}, LUC ${monster.luc}, AGI ${monster.agi}, Coin ${monster.coin}`,
     });
@@ -142,7 +137,7 @@ export class GameState {
     if (this.player.isDead()) {
       this.gameScreen = "GAMEOVER";
     } else if (this.combatSystem.isBattleOver()) {
-      this.ConsoleIO.ShowMessage({type:"System",text:"Monster isDead"})
+      this.ShowMessage({type:"System",text:"Monster isDead"})
       this.gameScreen = "DUNGEON";
     }
   }
