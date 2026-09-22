@@ -9,6 +9,7 @@ import path from "path";
 
 import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
+import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
 
 import type { logType } from "../Type-Enum/type";
 
@@ -21,14 +22,10 @@ import { InventoryPanel } from "./components/InventoryPanel";
 import { ActionPanel } from "./components/ActionPanel";
 import { ActionLog, formatLogText } from "./components/ActionLog";
 import { CombatView } from "./components/CombatView";
-import { Footer } from "./components/Footer";
 import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, UIScreen } from "./uiTypes";
 import {
-  getPlayerUIProps,
-  getInventoryUIProps,
-  getEnemyUIProps,
   isPlayerAttackTurn,
   mapInputKey,
   resolveScreen,
@@ -51,46 +48,59 @@ soundSystem.loadManifest({
   menuConfirm:path.join(soundDir, "menuConfirm.mp3"),
 });
 
-// ─── Game Setup ─────────────────────────────────────────────────────────────
-const [logs, setLogs] = createSignal<logType[]>([]);
-
-const gameLoop = new GameLoop((entry: logType) => {
-  setLogs((prev) => [...prev, entry]);
-});
-gameLoop.start();
-
-const gameState = gameLoop.getGameState();
 
 // ─── App Component ────────────────────────────────────────────────────────────
 // การอ่านข้อมูลจาก Game Logic ทั้งหมดอยู่ใน ./gameBridge — ไฟล์นี้ทำแค่ต่อสัญญาณ UI
 
 const App = () => {
   const renderer = useRenderer();
-
+  
   // Signals ที่ UI ใช้แสดงผล
-  const [player,    setPlayer]    = createSignal<PlayerUIProps>(getPlayerUIProps(gameState));
-  const [inventory, setInventory] = createSignal<InventoryUIProps>(getInventoryUIProps(gameState));
-  const [screen,    setScreen]    = createSignal<UIScreen>(resolveScreen(gameState));
+  const [player,    setPlayer]    = createSignal<PlayerUIProps>();
+  const [inventory, setInventory] = createSignal<InventoryUIProps>();
   const [enemy,     setEnemy]     = createSignal<EnemyUIProps | null>(null);
   const [attackTurn, setAttackTurn] = createSignal<boolean>(true);
+ 
+  
+  // ─── Game Setup ─────────────────────────────────────────────────────────────
+  const [logs, setLogs] = createSignal<logType[]>([]);
+  
+  const consoleIO = new ConsoleIO(
+    (entry: logType) => {setLogs((prev) => [...prev, entry])}, // โยนฟังชั่นไว้ set ให้ console io ไปเรียกใช้งาน
+    (entry: InventoryUIProps) => {setInventory(entry)},
+    (entry: PlayerUIProps) => {setPlayer(entry)},
+    (entry: EnemyUIProps) => {setEnemy(entry)}
+  )
+  const gameLoop = new GameLoop((log) => consoleIO.ShowMessage(log));
+  gameLoop.start();
+  
+  const gameState = gameLoop.getGameState();
+  setPlayer(consoleIO.getPlayerUIProps(gameState));
+  setInventory(consoleIO.getInventoryUIProps(gameState));
+
+  
+  const [screen,    setScreen]    = createSignal<UIScreen>(resolveScreen(gameState));
   const [map]                     = createSignal(gameState.currentMap.getGrid());
   const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+
 
   // Refresh ข้อมูลทั้งหมดจาก Game Logic (batch = วาดใหม่ครั้งเดียว ไม่กระพริบหลายรอบ)
   function refresh() {
     batch(() => {
-      setPlayer(getPlayerUIProps(gameState));
-      setInventory(getInventoryUIProps(gameState));
+      consoleIO.ShowPlayer(gameState);
+      consoleIO.ShowInventory(gameState);
+      consoleIO.ShowEnemy(gameState)
+    
+      
       setScreen(resolveScreen(gameState));
-      setEnemy(getEnemyUIProps(gameState));
       setAttackTurn(isPlayerAttackTurn(gameState));
     });
   }
-
+  
   // Keyboard handler — ส่ง input ไปให้ Game Logic แล้ว refresh UI
   useKeyboard((key) => {
     const name = key.name.toLowerCase();
-
+    
     // ESC / Q = ออกจากโปรแกรม (Q ถูก gameloop ตีความเป็น QUIT ซึ่งจะทำให้เกมหยุดแต่ UI ค้าง)
     if (name === "escape" || name === "q") {
       renderer.destroy();
@@ -137,10 +147,10 @@ const App = () => {
           `if (screen() === ...) return` จะเช็กแค่ตอนสร้างและไม่อัปเดตตามภายหลัง */}
       <Switch>
         <Match when={screen() === "GAMEOVER"}>
-          <GameOverScreen player={player()} />
+          <GameOverScreen player={player()!} />
         </Match>
         <Match when={screen() === "VICTORY"}>
-          <VictoryScreen player={player()} />
+          <VictoryScreen player={player()!} />
         </Match>
         <Match when={true}>
           {/* ─── Main game window ─────────────────────────────────────── */}
@@ -177,13 +187,13 @@ const App = () => {
                   fallback={
                     <DungeonView
                       grid={map()}
-                      playerPos={player().position}
+                      playerPos={player()!.position}
                       exitPos={exitPos()}
                     />
                   }
                 >
                   <CombatView
-                    player={player()}
+                    player={player()!}
                     enemy={enemy()!}
                     isPlayerTurn={attackTurn()}
                     lastLog={lastLog()}
@@ -200,8 +210,8 @@ const App = () => {
                   height: 32,
                 }}
               >
-                <PlayerPanel player={player()} />
-                <InventoryPanel inventory={inventory()} />
+                <PlayerPanel player={player()!} />
+                <InventoryPanel inventory={inventory()!} />
                 <ActionPanel screen={screen()} isPlayerTurn={attackTurn()} />
               </box>
             </box>
