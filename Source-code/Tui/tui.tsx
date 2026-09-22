@@ -26,7 +26,6 @@ import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, UIScreen } from "./uiTypes";
 import {
-  getEnemyUIProps,
   isPlayerAttackTurn,
   mapInputKey,
   resolveScreen,
@@ -57,23 +56,20 @@ const App = () => {
   const renderer = useRenderer();
   
   // Signals ที่ UI ใช้แสดงผล
-  // const [player,    setPlayer]    = createSignal<PlayerUIProps>(getPlayerUIProps(gameState));
-  // const [inventory, setInventory] = createSignal<InventoryUIProps>(getInventoryUIProps(gameState));
   const [player,    setPlayer]    = createSignal<PlayerUIProps>();
   const [inventory, setInventory] = createSignal<InventoryUIProps>();
-  // const [screen,    setScreen]    = createSignal<UIScreen>(resolveScreen(gameState));
   const [enemy,     setEnemy]     = createSignal<EnemyUIProps | null>(null);
   const [attackTurn, setAttackTurn] = createSignal<boolean>(true);
-  // const [map]                     = createSignal(gameState.currentMap.getGrid());
-  // const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+ 
   
   // ─── Game Setup ─────────────────────────────────────────────────────────────
   const [logs, setLogs] = createSignal<logType[]>([]);
   
   const consoleIO = new ConsoleIO(
-    (entry: logType) => {setLogs((prev) => [...prev, entry])},
+    (entry: logType) => {setLogs((prev) => [...prev, entry])}, // โยนฟังชั่นไว้ set ให้ console io ไปเรียกใช้งาน
     (entry: InventoryUIProps) => {setInventory(entry)},
-    (entry: PlayerUIProps) => {setPlayer(entry)}
+    (entry: PlayerUIProps) => {setPlayer(entry)},
+    (entry: EnemyUIProps) => {setEnemy(entry)}
   )
   const gameLoop = new GameLoop((log) => consoleIO.ShowMessage(log));
   gameLoop.start();
@@ -93,8 +89,10 @@ const App = () => {
     batch(() => {
       consoleIO.ShowPlayer(gameState);
       consoleIO.ShowInventory(gameState);
+      consoleIO.ShowEnemy(gameState)
+    
+      
       setScreen(resolveScreen(gameState));
-      setEnemy(getEnemyUIProps(gameState));
       setAttackTurn(isPlayerAttackTurn(gameState));
     });
   }

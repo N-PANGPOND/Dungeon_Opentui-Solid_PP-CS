@@ -32,27 +32,12 @@ export function resolveScreen(gs: GameState): UIScreen {
 
 // คืน CombatSystem ปัจจุบัน เฉพาะตอนอยู่ในหน้า COMBAT จริง ๆ
 // (นอก combat ตัวแปรนี้ยังค้างศัตรูของสู้ครั้งก่อนอยู่ จึงห้ามอ่าน)
-function getCombat(gs: GameState) {
+export function getCombat(gs: GameState) {
   if (gs.gameScreen !== "COMBAT") return null;
   return gs["combatSystem"] ?? null;
 }
 
-export function getEnemyUIProps(gs: GameState): EnemyUIProps | null {
-  const combat = getCombat(gs);
-  if (!combat) return null;
 
-  const stats = combat.getMonsterStats();
-
-  // ชนิดมอนสเตอร์ (NORMAL MONS / ELITE MONS / BOSS) ไม่มี getter — อ่านไม่ได้ก็ใช้ชื่อกลาง
-  let name = "MONSTER";
-  try {
-    name = combat["monster"]["MonsterType"] ?? name;
-  } catch {
-    /* ใช้ชื่อกลางต่อไป */
-  }
-
-  return { name, hp: stats.hp, maxHp: stats.maxHp, atk: stats.atk, def: stats.def };
-}
 
 // true = ถึงตา player โจมตี (เลือก Attack/Strike/...), false = ถึงตา monster โจมตี (player เลือก Defend/Counter/...)
 export function isPlayerAttackTurn(gs: GameState): boolean {

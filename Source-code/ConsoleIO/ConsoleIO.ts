@@ -2,7 +2,8 @@ import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 import type { Direction,logType } from "../Type-Enum/type";
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
 import { GameState } from "../Game/State";
-import type { InventoryUIProps, PlayerUIProps } from "../Tui/uiTypes";
+import { getCombat } from "../Tui/gameBridge";
+import type { EnemyUIProps, InventoryUIProps, PlayerUIProps } from "../Tui/uiTypes";
 
 export type GameInputIntent =
     | { type: "MOVE"; direction: Direction }
@@ -63,10 +64,11 @@ export class ConsoleIO {
         private addLog: (log: logType) => void = () => {},
         private addInventory: (items: InventoryUIProps) => void = () => {},
         private addPlayer: (items: PlayerUIProps) => void = () => {},
+        private addEnemy: (enemy: EnemyUIProps) => void = () => {},
     ){}
 
     public ShowMessage(log:logType): void {
-        this.addLog(log);
+        this.addLog(log); // เอาฟังชั่นที่ได้จากการโยนมาใช้
     }
     
     public ShowInventory(gs: GameState): void {
@@ -74,6 +76,9 @@ export class ConsoleIO {
     }
     public ShowPlayer(gs: GameState): void {
         this.addPlayer(this.getPlayerUIProps(gs))
+    }
+    public ShowEnemy(gs: GameState): void {
+        this.addEnemy(this.getEnemyUIProps(gs)!)
     }
 
     public getPlayerUIProps(gs: GameState): PlayerUIProps {
@@ -89,6 +94,22 @@ export class ConsoleIO {
       };
     }
 
+    public getEnemyUIProps(gs: GameState): EnemyUIProps | null {
+      const combat = getCombat(gs);
+      if (!combat) return null;
+    
+      const stats = combat.getMonsterStats();
+    
+      let name = "MONSTER";
+      try {
+        name = combat["monster"]["MonsterType"] ?? name;
+      } catch {
+        /* ใช้ชื่อกลางต่อไป */
+      }
+    
+      return { name, hp: stats.hp, maxHp: stats.maxHp, atk: stats.atk, def: stats.def };
+    }
+
     public getInventoryUIProps(gs: GameState): InventoryUIProps {
       const items = gs.player
         .getInventory()
@@ -99,6 +120,9 @@ export class ConsoleIO {
         }));
       return { items, maxSlots: INVENTORY_MAX_SLOTS };
     }
+
+
+    // ไม่น่าได้ใช้แล้วพวกนี้ มั้งนะ
     // public Clear(): void {
     //     this.setMessage("");
     // }
