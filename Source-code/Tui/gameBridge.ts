@@ -11,10 +11,16 @@
 // =============================================================
 
 import type { GameState } from "../Game/State";
-import type { EnemyUIProps, InventoryUIProps, PlayerUIProps, UIScreen } from "./uiTypes";
+import type { EnemyUIProps, EventScreenUIProps, InventoryUIProps, PlayerUIProps, UIScreen } from "./uiTypes";
 
 // Inventory.maxSlots เป็น private (ค่าคือ 8) — ถ้าเปลี่ยนที่ Inventory.ts ให้แก้ค่านี้ตาม
 export const INVENTORY_MAX_SLOTS = 8;
+
+// ─── Event Screen ───────────────────────────────────────────────────────────────
+
+export function getEventScreenProps(gs: GameState): EventScreenUIProps | null {
+  return gs.getPendingEvent();
+}
 
 // ─── Screen ────────────────────────────────────────────────────────────────
 
@@ -24,6 +30,8 @@ export const INVENTORY_MAX_SLOTS = 8;
 export function resolveScreen(gs: GameState): UIScreen {
   if (gs.isGameOver() || gs.gameScreen === "GAMEOVER") return "GAMEOVER";
   if (gs.isVictory()) return "VICTORY";
+  // ถ้ามี pendingEvent ค้างอยู่ ให้แสดง event splash screen ก่อน
+  if (gs.getPendingEvent() !== null) return "EVENT";
   return gs.gameScreen as UIScreen;
 }
 
