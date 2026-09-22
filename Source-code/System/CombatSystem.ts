@@ -6,10 +6,9 @@ import { DungeonMap } from "../DungeonMap/DungeonMap";
 
 
 export class CombatSystem {
-    private player: Player; 
     private monster: Monster;
     private isPlayerAttacker: boolean;
-    constructor(player: Player,DungeonMap:DungeonMap, private addLog: (log: logType) => void = () => {}) { 
+    constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
         let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
         this.monster = MonsterFactory.createMonster(distToExit);
@@ -22,14 +21,14 @@ export class CombatSystem {
                     throw new Error("Player is Attacking But Action Is Not AttackingType");
                 }
                 const monsterAction : DefensiveType = this.monster.decideDefensiveAction()
-                this.addLog({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
+                this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
                 this.processTurn(this.player, this.monster,playerAction as AttackingType,monsterAction);
             } else {
                 if (!Object.values(DefensiveType).includes(playerAction as DefensiveType)) {
                     throw new Error("Player is Defensive But Action Is Not DefensiveType");
                 }
                 const monsterAction = this.monster.decideAttackingAction();
-                this.addLog({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
+                this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
                 this.processTurn(this.monster, this.player,monsterAction,playerAction as DefensiveType);
             }
             this.isPlayerAttacker = !this.isPlayerAttacker;
@@ -89,7 +88,7 @@ export class CombatSystem {
 
         const targetName = damageTarget === this.player ? "Player" : "Monster";
         const sourceName = damageSource === this.player ? "Player" : "Monster";
-        this.addLog({
+        this.ShowMessage({
             type: "System",
             text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
         });

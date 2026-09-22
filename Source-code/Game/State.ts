@@ -39,25 +39,21 @@ const eventScreens = eventJsonRaw["event@"];
 export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
-  public currentMap: DungeonMap;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
 
-  private ConsoleIO : ConsoleIO
   private isGetWife: boolean;
   private isPause: boolean;
   private combatSystem: CombatSystem;
   private pendingEvent: PendingEvent | null = null;
  // private eventSystem: GameEvent;
 
-  constructor(currentMap: DungeonMap,addLog: (log: logType) => void = () => {}) {
+  constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
     this.gameScreen = "DUNGEON";
-    this.currentMap = currentMap;
     this.player = new Player({maxHp:160,hp:160,atk:30,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
     this.isGetWife = false;
     this.isPause = false;
-    this.ConsoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog)
-    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
    //this.eventSystem = new GameEvent();
   }
 
@@ -99,7 +95,7 @@ export class GameState {
     }
 
     if (!this.currentMap.isWalkable(nextPos)) {
-      this.ConsoleIO.ShowMessage({type:"System",text:"is Not Walkable"})
+      this.ShowMessage({type:"System",text:"is Not Walkable"})
       return false;
     }
 
@@ -212,7 +208,7 @@ export class GameState {
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
 
     const monster = this.combatSystem.getMonsterStats();
-    this.ConsoleIO.ShowMessage({
+    this.ShowMessage({
       type: "System",
       text: `Monster stats: HP ${monster.hp}/${monster.maxHp}, ATK ${monster.atk}, DEF ${monster.def}, LUC ${monster.luc}, AGI ${monster.agi}, Coin ${monster.coin}`,
     });
@@ -227,7 +223,7 @@ export class GameState {
     if (this.player.isDead()) {
       this.gameScreen = "GAMEOVER";
     } else if (this.combatSystem.isBattleOver()) {
-      this.ConsoleIO.ShowMessage({type:"System",text:"Monster isDead"})
+      this.ShowMessage({type:"System",text:"Monster isDead"})
       this.gameScreen = "DUNGEON";
     }
   }
