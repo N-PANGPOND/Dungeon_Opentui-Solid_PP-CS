@@ -1,117 +1,527 @@
 import { describe, expect, it, mock } from "bun:test";
-import { ConsoleIO } from "../Source-code/ConsoleIO/ConsoleIO";
+import {
+    ConsoleIO,
+    INVENTORY_MAX_SLOTS,
+    parseKeyIntent,
+} from "../Source-code/ConsoleIO/ConsoleIO";
 import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
 
-const makeIO = () => {
-    const setMessage = mock((_value: string) => {});
-    const setStatus = mock((_value: string) => {});
-    const setSelectedIndex = mock((_index: number) => {});
-    const io = new ConsoleIO(setMessage, setStatus, setSelectedIndex);
-    return { io, setMessage, setStatus, setSelectedIndex };
-};
+describe("parseKeyIntent()", () => {
+    it.each([
+        ["up", "up"],
+        ["w", "up"],
+        ["UP", "up"],
+        ["ArrowUp", "up"],
+        ["arrow-up", "up"],
+        ["arrow_up", "up"],
+    ])("ควรแปลง %s เป็น MOVE up", (key: string, direction: "up") => {
+        expect(parseKeyIntent(key)).toEqual({
+            type: "MOVE",
+            direction,
+        });
+    });
+
+    it.each([
+        ["down", "down"],
+        ["s", "down"],
+        ["DOWN", "down"],
+        ["ArrowDown", "down"],
+        ["arrow-down", "down"],
+        ["arrow_down", "down"],
+    ])("ควรแปลง %s เป็น MOVE down", (key : string, direction: "down") => {
+        expect(parseKeyIntent(key)).toEqual({
+            type: "MOVE",
+            direction,
+        });
+    });
+
+    it.each([
+        ["left", "left"],
+        ["a", "left"],
+        ["LEFT", "left"],
+        ["ArrowLeft", "left"],
+        ["arrow-left", "left"],
+        ["arrow_left", "left"],
+    ])("ควรแปลง %s เป็น MOVE left", (key: string, direction: "left") => {
+        expect(parseKeyIntent(key)).toEqual({
+            type: "MOVE",
+            direction,
+        });
+    });
+
+    it.each([
+        ["right", "right"],
+        ["d", "right"],
+        ["RIGHT", "right"],
+        ["ArrowRight", "right"],
+        ["arrow-right", "right"],
+        ["arrow_right", "right"],
+    ])("ควรแปลง %s เป็น MOVE right", (key: string, direction: "right") => {
+        expect(parseKeyIntent(key)).toEqual({
+            type: "MOVE",
+            direction,
+        });
+    });
+
+    it.each([
+        ["1", AttackingType.Attack],
+        ["2", AttackingType.Strike],
+        ["3", AttackingType.UseItem],
+        ["4", AttackingType.Run],
+        ["5", DefensiveType.Defend],
+        ["6", DefensiveType.Counter],
+        ["7", DefensiveType.UseItem],
+        ["8", DefensiveType.Run],
+    ])("ควรแปลง key %s เป็น COMBAT_ACTION", (key: string, action: AttackingType | DefensiveType) => {
+        expect(parseKeyIntent(key)).toEqual({
+            type: "COMBAT_ACTION",
+            action,
+        });
+    });
+
+    it.each([
+        ["i", "OPEN_INVENTORY"],
+        ["I", "OPEN_INVENTORY"],
+        ["p", "PAUSE"],
+        ["P", "PAUSE"],
+        ["q", "QUIT"],
+        ["Q", "QUIT"],
+        ["escape", "QUIT"],
+        ["ESCAPE", "QUIT"],
+    ])("ควรแปลง key %s เป็น %s", (key: string, type: string) => {
+        expect(parseKeyIntent(key)).toEqual({ type });
+    });
+
+    it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
+        "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
+        (key: string) => {
+            expect(parseKeyIntent(key)).toEqual({ type: "UNKNOWN" });
+        },
+    );
+
+    it("ควรตัด arrow prefix ได้เฉพาะรูปแบบที่กำหนด", () => {
+        expect(parseKeyIntent("arrow--up")).toEqual({ type: "UNKNOWN" });
+        expect(parseKeyIntent("arrow_up")).toEqual({
+            type: "MOVE",
+            direction: "up",
+        });
+    });
+});
 
 describe("ConsoleIO", () => {
-    it("ShowMessage ควรส่ง [type] text ไปที่ setMessage", () => {
-        const { io, setMessage } = makeIO();
-        io.ShowMessage("SYSTEM", "Test message");
-        expect(setMessage).toHaveBeenCalledWith("[SYSTEM] Test message");
+    const makeIO = () => {
+        const addLog = mock((_log: { type: "System"; text: string }) => {});
+        const addInventory = mock((_items: any) => {});
+        const addPlayer = mock((_player: any) => {});
+        const addEnemy = mock((_enemy: any) => {});
+
+        const io = new ConsoleIO(
+            addLog,
+            addInventory,
+            addPlayer,
+            addEnemy,
+        );
+
+        return {
+            io,
+            addLog,
+            addInventory,
+            addPlayer,
+            addEnemy,
+        };
+    };
+
+    const makePlayer = (overrides: Record<string, unknown> = {}) => ({
+        getHp: () => 120,
+        getMaxHp: () => 160,
+        getAtk: () => 30,
+        getDef: () => 5,
+        getCoin: () => 75,
+        getPosition: () => ({ x: 4, y: 2 }),
+        getInventory: () => ({
+            getItems: () => [],
+        }),
+        ...overrides,
     });
 
-    it("Clear ควรส่งข้อความว่างไปที่ setMessage", () => {
-        const { io, setMessage } = makeIO();
-        io.Clear();
-        expect(setMessage).toHaveBeenCalledWith("");
+    const makeGameState = (overrides: Record<string, unknown> = {}) =>
+        ({
+            player: makePlayer(),
+            gameScreen: "DUNGEON",
+            ...overrides,
+        }) as any;
+
+    describe("constructor", () => {
+        it("ควรสร้าง ConsoleIO ได้โดยไม่ส่ง callback", () => {
+            expect(() => new ConsoleIO()).not.toThrow();
+        });
+
+        it("callback ทุกตัวควรเป็น optional", () => {
+            const io = new ConsoleIO();
+
+            expect(() => io.ShowMessage({ type: "System", text: "test" })).not.toThrow();
+            expect(() => io.ShowInventory(makeGameState())).not.toThrow();
+            expect(() => io.ShowPlayer(makeGameState())).not.toThrow();
+            expect(() => io.ShowEnemy(makeGameState())).not.toThrow();
+        });
     });
 
-    it("ShowStatus ควรส่ง status ไปที่ setStatus", () => {
-        const { io, setStatus } = makeIO();
-        io.ShowStatus("HP: 100/100");
-        expect(setStatus).toHaveBeenCalledWith("HP: 100/100");
+    describe("ShowMessage()", () => {
+        it("ควรส่ง log ไปที่ addLog โดยไม่แก้ข้อมูล", () => {
+            const { io, addLog } = makeIO();
+            const log = { type: "System" as const, text: "Hello Dungeon" };
+
+            io.ShowMessage(log);
+
+            expect(addLog).toHaveBeenCalledTimes(1);
+            expect(addLog).toHaveBeenCalledWith(log);
+        });
     });
 
-    it("ถ้ายังไม่มี menu handleMenuKey ควรคืน false", () => {
-        const { io } = makeIO();
-        expect(io.handleMenuKey("down")).toBe(false);
+    describe("getPlayerUIProps()", () => {
+        it("ควรแปลงข้อมูล Player เป็น PlayerUIProps ครบทุก field", () => {
+            const { io } = makeIO();
+            const gs = makeGameState({
+                player: makePlayer({
+                    getHp: () => 90,
+                    getMaxHp: () => 160,
+                    getAtk: () => 35,
+                    getDef: () => 12,
+                    getCoin: () => 250,
+                    getPosition: () => ({ x: 10, y: 20 }),
+                }),
+            });
+
+            expect(io.getPlayerUIProps(gs)).toEqual({
+                name: "HERO",
+                hp: 90,
+                maxHp: 160,
+                atk: 35,
+                def: 12,
+                coin: 250,
+                position: { x: 10, y: 20 },
+            });
+        });
+
+        it("ควรอ่านค่าปัจจุบันจาก Player ทุกครั้งที่เรียก", () => {
+            const { io } = makeIO();
+            let hp = 100;
+
+            const gs = makeGameState({
+                player: makePlayer({
+                    getHp: () => hp,
+                }),
+            });
+
+            expect(io.getPlayerUIProps(gs).hp).toBe(100);
+
+            hp = 50;
+
+            expect(io.getPlayerUIProps(gs).hp).toBe(50);
+        });
     });
 
-    it("attacking menu เริ่มที่ Attack", async () => {
-        const { io, setSelectedIndex, setMessage } = makeIO();
-        const p = io.showAttackingMenu();
-        expect(setSelectedIndex).toHaveBeenCalledWith(0);
-        expect(setMessage).toHaveBeenCalledWith("↑↓ เลือก, Enter ยืนยัน");
-        io.handleMenuKey("return");
-        await expect(p).resolves.toBe(AttackingType.Attack);
+    describe("ShowPlayer()", () => {
+        it("ควรส่ง PlayerUIProps ที่สร้างจาก getPlayerUIProps ไปที่ addPlayer", () => {
+            const { io, addPlayer } = makeIO();
+            const gs = makeGameState();
+
+            io.ShowPlayer(gs);
+
+            expect(addPlayer).toHaveBeenCalledTimes(1);
+            expect(addPlayer).toHaveBeenCalledWith({
+                name: "HERO",
+                hp: 120,
+                maxHp: 160,
+                atk: 30,
+                def: 5,
+                coin: 75,
+                position: { x: 4, y: 2 },
+            });
+        });
     });
 
-    it("attacking menu down 1/2/3 ครั้งควรได้ Strike/Use Item/Run", async () => {
-        const { io } = makeIO();
+    describe("getInventoryUIProps()", () => {
+        it("Inventory ว่างควรคืน items เป็น array ว่างและ maxSlots = 8", () => {
+            const { io } = makeIO();
+            const gs = makeGameState();
 
-        let p = io.showAttackingMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("return");
-        await expect(p).resolves.toBe(AttackingType.Strike);
+            expect(io.getInventoryUIProps(gs)).toEqual({
+                items: [],
+                maxSlots: INVENTORY_MAX_SLOTS,
+            });
+        });
 
-        p = io.showAttackingMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("return");
-        await expect(p).resolves.toBe(AttackingType.UseItem);
+        it("ควรแปลง Item ทุกชิ้นเป็น name + description", () => {
+            const { io } = makeIO();
+            const gs = makeGameState({
+                player: makePlayer({
+                    getInventory: () => ({
+                        getItems: () => [
+                            {
+                                item: {
+                                    name: "POTION",
+                                    description: "Restores 25 HP",
+                                    price: 20,
+                                },
+                            },
+                            {
+                                item: {
+                                    name: "HIGH_POTION",
+                                    description: "Restores 50 HP",
+                                    price: 50,
+                                },
+                            },
+                            {
+                                item: {
+                                    name: "SMOKE_BOMB",
+                                    description: "Escape from battle",
+                                    price: 100,
+                                },
+                            },
+                        ],
+                    }),
+                }),
+            });
 
-        p = io.showAttackingMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
-        io.handleMenuKey("return");
-        await expect(p).resolves.toBe(AttackingType.Run);
+            expect(io.getInventoryUIProps(gs)).toEqual({
+                items: [
+                    {
+                        name: "POTION",
+                        description: "Restores 25 HP",
+                    },
+                    {
+                        name: "HIGH_POTION",
+                        description: "Restores 50 HP",
+                    },
+                    {
+                        name: "SMOKE_BOMB",
+                        description: "Escape from battle",
+                    },
+                ],
+                maxSlots: 8,
+            });
+        });
+
+        it("ควรรักษาลำดับของ Item ตาม Inventory", () => {
+            const { io } = makeIO();
+            const names = ["A", "B", "C"];
+
+            const gs = makeGameState({
+                player: makePlayer({
+                    getInventory: () => ({
+                        getItems: () =>
+                            names.map((name) => ({
+                                item: {
+                                    name,
+                                    description: `${name} description`,
+                                    price: 10,
+                                },
+                            })),
+                    }),
+                }),
+            });
+
+            expect(io.getInventoryUIProps(gs).items.map((x: any) => x.name)).toEqual(
+                names,
+            );
+        });
     });
 
-    it("attacking menu up จาก index 0 ต้องวนไป index 3", () => {
-        const { io, setSelectedIndex } = makeIO();
-        io.showAttackingMenu();
-        setSelectedIndex.mockClear();
-        expect(io.handleMenuKey("up")).toBe(true);
-        expect(setSelectedIndex).toHaveBeenCalledWith(3);
+    describe("ShowInventory()", () => {
+        it("ควรส่ง InventoryUIProps ไปที่ addInventory", () => {
+            const { io, addInventory } = makeIO();
+            const gs = makeGameState({
+                player: makePlayer({
+                    getInventory: () => ({
+                        getItems: () => [
+                            {
+                                item: {
+                                    name: "POTION",
+                                    description: "Restores 25 HP",
+                                    price: 20,
+                                },
+                            },
+                        ],
+                    }),
+                }),
+            });
+
+            io.ShowInventory(gs);
+
+            expect(addInventory).toHaveBeenCalledTimes(1);
+            expect(addInventory).toHaveBeenCalledWith({
+                items: [
+                    {
+                        name: "POTION",
+                        description: "Restores 25 HP",
+                    },
+                ],
+                maxSlots: 8,
+            });
+        });
     });
 
-    it("attacking menu down จาก index 3 ต้องวนกลับ index 0", () => {
-        const { io, setSelectedIndex } = makeIO();
-        io.showAttackingMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
-        setSelectedIndex.mockClear();
-        expect(io.handleMenuKey("down")).toBe(true);
-        expect(setSelectedIndex).toHaveBeenCalledWith(0);
+    describe("getEnemyUIProps()", () => {
+        it("ถ้าไม่ได้อยู่หน้า COMBAT ควรคืน null", () => {
+            const { io } = makeIO();
+            const gs = makeGameState({
+                gameScreen: "DUNGEON",
+            });
+
+            expect(io.getEnemyUIProps(gs)).toBeNull();
+        });
+
+        it("ถ้าอยู่หน้า COMBAT แต่ไม่มี combatSystem ควรคืน null", () => {
+            const { io } = makeIO();
+            const gs = makeGameState({
+                gameScreen: "COMBAT",
+            });
+
+            expect(io.getEnemyUIProps(gs)).toBeNull();
+        });
+
+        it("ถ้าอยู่หน้า COMBAT ควรอ่าน monster stats และคืน EnemyUIProps", () => {
+            const { io } = makeIO();
+            const combat = {
+                getMonsterStats: mock(() => ({
+                    hp: 80,
+                    maxHp: 100,
+                    atk: 25,
+                    def: 10,
+                    luc: 5,
+                    agi: 12,
+                    coin: 40,
+                })),
+                monster: {
+                    MonsterType: "ELITE MONS",
+                },
+            };
+
+            const gs = makeGameState({
+                gameScreen: "COMBAT",
+                combatSystem: combat,
+            });
+
+            expect(io.getEnemyUIProps(gs)).toEqual({
+                name: "ELITE MONS",
+                hp: 80,
+                maxHp: 100,
+                atk: 25,
+                def: 10,
+            });
+
+            expect(combat.getMonsterStats).toHaveBeenCalledTimes(1);
+        });
+
+        it("ถ้า MonsterType ไม่มีค่า ควรใช้ชื่อ MONSTER", () => {
+            const { io } = makeIO();
+            const combat = {
+                getMonsterStats: () => ({
+                    hp: 50,
+                    maxHp: 50,
+                    atk: 15,
+                    def: 3,
+                    luc: 0,
+                    agi: 5,
+                    coin: 10,
+                }),
+                monster: {},
+            };
+
+            const gs = makeGameState({
+                gameScreen: "COMBAT",
+                combatSystem: combat,
+            });
+
+            expect(io.getEnemyUIProps(gs)).toEqual({
+                name: "MONSTER",
+                hp: 50,
+                maxHp: 50,
+                atk: 15,
+                def: 3,
+            });
+        });
+
+        it("ถ้าอ่าน MonsterType แล้วเกิด error ควรใช้ชื่อ MONSTER", () => {
+            const { io } = makeIO();
+
+            const combat = {
+                getMonsterStats: () => ({
+                    hp: 30,
+                    maxHp: 40,
+                    atk: 10,
+                    def: 2,
+                    luc: 0,
+                    agi: 5,
+                    coin: 5,
+                }),
+            };
+
+            Object.defineProperty(combat, "monster", {
+                get() {
+                    throw new Error("monster unavailable");
+                },
+            });
+
+            const gs = makeGameState({
+                gameScreen: "COMBAT",
+                combatSystem: combat,
+            });
+
+            expect(io.getEnemyUIProps(gs)).toEqual({
+                name: "MONSTER",
+                hp: 30,
+                maxHp: 40,
+                atk: 10,
+                def: 2,
+            });
+        });
     });
 
-    it("key ที่ไม่เกี่ยวกับ menu ควรคืน false", () => {
-        const { io } = makeIO();
-        io.showAttackingMenu();
-        expect(io.handleMenuKey("x")).toBe(false);
-    });
+    describe("ShowEnemy()", () => {
+        it("เมื่ออยู่หน้า COMBAT ควรส่ง EnemyUIProps ไปที่ addEnemy", () => {
+            const { io, addEnemy } = makeIO();
+            const gs = makeGameState({
+                gameScreen: "COMBAT",
+                combatSystem: {
+                    getMonsterStats: () => ({
+                        hp: 70,
+                        maxHp: 100,
+                        atk: 20,
+                        def: 8,
+                        luc: 2,
+                        agi: 10,
+                        coin: 20,
+                    }),
+                    monster: {
+                        MonsterType: "NORMAL MONS",
+                    },
+                },
+            });
 
-    it("เมื่อกด return แล้ว menu ควรถูกปิด", async () => {
-        const { io } = makeIO();
-        const p = io.showAttackingMenu();
-        io.handleMenuKey("return");
-        await expect(p).resolves.toBe(AttackingType.Attack);
-        expect(io.handleMenuKey("down")).toBe(false);
-    });
+            io.ShowEnemy(gs);
 
-    it("defensive menu เริ่มที่ Defend", async () => {
-        const { io } = makeIO();
-        const p = io.showDefensiveMenu();
-        io.handleMenuKey("return");
-        await expect(p).resolves.toBe(DefensiveType.Defend);
-    });
+            expect(addEnemy).toHaveBeenCalledTimes(1);
+            expect(addEnemy).toHaveBeenCalledWith({
+                name: "NORMAL MONS",
+                hp: 70,
+                maxHp: 100,
+                atk: 20,
+                def: 8,
+            });
+        });
 
-    it("defensive menu down 1/2/3 ครั้งควรได้ Counter/Use Item/Run", async () => {
-        const { io } = makeIO();
+        it("นอกหน้า COMBAT ควรส่ง null ไปที่ addEnemy ตาม implementation ปัจจุบัน", () => {
+            const { io, addEnemy } = makeIO();
+            const gs = makeGameState({
+                gameScreen: "DUNGEON",
+            });
 
-        let p = io.showDefensiveMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("return");
-        await expect(p).resolves.toBe(DefensiveType.Counter);
+            io.ShowEnemy(gs);
 
-        p = io.showDefensiveMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("return");
-        await expect(p).resolves.toBe(DefensiveType.UseItem);
-
-        p = io.showDefensiveMenu();
-        io.handleMenuKey("down"); io.handleMenuKey("down"); io.handleMenuKey("down");
-        io.handleMenuKey("return");
-        await expect(p).resolves.toBe(DefensiveType.Run);
+            expect(addEnemy).toHaveBeenCalledTimes(1);
+            expect(addEnemy).toHaveBeenCalledWith(null);
+        });
     });
 });
