@@ -25,8 +25,9 @@ export function resolvePlayCommand(
             return {
                 cmd: "powershell",
                 args: [
+                    "-Sta",
                     "-c",
-                    `(New-Object Media.SoundPlayer '${filePath}').PlaySync();`,
+                    `Add-Type -AssemblyName presentationCore; $mp = New-Object System.Windows.Media.MediaPlayer; $mp.Open([uri]'${filePath}'); $mp.Play(); Start-Sleep -Milliseconds 3000`,
                 ],
             };
         default:
