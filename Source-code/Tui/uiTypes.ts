@@ -46,6 +46,8 @@ export interface DungeonViewUIProps {
   grid: MapObject[][];
   playerPos: { x: number; y: number };
   exitPos: { x: number; y: number };
+  wifePos: { x: number; y: number };
+  isGetWife: boolean;                   
 }
 
 // ─── Shop UI Props ─────────────────────────────────────────────────────────

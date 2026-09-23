@@ -59,6 +59,12 @@ export const DungeonView = (props: DungeonViewUIProps) => {
   const exitVisible = () =>
     exitCol() >= 0 && exitCol() < VIEW_COLS && exitRow() >= 0 && exitRow() < VIEW_ROWS;
 
+  const wifeCol = () => props.wifePos.x - cam().x;
+  const wifeRow = () => props.wifePos.y - cam().y;
+  const wifeVisible = () =>
+    !props.isGetWife &&   // ช่วยแล้วให้ซ่อน ไม่โชว์ซ้ำ
+    wifeCol() >= 0 && wifeCol() < VIEW_COLS && wifeRow() >= 0 && wifeRow() < VIEW_ROWS;
+
   return (
     <box
       title=" MAP "
@@ -83,6 +89,12 @@ export const DungeonView = (props: DungeonViewUIProps) => {
           fg={theme.colors.exit}
         >
           {theme.icons.exit}
+        </text>
+      </Show>
+
+      <Show when={wifeVisible()}>
+        <text position="absolute" left={wifeCol() * 2} top={wifeRow()} fg={theme.colors.wife}>
+          {theme.icons.wife}
         </text>
       </Show>
 

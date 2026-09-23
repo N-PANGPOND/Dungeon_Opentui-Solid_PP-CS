@@ -86,6 +86,8 @@ const App = () => {
   const [shopMode,  setShopMode]  = createSignal<"buy" | "sell">("buy");
   const [map]                     = createSignal(gameState.currentMap.getGrid());
   const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+  const [wifePos] = createSignal(gameState.currentMap.getWifePos());
+  const [rescuedWife, setRescuedWife] = createSignal(gameState.didRescueWife());
   const [selectedSlot, setSelectedSlot] = createSignal<number | null>(getSelectedSlot(gameState));
 
   // Signal สำหรับ Event Splash Screen
@@ -107,6 +109,7 @@ const App = () => {
       
       setScreen(resolveScreen(gameState));
       setAttackTurn(isPlayerAttackTurn(gameState));
+      setRescuedWife(gameState.didRescueWife());
     });
   }
 
@@ -148,9 +151,14 @@ const App = () => {
       return;
     }
 
-    // Block input บน end screens
+    // Block input บน end screens (ยกเว้น ESC ที่ใช้ออกจากโปรแกรม)
     const s = screen();
-    if (s === "GAMEOVER" || s === "VICTORY") return;
+      if (s === "GAMEOVER" || s === "VICTORY") {
+        if (name === "escape") {
+          renderer.destroy();
+     }
+      return;
+    }
 
     // จัดการ input ในหน้า SHOP
     if (s === "SHOP") {
@@ -281,7 +289,7 @@ const App = () => {
           <GameOverScreen player={player()!} />
         </Match>
         <Match when={screen() === "VICTORY"}>
-          <VictoryScreen player={player()!} />
+          <VictoryScreen player={player()!} rescuedWife={rescuedWife()} />
         </Match>
         <Match when={true}>
           {/* ─── Main game window ─────────────────────────────────────── */}
@@ -347,6 +355,8 @@ const App = () => {
                       grid={map()}
                       playerPos={player()!.position}
                       exitPos={exitPos()}
+                      wifePos={wifePos()}          
+                      isGetWife={rescuedWife()}
                     />
                   </Match>
                 </Switch>
