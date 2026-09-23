@@ -15,7 +15,7 @@ describe("parseKeyIntent()", () => {
         ["arrow-up", "up"],
         ["arrow_up", "up"],
     ])("ควรแปลง %s เป็น MOVE up", (key, direction) => {
-        expect(parseKeyIntent(key)).toEqual({
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
         });
@@ -29,7 +29,7 @@ describe("parseKeyIntent()", () => {
         ["arrow-down", "down"],
         ["arrow_down", "down"],
     ])("ควรแปลง %s เป็น MOVE down", (key, direction) => {
-        expect(parseKeyIntent(key)).toEqual({
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
         });
@@ -43,7 +43,7 @@ describe("parseKeyIntent()", () => {
         ["arrow-left", "left"],
         ["arrow_left", "left"],
     ])("ควรแปลง %s เป็น MOVE left", (key, direction) => {
-        expect(parseKeyIntent(key)).toEqual({
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
         });
@@ -57,7 +57,7 @@ describe("parseKeyIntent()", () => {
         ["arrow-right", "right"],
         ["arrow_right", "right"],
     ])("ควรแปลง %s เป็น MOVE right", (key, direction) => {
-        expect(parseKeyIntent(key)).toEqual({
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
         });
@@ -73,7 +73,7 @@ describe("parseKeyIntent()", () => {
         ["7", DefensiveType.UseItem],
         ["8", DefensiveType.Run],
     ])("ควรแปลง key %s เป็น COMBAT_ACTION", (key, action) => {
-        expect(parseKeyIntent(key)).toEqual({
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "COMBAT_ACTION",
             action,
         });
@@ -89,22 +89,44 @@ describe("parseKeyIntent()", () => {
         ["escape", "QUIT"],
         ["ESCAPE", "QUIT"],
     ])("ควรแปลง key %s เป็น %s", (key, type) => {
-        expect(parseKeyIntent(key)).toEqual({ type });
+        expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type });
     });
 
     it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
         "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
         (key) => {
-            expect(parseKeyIntent(key)).toEqual({ type: "UNKNOWN" });
+            expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type: "UNKNOWN" });
         },
     );
 
     it("ควรตัด arrow prefix ได้เฉพาะรูปแบบที่กำหนด", () => {
-        expect(parseKeyIntent("arrow--up")).toEqual({ type: "UNKNOWN" });
-        expect(parseKeyIntent("arrow_up")).toEqual({
+        expect(parseKeyIntent("arrow--up", "DUNGEON")).toEqual({ type: "UNKNOWN" });
+        expect(parseKeyIntent("arrow_up", "DUNGEON")).toEqual({
             type: "MOVE",
             direction: "up",
         });
+    });
+
+    it.each([
+        ["1", 0],
+        ["8", 7],
+    ])("หน้า INVENTORY key %s ควรเลือก slot index %s", (key, index) => {
+        expect(parseKeyIntent(key, "INVENTORY")).toEqual({
+            type: "SELECT_SLOT",
+            index,
+        });
+    });
+
+    it("หน้า INVENTORY key 9 ซึ่งเกิน 8 ช่องควรเป็น UNKNOWN", () => {
+        expect(parseKeyIntent("9", "INVENTORY")).toEqual({ type: "UNKNOWN" });
+    });
+
+    it("หน้า INVENTORY key u ควรเป็น USE_ITEM", () => {
+        expect(parseKeyIntent("u", "INVENTORY")).toEqual({ type: "USE_ITEM" });
+    });
+
+    it("หน้า INVENTORY key x ควรเป็น DISCARD_ITEM", () => {
+        expect(parseKeyIntent("x", "INVENTORY")).toEqual({ type: "DISCARD_ITEM" });
     });
 });
 

@@ -106,6 +106,28 @@ describe("Event", () => {
     });
 
     describe("Potion()", () => {
+        test("random = 0.25 พอดีควรได้ HIGH_POTION ตามขอบเขต index", () => {
+            const event = new Event();
+            const restore = mockRandom(0.25);
+
+            try {
+                expect(event.Potion().getName()).toBe("HIGH_POTION");
+            } finally {
+                restore();
+            }
+        });
+
+        test("random = 0.75 พอดีควรได้ POTION_DEF ตามขอบเขต index", () => {
+            const event = new Event();
+            const restore = mockRandom(0.75);
+
+            try {
+                expect(event.Potion().getName()).toBe("POTION_DEF");
+            } finally {
+                restore();
+            }
+        });
+
         test("random = 0 ควรได้ POTION (index แรก)", () => {
             const event = new Event();
             const restore = mockRandom(0);
@@ -159,6 +181,22 @@ describe("Event", () => {
                 const second = event.Potion();
                 expect(first).not.toBe(second);
                 expect(first.getName()).toBe(second.getName());
+            } finally {
+                restore();
+            }
+        });
+    });
+
+    describe("Trap()", () => {
+        test("HP เหลือ 1 และโดนความเสียหายขั้นต่ำควรเหลือ 0", () => {
+            const event = new Event();
+            const player = makePlayer(1);
+            const restore = mockRandom(0);
+
+            try {
+                expect(event.Trap(player)).toBe(1);
+                expect(player.getHp()).toBe(0);
+                expect(player.isDead()).toBe(true);
             } finally {
                 restore();
             }

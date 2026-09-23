@@ -4,7 +4,7 @@ import { DungeonMap, type MapConfig } from "../Source-code/DungeonMap/DungeonMap
 import { EndingType, AttackingType } from "../Source-code/Type-Enum/enum";
 import { Item } from "../Source-code/Item-Inventory/Item";
 
-describe("GameState - high coverage", () => {
+describe("GameState - ทดสอบครอบคลุม", () => {
     let game: GameState;
     let logs: { type: "System"; text: string }[];
     let originalRandom: Math["random"];
@@ -33,7 +33,7 @@ describe("GameState - high coverage", () => {
         Math.random = originalRandom;
     });
 
-    test("constructor initializes the default state", () => {
+    test("constructor ควรกำหนด state เริ่มต้นถูกต้อง", () => {
         expect(game.gameScreen).toBe("DUNGEON");
         expect(game.player.getHp()).toBe(160);
         expect(game.player.getCoin()).toBe(50);
@@ -46,7 +46,7 @@ describe("GameState - high coverage", () => {
         expect(game.isGameOver()).toBe(false);
     });
 
-    test("pending event getter and clear work", () => {
+    test("getter ของ pending event และ clear ควรทำงานถูกต้อง", () => {
         game.eventTreasure();
         expect(game.getPendingEvent()).not.toBeNull();
 
@@ -60,7 +60,7 @@ describe("GameState - high coverage", () => {
             ["down", { x: 0, y: 1 }],
             ["left", { x: -1, y: 0 }],
             ["right", { x: 1, y: 0 }],
-        ] as const)("handles direction %s", (direction: "up" | "down" | "left" | "right", expectedDelta: { x: number; y: number; }) => {
+        ] as const)("ทิศทาง %s ควรขยับผู้เล่นถูกต้อง", (direction: "up" | "down" | "left" | "right", expectedDelta: { x: number; y: number; }) => {
             const map = new DungeonMap({
                 spawnPos: { x: 1, y: 1 },
                 wifePos: [{ x: 3, y: 1 }],
@@ -73,16 +73,6 @@ describe("GameState - high coverage", () => {
             });
             game = new GameState(map, (log) => logs.push(log));
 
-            // Avoid triggering the wife/event path during this directional test.
-            mock.module("../Source-code/Event/Event", () => ({
-                Event: class {
-                    Trap() { return 1; }
-                    Treasure() { return 1; }
-                    Potion() { return new Item({ name: "POTION", description: "test", price: 1 }); }
-                    Shop() { return {}; }
-                }
-            }));
-
             const before = { ...game.player.Position };
             const moved = game.movePlayer(direction);
 
@@ -94,27 +84,35 @@ describe("GameState - high coverage", () => {
             expect(game.exploredTiles.size).toBe(1);
         });
 
-        test("returns false when target is a wall", () => {
+        test("เป้าหมายเป็นกำแพงควรคืน false และไม่ขยับ", () => {
             const moved = game.movePlayer("down");
             expect(moved).toBe(false);
             expect(game.player.Position).toEqual({ x: 0, y: 0 });
             expect(logs.at(-1)?.text).toBe("is Not Walkable");
         });
 
-        test("returns false while paused", () => {
+
+        test("จากขอบซ้ายเดินซ้ายควรติดขอบและไม่ขยับ", () => {
+            const moved = game.movePlayer("left");
+
+            expect(moved).toBe(false);
+            expect(game.player.Position).toEqual({ x: 0, y: 0 });
+        });
+
+        test("ตอน pause ควรคืน false และไม่ขยับ", () => {
             (game as any).isPause = true;
             expect(game.movePlayer("right")).toBe(false);
             expect(game.player.Position).toEqual({ x: 0, y: 0 });
         });
 
-        test("returns false outside DUNGEON", () => {
+        test("นอกหน้า DUNGEON ควรคืน false และไม่ขยับ", () => {
             game.gameScreen = "INVENTORY";
             expect(game.movePlayer("right")).toBe(false);
             expect(game.player.Position).toEqual({ x: 0, y: 0 });
         });
     });
 
-    test("finding the wife sets rescue state and logs once", () => {
+    test("เจอภรรยาควรเปลี่ยน rescue state และ log เพียงครั้งเดียว", () => {
         game.player.Position = { x: 1, y: 0 };
         game.checkTileEvent();
 
@@ -126,7 +124,7 @@ describe("GameState - high coverage", () => {
         expect(logs.length).toBe(count);
     });
 
-    test("a previously triggered tile does not trigger another event", () => {
+    test("tile ที่เคย trigger แล้วไม่ควรเกิด event ซ้ำ", () => {
         game.player.Position = { x: 2, y: 0 };
         (game as any).eventTriggeredTiles.add("2,0");
 
@@ -136,12 +134,75 @@ describe("GameState - high coverage", () => {
         expect(game.getShop()).toBeNull();
     });
 
-    test("eventNothing logs the nothing event", () => {
+    describe("checkTileEvent() - ขอบเขต probability", () => {
+        const prepareEventTile = () => {
+            game.player.Position = { x: 2, y: 0 };
+            (game as any).eventTriggeredTiles.clear();
+            game.clearPendingEvent();
+            game.gameScreen = "DUNGEON";
+        };
+
+        test("random = 0 ควรเลือก Monster event", () => {
+            prepareEventTile();
+            Math.random = () => 0;
+
+            game.checkTileEvent();
+
+            expect(game.gameScreen).toBe("COMBAT");
+        });
+
+        test("random ที่ตรงขอบ 0.25/1.05 ควรเปลี่ยนจาก Monster เป็น Trap", () => {
+            prepareEventTile();
+            Math.random = () => 0.25 / 1.05;
+
+            game.checkTileEvent();
+
+            expect(game.getPendingEvent()?.name).toBe("⚠ TRAP!");
+        });
+
+        test("random ที่ตรงขอบ 0.32/1.05 ควรเปลี่ยนเป็น Treasure", () => {
+            prepareEventTile();
+            Math.random = () => 0.32 / 1.05;
+
+            game.checkTileEvent();
+
+            expect(game.getPendingEvent()?.name).toBe("★ TREASURE!");
+        });
+
+        test("random ที่ตรงขอบ 0.42/1.05 ควรเปลี่ยนเป็น Potion", () => {
+            prepareEventTile();
+            Math.random = () => 0.42 / 1.05;
+
+            game.checkTileEvent();
+
+            expect(game.getPendingEvent()?.isChoice).toBe(true);
+        });
+
+        test("random ที่ตรงขอบ 0.46/1.05 ควรเปลี่ยนเป็น Shop", () => {
+            prepareEventTile();
+            Math.random = () => 0.46 / 1.05;
+
+            game.checkTileEvent();
+
+            expect(game.gameScreen).toBe("SHOP");
+        });
+
+        test("random ที่ตรงขอบ 0.55/1.05 ควรเปลี่ยนเป็น Nothing", () => {
+            prepareEventTile();
+            Math.random = () => 0.55 / 1.05;
+
+            game.checkTileEvent();
+
+            expect(logs.at(-1)?.text).toBe("Nothing happened here.");
+        });
+    });
+
+    test("eventNothing ควรบันทึกข้อความ Nothing", () => {
         game.eventNothing();
         expect(logs.at(-1)?.text).toBe("Nothing happened here.");
     });
 
-    test("eventTrap creates pending event and damages player", () => {
+    test("eventTrap ควรสร้าง pending event และลด HP ผู้เล่น", () => {
         Math.random = () => 0.5;
         const before = game.player.getHp();
 
@@ -153,7 +214,7 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("Trap triggered! Lost 11 HP!");
     });
 
-    test("eventTreasure creates pending event and adds coins", () => {
+    test("eventTreasure ควรสร้าง pending event และเพิ่ม coin", () => {
         Math.random = () => 0.5;
         const before = game.player.getCoin();
 
@@ -164,7 +225,7 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("Found Treasure! Gained 51 Coins!");
     });
 
-    test("eventPotion creates a choice event", () => {
+    test("eventPotion ควรสร้าง choice event", () => {
         Math.random = () => 0;
         game.eventPotion();
 
@@ -174,11 +235,11 @@ describe("GameState - high coverage", () => {
         expect(pending?.name).toContain("POTION");
     });
 
-    test("takePotion returns false when no potion is waiting", () => {
+    test("takePotion ควรคืน false เมื่อไม่มี potion รอรับ", () => {
         expect(game.takePotion()).toBe(false);
     });
 
-    test("takePotion adds the found potion and clears the event", () => {
+    test("takePotion ควรเพิ่ม potion และล้าง event", () => {
         Math.random = () => 0;
         game.eventPotion();
 
@@ -187,7 +248,7 @@ describe("GameState - high coverage", () => {
         expect(game.getPendingEvent()).toBeNull();
     });
 
-    test("takePotion returns false when inventory is full", () => {
+    test("takePotion ควรคืน false เมื่อ inventory เต็ม", () => {
         const filler = new Item({ name: "FILLER", description: "x", price: 1 });
         for (let i = 0; i < 8; i++) {
             expect(game.player.getInventory().addItem(filler)).toBe(true);
@@ -202,7 +263,7 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("Inventory is full!");
     });
 
-    test("leavePotion clears a waiting potion", () => {
+    test("leavePotion ควรล้าง potion ที่รออยู่", () => {
         Math.random = () => 0;
         game.eventPotion();
         game.leavePotion();
@@ -211,12 +272,12 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("Left POTION behind.");
     });
 
-    test("leavePotion is safe when there is no potion", () => {
+    test("leavePotion ไม่ควร error เมื่อไม่มี potion", () => {
         game.leavePotion();
         expect(game.getPendingEvent()).toBeNull();
     });
 
-    test("eventShop creates a shop screen and pending event", () => {
+    test("eventShop ควรเปิดหน้า SHOP และสร้าง pending event", () => {
         game.eventShop();
 
         expect(game.gameScreen).toBe("SHOP");
@@ -225,12 +286,12 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("Welcome to the Shop!");
     });
 
-    test("buyFromShop and sellToShop return false when no shop exists", () => {
+    test("buyFromShop และ sellToShop ควรคืน false เมื่อไม่มี shop", () => {
         expect(game.buyFromShop(0)).toBe(false);
         expect(game.sellToShop(0)).toBe(false);
     });
 
-    test("buyFromShop delegates to the current shop", () => {
+    test("buyFromShop ควรส่งต่อไปยัง shop ปัจจุบัน", () => {
         game.eventShop();
         const shop = game.getShop()!;
         const buySpy = mock(() => ({ success: true, message: "bought" }));
@@ -241,7 +302,7 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toBe("bought");
     });
 
-    test("sellToShop delegates to the current shop", () => {
+    test("sellToShop ควรส่งต่อไปยัง shop ปัจจุบัน", () => {
         game.eventShop();
         const shop = game.getShop()!;
         const sellSpy = mock(() => ({ success: true, message: "sold" }));
@@ -252,7 +313,7 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toBe("sold");
     });
 
-    test("leaveShop clears shop, event and returns to dungeon", () => {
+    test("leaveShop ควรล้าง shop/event และกลับ DUNGEON", () => {
         game.eventShop();
         game.leaveShop();
 
@@ -262,13 +323,13 @@ describe("GameState - high coverage", () => {
         expect(logs.at(-1)?.text).toContain("returned to the dungeon");
     });
 
-    test("leaveShop is safe without an active shop", () => {
+    test("leaveShop ไม่ควร error เมื่อไม่มี shop", () => {
         game.leaveShop();
         expect(game.gameScreen).toBe("DUNGEON");
         expect(game.getShop()).toBeNull();
     });
 
-    test("eventCombat enters COMBAT", () => {
+    test("eventCombat ควรเข้าสู่หน้า COMBAT", () => {
         game.eventCombat();
 
         expect(game.gameScreen).toBe("COMBAT");
@@ -276,12 +337,12 @@ describe("GameState - high coverage", () => {
         expect(logs.some((x) => x.text.includes("Monster stats:"))).toBe(true);
     });
 
-    test("handleCombatAction does nothing outside COMBAT", () => {
+    test("handleCombatAction นอก COMBAT ควรไม่ทำงาน", () => {
         game.handleCombatAction(AttackingType.Attack);
         expect(game.gameScreen).toBe("DUNGEON");
     });
 
-    test("handleCombatAction delegates while in COMBAT", () => {
+    test("handleCombatAction ใน COMBAT ควรส่งต่อ action", () => {
         game.eventCombat();
         const combat = (game as any).combatSystem;
         const spy = mock(() => {});
@@ -291,23 +352,23 @@ describe("GameState - high coverage", () => {
         expect(spy).toHaveBeenCalledWith(AttackingType.Attack);
     });
 
-    test("isGameOver becomes true at zero HP", () => {
+    test("HP = 0 ควรทำให้ isGameOver เป็น true", () => {
         (game.player as any).hp = 0;
         expect(game.isGameOver()).toBe(true);
     });
 
-    test("checkEnding returns NONE when not at exit", () => {
+    test("ยังไม่ถึง Exit ควรได้ EndingType.NONE", () => {
         expect(game.checkEnding()).toBe(EndingType.NONE);
         expect(game.isVictory()).toBe(false);
     });
 
-    test("checkEnding returns BAD_END at exit without wife", () => {
+    test("ถึง Exit แต่ยังไม่ช่วยภรรยาควรได้ BAD_END", () => {
         game.player.Position = { x: 3, y: 0 };
         expect(game.checkEnding()).toBe(EndingType.BAD_END);
         expect(game.isVictory()).toBe(true);
     });
 
-    test("checkEnding returns GOOD_END at exit after rescuing wife", () => {
+    test("ถึง Exit หลังช่วยภรรยาควรได้ GOOD_END", () => {
         (game as any).isGetWife = true;
         game.player.Position = { x: 3, y: 0 };
 
@@ -316,7 +377,7 @@ describe("GameState - high coverage", () => {
         expect(game.isVictory()).toBe(true);
     });
 
-    test("toggleInventory switches DUNGEON <-> INVENTORY", () => {
+    test("toggleInventory ควรสลับ DUNGEON <-> INVENTORY", () => {
         game.toggleInventory();
         expect(game.gameScreen).toBe("INVENTORY");
 
@@ -324,13 +385,13 @@ describe("GameState - high coverage", () => {
         expect(game.gameScreen).toBe("DUNGEON");
     });
 
-    test("toggleInventory does nothing on another screen", () => {
+    test("toggleInventory นอก DUNGEON/INVENTORY ควรไม่ทำงาน", () => {
         game.gameScreen = "SHOP";
         game.toggleInventory();
         expect(game.gameScreen).toBe("SHOP");
     });
 
-    test("selectSlot ignores non-inventory screen", () => {
+    test("selectSlot นอก INVENTORY ควรถูกละเว้น", () => {
         const item = new Item({ name: "A", description: "A", price: 1 });
         game.player.getInventory().addItem(item);
 
@@ -338,7 +399,7 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("selectSlot ignores negative and out-of-range indexes", () => {
+    test("selectSlot index ติดลบหรือเกินช่วงควรถูกละเว้น", () => {
         const item = new Item({ name: "A", description: "A", price: 1 });
         game.player.getInventory().addItem(item);
         game.gameScreen = "INVENTORY";
@@ -350,7 +411,7 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("selectSlot accepts a valid index", () => {
+    test("selectSlot index ที่ถูกต้องควรเลือก slot ได้", () => {
         const item = new Item({ name: "A", description: "A", price: 1 });
         game.player.getInventory().addItem(item);
         game.gameScreen = "INVENTORY";
@@ -359,19 +420,19 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBe(0);
     });
 
-    test("useSelectedItem ignores non-inventory screen", () => {
+    test("useSelectedItem นอก INVENTORY ควรถูกละเว้น", () => {
         game.selectedSlot = 0;
         game.useSelectedItem();
         expect(game.selectedSlot).toBe(0);
     });
 
-    test("useSelectedItem ignores null selection", () => {
+    test("useSelectedItem เมื่อยังไม่เลือก slot ควรถูกละเว้น", () => {
         game.gameScreen = "INVENTORY";
         game.useSelectedItem();
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("useSelectedItem uses and clears a valid selected item", () => {
+    test("useSelectedItem ที่ถูกต้องควรใช้ item และล้าง selection", () => {
         const item = new Item(
             { name: "HEAL", description: "heal", price: 1 },
             (target) => target.heal(10),
@@ -388,7 +449,7 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("discardSelectedItem ignores non-inventory screen", () => {
+    test("discardSelectedItem นอก INVENTORY ควรถูกละเว้น", () => {
         const item = new Item({ name: "A", description: "A", price: 1 });
         game.player.getInventory().addItem(item);
         game.selectedSlot = 0;
@@ -399,13 +460,13 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBe(0);
     });
 
-    test("discardSelectedItem ignores null selection", () => {
+    test("discardSelectedItem เมื่อยังไม่เลือก slot ควรถูกละเว้น", () => {
         game.gameScreen = "INVENTORY";
         game.discardSelectedItem();
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("discardSelectedItem removes the selected item and clears selection", () => {
+    test("discardSelectedItem ควรลบ item ที่เลือกและล้าง selection", () => {
         const a = new Item({ name: "A", description: "A", price: 1 });
         const b = new Item({ name: "B", description: "B", price: 2 });
         game.player.getInventory().addItem(a);
@@ -419,7 +480,7 @@ describe("GameState - high coverage", () => {
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("private Pause toggles the pause state used by movement", () => {
+    test("Pause ควรสลับสถานะ pause ที่ใช้ควบคุมการเดิน", () => {
         const state = game as any;
         expect(state.isPause).toBe(false);
 

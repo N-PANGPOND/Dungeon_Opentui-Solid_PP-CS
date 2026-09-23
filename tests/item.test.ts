@@ -1,4 +1,4 @@
-import { describe, expect, test, mock, beforeEach, afterEach } from "bun:test";
+import { describe, expect, test, mock, beforeEach } from "bun:test";
 import { Item, Itemfactory } from "../Source-code/Item-Inventory/Item";
 import { Character } from "../Source-code/Character/character";
 
@@ -171,6 +171,18 @@ describe("Itemfactory", () => {
         expect(character.getDef()).toBe(15);
     });
 
+    test("getName getPrice และ getDesciption ควรคืนข้อมูลของ Item", () => {
+        const item = new Item({
+            name: "TEST",
+            description: "คำอธิบายทดสอบ",
+            price: 123,
+        });
+
+        expect(item.getName()).toBe("TEST");
+        expect(item.getPrice()).toBe(123);
+        expect(item.getDesciption()).toBe("คำอธิบายทดสอบ");
+    });
+
     test("สร้าง Smoke Bomb ได้", () => {
         const item = Itemfactory.CreateSMOKE_BOMB();
 
@@ -178,19 +190,21 @@ describe("Itemfactory", () => {
         expect(item.item.name).toBe("SMOKE_BOMB");
     });
 
-    test("Smoke Bomb เรียก Effect ได้ แต่ยังใช้สำหรับหนีจาก Combat ไม่ได้", () => {
+    test("Smoke Bomb ควรเรียก Effect และไม่ throw", () => {
         const consoleLog = mock(() => {});
-
-        const originalConsoleLog = consoleLog.log;
-        consoleLog.log = consoleLog;
+        const originalConsoleLog = console.log;
+        console.log = consoleLog;
 
         try {
             const item = Itemfactory.CreateSMOKE_BOMB();
 
             expect(() => item.use(character)).not.toThrow();
-            expect(consoleLog).toHaveBeenNthCalledWith(1, "Smoke Bomb is used!");
+            expect(consoleLog).toHaveBeenCalledTimes(1);
+            expect(consoleLog).toHaveBeenCalledWith(
+                expect.stringContaining("used SMOKE_BOMB to escape!"),
+            );
         } finally {
-            consoleLog.log = originalConsoleLog;
+            console.log = originalConsoleLog;
         }
     });
 });

@@ -78,6 +78,19 @@ describe("Inventory System", () => {
         expect(inv.getItems()).toHaveLength(0);
     });
 
+    it("removeItem ด้วย index ติดลบไม่ควรลบ item โดยไม่ตั้งใจ", () => {
+        const inv = new Inventory();
+        const item1 = makeItem("Item 1");
+        const item2 = makeItem("Item 2");
+        inv.addItem(item1);
+        inv.addItem(item2);
+
+        inv.removeItem(-1);
+
+        // Bug detector: Array.splice(-1, 1) ของ implementation ปัจจุบันจะลบ item ตัวสุดท้าย
+        expect(inv.getItems()).toEqual([item1, item2]);
+    });
+
     it("useItem ด้วย index ที่ไม่มีอยู่จริงไม่ควร error และไม่ลบ item", () => {
         const inv = new Inventory();
         const item = makeItem("Item 1");
@@ -86,6 +99,55 @@ describe("Inventory System", () => {
         expect(() => inv.useItem(99, makeCharacter())).not.toThrow();
         expect(inv.getItems()).toHaveLength(1);
         expect(inv.getItems()[0]).toBe(item);
+    });
+
+    it("ลบ item slot สุดท้ายแล้วสามารถเติม item ใหม่กลับมาให้ครบ 8 ช่องได้", () => {
+        const inv = new Inventory();
+
+        for (let i = 0; i < 8; i++) {
+            inv.addItem(makeItem(`Item ${i + 1}`));
+        }
+
+        inv.removeItem(7);
+
+        expect(inv.isFull()).toBe(false);
+        expect(inv.addItem(makeItem("Item 9"))).toBe(true);
+        expect(inv.getItems()).toHaveLength(8);
+        expect(inv.getItems()[7]?.item.name).toBe("Item 9");
+    });
+
+    it("removeItem ด้วย index ที่เกินจำนวน item ไม่ควรเปลี่ยน inventory", () => {
+        const inv = new Inventory();
+        const item = makeItem("Item 1");
+        inv.addItem(item);
+
+        inv.removeItem(99);
+
+        expect(inv.getItems()).toEqual([item]);
+    });
+
+    it("useItem ที่ slot สุดท้ายควรใช้ effect และลบ item ออก", () => {
+        const inv = new Inventory();
+        const target = makeCharacter();
+        const effect = mock((_target: Character) => {});
+
+        inv.addItem(makeItem("Item 1"));
+        inv.addItem(makeItem("Item 2"));
+        inv.addItem(new Item({ name: "Item 3", description: "Test item", price: 10 }, effect));
+
+        inv.useItem(2, target);
+
+        expect(effect).toHaveBeenCalledWith(target);
+        expect(inv.getItems().map((x) => x.item.name)).toEqual(["Item 1", "Item 2"]);
+    });
+
+    it("useItem ด้วย index ติดลบไม่ควร error และไม่ลบ item", () => {
+        const inv = new Inventory();
+        const item = makeItem("Item 1");
+        inv.addItem(item);
+
+        expect(() => inv.useItem(-1, makeCharacter())).not.toThrow();
+        expect(inv.getItems()).toEqual([item]);
     });
 
     it("useItem ที่ slot กลางควรลบเฉพาะ slot นั้น", () => {

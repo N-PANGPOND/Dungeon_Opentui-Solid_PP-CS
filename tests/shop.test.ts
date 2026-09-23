@@ -67,6 +67,26 @@ describe("Shop", () => {
             expect(result).toEqual({ success: false, message: "Invalid item selection!" });
         });
 
+        test("มีเงินเท่าราคาไอเทมพอดีควรซื้อสำเร็จ", () => {
+            const shop = new Shop();
+            const player = makePlayer(20);
+            const result = shop.buyItem(0, player);
+
+            expect(result.success).toBe(true);
+            expect(player.getCoin()).toBe(0);
+            expect(player.getInventory().getItems()).toHaveLength(1);
+        });
+
+        test("มีเงินน้อยกว่าราคาไอเทม 1 coin ควรซื้อไม่ได้", () => {
+            const shop = new Shop();
+            const player = makePlayer(19);
+            const result = shop.buyItem(0, player);
+
+            expect(result.success).toBe(false);
+            expect(player.getCoin()).toBe(19);
+            expect(player.getInventory().getItems()).toHaveLength(0);
+        });
+
         test("เงินไม่พอควรซื้อไม่ได้และไม่หักเงิน", () => {
             const shop = new Shop();
             const player = makePlayer(5); // POTION ราคา 20
@@ -195,6 +215,19 @@ describe("Shop", () => {
             expect(result.message).toBe("Sold HIGH_POTION for 40 Coins (80% value)!");
             expect(player.getCoin()).toBe(40);
             expect(player.getInventory().getItems()).toHaveLength(0);
+        });
+
+        test("ขายไอเทม slot สุดท้ายควรลบเฉพาะ slot สุดท้าย", () => {
+            const shop = new Shop();
+            const player = makePlayer(0);
+            player.addItem(Itemfactory.CreatePOTION());
+            player.addItem(Itemfactory.CreateHIGH_POTION());
+
+            const result = shop.sellItem(1, player);
+
+            expect(result.success).toBe(true);
+            expect(player.getInventory().getItems().map((i) => i.getName())).toEqual(["POTION"]);
+            expect(player.getCoin()).toBe(40);
         });
 
         test("ขายไอเทมที่ slot กลางควรลบเฉพาะ slot นั้น", () => {
