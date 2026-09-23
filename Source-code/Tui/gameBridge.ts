@@ -11,6 +11,7 @@
 // =============================================================
 
 import type { GameState } from "../Game/State";
+import { EndingType } from "../Type-Enum/enum";
 import type { EnemyUIProps, InventoryUIProps, PlayerUIProps, UIScreen } from "./uiTypes";
 
 // Inventory.maxSlots เป็น private (ค่าคือ 8) — ถ้าเปลี่ยนที่ Inventory.ts ให้แก้ค่านี้ตาม
@@ -23,7 +24,9 @@ export const INVENTORY_MAX_SLOTS = 8;
 // แพ้ก่อน -> ชนะ -> ตาม gameScreen ปกติ
 export function resolveScreen(gs: GameState): UIScreen {
   if (gs.isGameOver() || gs.gameScreen === "GAMEOVER") return "GAMEOVER";
-  if (gs.isVictory()) return "VICTORY";
+  const ending = gs.checkEnding();
+  if (ending === EndingType.GOOD_END) return "GOOD_END";
+  if (ending === EndingType.BAD_END) return "BAD_END";
   return gs.gameScreen as UIScreen;
 }
 

@@ -1,16 +1,16 @@
 // =============================================================
-// VictoryScreen.tsx — Victory Full-Screen Panel
-// แสดงเมื่อ player ถึง Exit (VICTORY screen)
+// GoodEndScreen.tsx — Good End Full-Screen Panel
+// แสดงเมื่อ player ถึง Exit (GOOD END screen)
 // =============================================================
 
 import { theme, pad, fmtNum } from "../theme";
 import type { PlayerUIProps } from "../uiTypes";
 
-interface VictoryScreenProps {
+interface GoodEndScreenProps {
   player: PlayerUIProps;
 }
 
-export const VictoryScreen = (props: VictoryScreenProps) => {
+export const GoodEndScreen = (props: GoodEndScreenProps) => {
   const p = () => props.player;
 
   const lines = [
@@ -44,6 +44,9 @@ export const VictoryScreen = (props: VictoryScreenProps) => {
       {lines.map((line) => (
         <text fg={theme.colors.success}>{pad(line, 78)}</text>
       ))}
+      
+      <text fg={theme.colors.success}>{pad("  คุณพาภรรยาออกจากดันเจี้ยนได้สำเร็จ!", 78)}</text>
+      <text>{" "}</text>
 
       {/* Divider */}
       <text fg={theme.colors.muted}>{pad("─".repeat(50), 78)}</text>

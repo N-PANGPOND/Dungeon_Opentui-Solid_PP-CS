@@ -23,7 +23,8 @@ import { ActionPanel } from "./components/ActionPanel";
 import { ActionLog, formatLogText } from "./components/ActionLog";
 import { CombatView } from "./components/CombatView";
 import { GameOverScreen } from "./components/GameOverScreen";
-import { VictoryScreen } from "./components/VictoryScreen";
+import { BadEndScreen } from "./components/BadEndScreen";
+import { GoodEndScreen } from "./components/GoodEndScreen";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, UIScreen } from "./uiTypes";
 import {
   isPlayerAttackTurn,
@@ -109,7 +110,7 @@ const App = () => {
 
     // Block input บน end screens
     const s = screen();
-    if (s === "GAMEOVER" || s === "VICTORY") return;
+    if (s === "GAMEOVER" || s === "GOOD_END" || s === "BAD_END") return;
 
     // combat ตาป้องกันต้องส่ง action ชุดอื่น — bridge แปลงให้
     const mapped = mapInputKey(name, s, attackTurn());
@@ -149,8 +150,11 @@ const App = () => {
         <Match when={screen() === "GAMEOVER"}>
           <GameOverScreen player={player()!} />
         </Match>
-        <Match when={screen() === "VICTORY"}>
-          <VictoryScreen player={player()!} />
+        <Match when={screen() === "GOOD_END"}>
+          {player() && <GoodEndScreen player={player()!} />}
+        </Match>
+        <Match when={screen() === "BAD_END"}>
+          {player() && <BadEndScreen player={player()!} />}
         </Match>
         <Match when={true}>
           {/* ─── Main game window ─────────────────────────────────────── */}

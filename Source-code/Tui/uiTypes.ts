@@ -49,7 +49,7 @@ export interface DungeonViewUIProps {
 }
 
 // mirrors Type-Enum/type.ts gameScreen exactly
-export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
+export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "INVENTORY" | "GOOD_END" | "BAD_END" | "GAMEOVER" | "PAUSE";
 
 // ─── Combat Props ──────────────────────────────────────────────────────────
 

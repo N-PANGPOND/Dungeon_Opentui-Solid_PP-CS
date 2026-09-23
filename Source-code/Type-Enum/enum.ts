@@ -17,3 +17,9 @@ export enum MapObject {
     Floor = "FLOOR",
     Exit = "EXIT",
 }
+
+export enum EndingType {
+    NONE,      // ยังไม่ถึง exit เกมยังไม่จบ
+    GOOD_END,  // ถึง exit + ช่วยเมียแล้ว
+    BAD_END,   // ถึง exit + ไม่ได้ช่วยเมีย
+}

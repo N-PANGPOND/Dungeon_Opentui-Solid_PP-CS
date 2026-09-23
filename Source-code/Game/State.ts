@@ -4,7 +4,7 @@ import { DungeonMap } from"../DungeonMap/DungeonMap"
 import { CombatSystem } from "../System/CombatSystem"
 import { Event } from "../Event/Event"
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
-
+import { EndingType } from "../Type-Enum/enum";
 
 //import { Event }
 
@@ -70,6 +70,15 @@ export class GameState {
   }
 
   public checkTileEvent(): void {
+    const pos = this.player.Position;
+
+    if (pos.x === this.currentMap.wifePos.x && pos.y === this.currentMap.wifePos.y) {
+        if (!this.isGetWife) {
+            this.isGetWife = true;
+            this.ShowMessage({ type: "System", text: "คุณเจอภรรยาแล้ว! พาเธอออกไปจากดันเจี้ยนกันเถอะ" });
+        }
+        return;   // กันไม่ให้สุ่มเจอ event อื่นซ้อนในช่องที่เมียอยู่
+    }
     const tileEvents : {
       name:string,
       weight:number,
@@ -145,8 +154,13 @@ export class GameState {
   public isGameOver(): boolean {
     return this.player.getHp() <= 0;
   }
+public checkEnding(): EndingType {   // เช็คว่าไปถึง exit แล้วหรือยัง ถ้าไปถึงแล้วเช็คว่าเจอเมียแล้วใช่ไหม ถ้าใช่ GOOD_END ถ้าไม่ใช่ BAD_END
+    const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
+    if (!reachedExit) return EndingType.NONE;
+    return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;   
+  }
 
-  public isVictory(): boolean {
-     return this.currentMap.getDistanceToExit(this.player.Position) === 0;
+public isVictory(): boolean {
+    return this.checkEnding() !== EndingType.NONE;   // จบเกมแบบถึง exit ทั้ง GOOD/BAD คือ isVictory() = true
   }
 }
