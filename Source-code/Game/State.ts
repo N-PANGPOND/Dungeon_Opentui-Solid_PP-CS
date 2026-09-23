@@ -41,10 +41,11 @@ export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
-  public selectedSlot: number | null;
+  public selectedSlot: number | null = null;
 
   private isGetWife: boolean;
   private isPause: boolean;
+  private inventoryReturnScreen: "DUNGEON" | "COMBAT" = "DUNGEON";
   private combatSystem: CombatSystem;
   private eventTriggeredTiles: Set<string> = new Set<string>();
   private pendingEvent: PendingEvent | null = null;
@@ -298,10 +299,11 @@ public isVictory(): boolean {
 }
 
   public toggleInventory(): void {
-    if (this.gameScreen === "DUNGEON") {
+    if (this.gameScreen === "DUNGEON" || this.gameScreen === "COMBAT") {
+      this.inventoryReturnScreen = this.gameScreen;
       this.gameScreen = "INVENTORY";
     } else if (this.gameScreen === "INVENTORY") {
-      this.gameScreen = "DUNGEON";  
+      this.gameScreen = this.inventoryReturnScreen;
     }
   }
 
@@ -315,7 +317,12 @@ public isVictory(): boolean {
   public useSelectedItem(): void {
     if (this.gameScreen !== "INVENTORY") return;  
     if (this.selectedSlot === null) return;
-    this.player.getInventory().useItem(this.selectedSlot, this.player);
+    const slotIndex = this.selectedSlot;
+    if (this.inventoryReturnScreen === "COMBAT") {
+      if (!this.combatSystem.usePlayerItem(slotIndex)) return;
+    } else {
+      this.player.getInventory().useItem(slotIndex, this.player);
+    }
     this.selectedSlot = null;
   }
   public discardSelectedItem(): void {

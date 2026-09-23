@@ -1,6 +1,7 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
 import { CombatSystem } from "../Source-code/System/CombatSystem";
 import { Character, Player } from "../Source-code/Character/character";
+import { Itemfactory } from "../Source-code/Item-Inventory/Item";
 import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
 
 const mapStub = {
@@ -178,6 +179,37 @@ describe("CombatSystem", () => {
     });
 
     describe("startbattle()", () => {
+        test("เมื่อใช้ item ที่เลือกควรใช้ไอเท็มและอยู่ในเทิร์นเดิม", () => {
+            const player = makePlayer(50);
+            player.addItem(Itemfactory.CreatePOTION());
+            const combat = new CombatSystem(player, mapStub as any);
+
+            combat.usePlayerItem(0);
+
+            expect(player.getHp()).toBe(75);
+            expect(player.getInventory().getItems()).toHaveLength(0);
+            expect(combat.isPlayerTurn()).toBe(true);
+        });
+
+        test("เมื่อไม่มีไอเท็มจะไม่เปลี่ยนเทิร์น", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+
+            combat.usePlayerItem(0);
+
+            expect(combat.isPlayerTurn()).toBe(true);
+        });
+
+        test("เมื่อใช้ item ระหว่างเทิร์นมอนสเตอร์ควรกลับมาเป็นเทิร์นผู้เล่น", () => {
+            const player = makePlayer(50);
+            player.addItem(Itemfactory.CreatePOTION_ATK());
+            const combat = new CombatSystem(player, mapStub as any);
+            (combat as any).isPlayerAttacker = false;
+
+            combat.usePlayerItem(0);
+
+            expect(combat.isPlayerTurn()).toBe(true);
+        });
+
         test("เมื่อ Player เป็น Attacker และส่ง DefensiveType ควร throw Error", () => {
             const combat = new CombatSystem(makePlayer(), mapStub as any);
 
