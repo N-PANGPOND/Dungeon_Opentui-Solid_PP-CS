@@ -32,7 +32,11 @@ export class GameLoop {
                 break;
             case "COMBAT_ACTION":
                 if (this.gameState.gameScreen === "COMBAT") {
-                    this.gameState.handleCombatAction(intent.action);
+                    if (intent.action === "Use Item") {
+                        this.gameState.toggleInventory();
+                    } else {
+                        this.gameState.handleCombatAction(intent.action);
+                    }
                 }
                 break;
             case "QUIT":

@@ -50,6 +50,18 @@ export class CombatSystem {
             !this.isPlayerAttacker;
     }
 
+    public usePlayerItem(slotIndex: number): boolean {
+        const item = this.player.getInventory().getItems()[slotIndex];
+        if (!item) {
+            this.ShowMessage({ type: "System", text: "ไม่มีไอเท็มให้ใช้" });
+            return false;
+        }
+
+        this.player.getInventory().useItem(slotIndex, this.player);
+        this.ShowMessage({ type: "System", text: `Player ใช้ ${item.getName()}` });
+        this.isPlayerAttacker = true;
+        return true;
+    }
 
     isPlayerTurn(): boolean {
         return this.isPlayerAttacker;
