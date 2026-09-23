@@ -289,8 +289,11 @@ export class GameState {
       this.isWifeExitFight = false;
      this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
     } else if (isBattleOver.Over) {
-      this.ShowMessage({type:"System",text:"Monster isDead"})
-      this.ShowMessage({type:"System",text:`Monster Drop Coin ${monsterCoin}`})
+      if (isBattleOver.Escaped) {
+        this.ShowMessage({type:"System",text:"You Escaped From Battle!"})
+      } else {
+        this.ShowMessage({type:"System",text:"You Defeated The Monster!"})
+      }
       this.player.adjustCoin(monsterCoin)
       this.gameScreen = "DUNGEON";
     }

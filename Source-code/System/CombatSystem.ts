@@ -4,11 +4,12 @@ import type { MonsterType,stats, Weights,position,logType } from "../Type-Enum/t
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import { DungeonMap } from "../DungeonMap/DungeonMap";
 
-type BattleOver = {"Over":boolean,"monster":Monster}
+type BattleOver = {"Over":boolean,"monster":Monster,"Escaped"?:boolean}
 
 export class CombatSystem {
     private monster: Monster;
     private isPlayerAttacker: boolean;
+    private escaped: boolean = false;
     private hasFled: boolean = false;
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
@@ -25,6 +26,7 @@ export class CombatSystem {
     return this.hasFled;
    }
     startbattle(playerAction:AttackingType | DefensiveType): void {
+         if (this.isBattleOver().Over) {return;}
         if (!this.player.isDead() && !this.monster.isDead()) {
             if (this.isPlayerAttacker) {
                 if (!Object.values(AttackingType).includes(playerAction as AttackingType)) {
@@ -32,26 +34,30 @@ export class CombatSystem {
                 }
                 const monsterAction : DefensiveType = this.monster.decideDefensiveAction()
                 this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
-                this.processTurn(this.player, this.monster,playerAction as AttackingType,monsterAction);
+              const escaped = this.processTurn(this.player, this.monster, playerAction as AttackingType, monsterAction );
+              if (escaped) return;
             } else {
                 if (!Object.values(DefensiveType).includes(playerAction as DefensiveType)) {
                     throw new Error("Player is Defensive But Action Is Not DefensiveType");
                 }
                 const monsterAction = this.monster.decideAttackingAction();
                 this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
-                this.processTurn(this.monster, this.player,monsterAction,playerAction as DefensiveType);
+                const escaped = this.processTurn( this.monster, this.player, monsterAction, playerAction as DefensiveType );
+                if (escaped) return;
             }
-            this.isPlayerAttacker = !this.isPlayerAttacker;
         }
+        this.isPlayerAttacker =
+            !this.isPlayerAttacker;
     }
+
 
     isPlayerTurn(): boolean {
         return this.isPlayerAttacker;
     }
 
     isBattleOver(): BattleOver {
-        const Over : boolean = this.player.isDead() || this.monster.isDead() || this.hasFled;
-        return {"Over":Over,"monster":this.monster}
+        const Over : boolean =  this.escaped || this.player.isDead() || this.monster.isDead();
+        return {"Over":Over,"monster":this.monster,"Escaped":this.escaped};
     }
 
     getMonsterStats(): stats {
@@ -70,7 +76,35 @@ export class CombatSystem {
         return calculateDamage(damageSource, damageTarget,multiplier,Math.random());
     }
 
-    processTurn(Attacker:Character,defensive:Character,AttackerAct:AttackingType,defensiveAct:DefensiveType):void{
+    processTurn(Attacker:Character,defensive:Character,AttackerAct:AttackingType,defensiveAct:DefensiveType):boolean | void {
+         if (defensiveAct === DefensiveType.Run) {
+
+        const escapeChance =
+            AttackerAct === AttackingType.Run
+                ? 0.5
+                : 0.25;
+
+        const random = Math.random();
+
+        if (random < escapeChance) {
+            this.escaped = true;
+            this.ShowMessage({
+                type: "System",
+                text: `${defensive === this.player ? "Player" : "Monster"} escaped!`,
+            });
+
+            return true;
+        }
+
+        this.ShowMessage({
+            type: "System",
+            text: `${defensive === this.player ? "Player" : "Monster"} failed to escape!`,
+        });
+
+
+        return false;
+    }
+
         const multipliers: Partial<Record<AttackingType, Partial<Record<DefensiveType, number>>>> = {
             [AttackingType.Attack]: {
                 [DefensiveType.Defend]: 0.5,
@@ -80,7 +114,7 @@ export class CombatSystem {
             [AttackingType.Strike]: {
                 [DefensiveType.Defend]: 2.0,
                 [DefensiveType.Counter]: 2.0,
-                [DefensiveType.Run]: 0.5,
+                [DefensiveType.Run]: 0.25,
             },
         };
         const multiplier = multipliers[AttackerAct]?.[defensiveAct] ?? 0;
