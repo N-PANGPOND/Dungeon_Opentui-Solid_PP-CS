@@ -19,10 +19,10 @@ export const InventoryPanel = (props: InventoryPanelProps) => {
   return (
     <box
       title=" INVENTORY "
-      titleColor={theme.colors.title}
+      titleColor={theme.colors.secondary}
       style={{
         borderStyle: theme.border.panel,
-        borderColor: theme.colors.borderPanel,
+        borderColor: theme.colors.secondary,
         flexDirection: "column",
         width: "100%",
         height: 15,

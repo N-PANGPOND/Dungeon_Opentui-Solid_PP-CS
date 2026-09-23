@@ -26,6 +26,7 @@ export const theme = {
     combat:       "#f59e0b",
     coin:         "#fbbf24",
     exit:         "#60a5fa",
+    wife:         "#f472b6",
     wall:         "#64748b",
     floor:        "#1e293b",
     // Convenience aliases used by GameOverScreen/VictoryScreen
@@ -46,6 +47,7 @@ export const theme = {
     enemy:   "👹",
     boss:    "💀",
     exit:    "🚪",
+    wife:    "💗",
     hp:      "♥",
     atk:     "⚔",
     def:     "◈",

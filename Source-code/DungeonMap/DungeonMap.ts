@@ -4,7 +4,7 @@ import type { position } from "../Type-Enum/type";
 
 export type MapConfig = {
     spawnPos: position;
-    wifePos: position;
+    wifePos: position[];
     exitPos: position;
     layout: number[][];
 };
@@ -33,10 +33,19 @@ export class DungeonMap {
         });
 
         this.startPos = config.spawnPos;
-        this.wifePos = config.wifePos;
+        this.wifePos = this.pickWifePos(config.wifePos);
         this.exitPos = config.exitPos;
     }
-
+    private pickWifePos(candidates: position[]): position {
+        if (candidates.length === 0) {
+            throw new Error("DungeonMap: ต้องมีจุดที่เป็นไปได้ของ wifePos อย่างน้อย 1 จุด");
+        }
+        const picked = candidates[Math.floor(Math.random() * candidates.length)]!;
+        if (!this.isInBounds(picked) || this.grid[picked.y]![picked.x] === MapObject.Wall) {
+            throw new Error("DungeonMap: wifePos ที่สุ่มได้ตกอยู่บนกำแพงหรือนอกแมพ");
+        }
+        return picked;
+    }
     private isInBounds(pos: position): boolean {
         return pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y < this.height;
     }
