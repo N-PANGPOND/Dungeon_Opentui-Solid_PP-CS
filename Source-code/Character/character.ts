@@ -78,7 +78,7 @@ export class MonsterFactory {
     public static createMonster(distToExit: number): Monster {
         if (distToExit < 3) {
             return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'BOSS');
-        }else if (distToExit < 25) { 
+        } else if (distToExit < 15) { 
             return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'ELITE MONS');
         } else {
             return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 10 }, 'NORMAL MONS');

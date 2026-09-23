@@ -11,25 +11,49 @@ import type { UIScreen } from "../uiTypes";
 
 interface ActionPanelProps {
   screen: UIScreen;
-  isPlayerTurn?: boolean; // true = ตา player โจมตี (default), false = ตา player ป้องกัน
+  isPlayerTurn?: boolean;  // true = ตา player โจมตี (default), false = ตา player ป้องกัน
+  isEventChoice?: boolean; // true = เฉพาะเมื่อเป็น Event ที่มีตัวเลือกให้กด (เช่น Potion)
 }
 
 export const ActionPanel = (props: ActionPanelProps) => {
   const isCombat = () => props.screen === "COMBAT";
+  const isChoice = () => props.screen === "EVENT" && (props.isEventChoice ?? false);
+  const isAutoEvent = () => props.screen === "EVENT" && !props.isEventChoice;
   const attacking = () => props.isPlayerTurn ?? true;
 
   const title = () => {
+    if (isChoice()) return " EVENT CHOICE ";
+    if (isAutoEvent()) return " EVENT ";
     if (!isCombat()) return " CONTROLS ";
     return attacking() ? " ATTACK TURN " : " DEFEND TURN ";
   };
-  const titleColor = () => (isCombat() ? theme.colors.combat : theme.colors.title);
-  const borderColor = () => (isCombat() ? theme.colors.combat : theme.colors.borderPanel);
+  const titleColor = () => (isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.title);
+  const borderColor = () => (isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.borderPanel);
 
-  // แถวที่ 1-2 ของ combat เปลี่ยนตามตา (แถว 3-4 เหมือนกันทั้งสองตา)
-  const row1 = () =>
-    attacking() ? `1  ${theme.icons.atk} Attack` : `1  ${theme.icons.def} Defend`;
-  const row2 = () =>
-    attacking() ? `2  ${theme.icons.bullet} Strike` : `2  ${theme.icons.bullet} Counter`;
+  const row1 = () => {
+    if (isChoice()) return `1  ${theme.icons.potion} Take Potion`;
+    if (isAutoEvent()) return "   (Please wait...)";
+    if (isCombat()) return attacking() ? `1  ${theme.icons.atk} Attack` : `1  ${theme.icons.def} Defend`;
+    return "W/A/S/D  Move";
+  };
+
+  const row2 = () => {
+    if (isChoice()) return `2  ${theme.icons.bullet} Leave / Skip`;
+    if (isAutoEvent()) return "   Auto-returning";
+    if (isCombat()) return attacking() ? `2  ${theme.icons.bullet} Strike` : `2  ${theme.icons.bullet} Counter`;
+    return "Arrow    Move";
+  };
+
+  const row3 = () => {
+    if (isChoice() || isAutoEvent()) return " ";
+    if (isCombat()) return `3  ${theme.icons.potion} Use Item`;
+    return "I        Inventory";
+  };
+
+  const row4 = () => {
+    if (isCombat()) return `4  ${theme.icons.bullet} Run`;
+    return "ESC      Quit";
+  };
 
   return (
     <box
@@ -40,22 +64,22 @@ export const ActionPanel = (props: ActionPanelProps) => {
         borderColor: borderColor(),
         flexDirection: "column",
         width: "100%",
-        height: 8,
+        height: 10,
         paddingLeft: 1,
         paddingTop: 1,
       }}
     >
-      <text fg={isCombat() ? (attacking() ? theme.colors.danger : theme.colors.info) : theme.colors.primary}>
-        {pad(isCombat() ? row1() : "W/A/S/D  Move", 30)}
+      <text fg={isChoice() ? theme.colors.success : isCombat() ? (attacking() ? theme.colors.danger : theme.colors.info) : isAutoEvent() ? theme.colors.textDim : theme.colors.primary}>
+        {pad(row1(), 30)}
       </text>
-      <text fg={isCombat() ? theme.colors.warning : theme.colors.textDim}>
-        {pad(isCombat() ? row2() : "Arrow    Move", 30)}
+      <text fg={isChoice() ? theme.colors.danger : isCombat() ? theme.colors.warning : theme.colors.textDim}>
+        {pad(row2(), 30)}
       </text>
       <text fg={isCombat() ? theme.colors.success : theme.colors.textDim}>
-        {pad(isCombat() ? `3  ${theme.icons.potion} Use Item` : "I        Inventory", 30)}
+        {pad(row3(), 30)}
       </text>
-      <text fg={isCombat() ? theme.colors.info : theme.colors.textDim}>
-        {pad(isCombat() ? `4  ${theme.icons.bullet} Run` : "ESC      Quit", 30)}
+      <text fg={theme.colors.textDim}>
+        {pad(row4(), 30)}
       </text>
     </box>
   );
