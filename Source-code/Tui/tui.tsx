@@ -108,6 +108,7 @@ const App = () => {
       setShop(getShopUIProps(gameState));
       
       setScreen(resolveScreen(gameState));
+      
       setAttackTurn(isPlayerAttackTurn(gameState));
       setRescuedWife(gameState.didRescueWife());
     });
@@ -253,7 +254,10 @@ const App = () => {
     if (screen() === "COMBAT") {
       const curTurn = attackTurn();
       if (prevScreen !== "COMBAT") {
-        setLogs((prev) => [...prev, { type: "System", text: "▶ YOUR TURN (Choose 1-4 to Attack)" }]);
+        setLogs((prev) => [...prev, {
+          type: "System",
+          text: curTurn ? "▶ YOUR TURN (Choose 1-4 to Attack)" : "▶ MONSTER'S TURN (Choose 1-4 to Defend)",
+        }]);
       } else if (prevTurn !== curTurn) {
         if (curTurn) {
           setLogs((prev) => [...prev, { type: "System", text: "▶ YOUR TURN (Choose 1-4 to Attack)" }]);
