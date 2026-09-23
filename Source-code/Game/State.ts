@@ -4,10 +4,37 @@ import { DungeonMap } from"../DungeonMap/DungeonMap"
 import { CombatSystem } from "../System/CombatSystem"
 import { Event } from "../Event/Event"
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
+import path from "path";
 
 
-//import { Event }
+import { Item } from "../Item-Inventory/Item";
 
+// ─── Pending Event Type ──────────────────────────────────────────────────────
+
+export type PendingEvent = {
+  name: string;      // ชื่อ event ที่แสดงบน splash screen
+  grid: number[][];  // pixel grid 27×46 จาก event.json
+  color: string;     // สีหลักของ event นั้น
+  isChoice?: boolean; // เป็น event ที่ต้องให้ผู้เล่นกดเลือกหรือไม่
+  potionItem?: Item | null; // ไอเทมโพชั่นที่พบ (ถ้ามี)
+};
+
+// โหลด event.json ครั้งเดียวตอน module load
+const eventDataPath = path.join(import.meta.dir, "../assets/Event/event.json");
+const eventJsonRaw = await Bun.file(eventDataPath).json() as {
+  "event@": {
+    Combat: {
+      normal: { screen: number[][] };
+      elite:  { screen: number[][] };
+      boss:   { screen: number[][] };
+    };
+    Trap:     { screen: number[][] };
+    Potion:   { screen: number[][] };
+    Shop:     { screen: number[][] };
+    Treasure: { screen: number[][] };
+  };
+};
+const eventScreens = eventJsonRaw["event@"];
 
 export class GameState {
   public player: Player;
@@ -18,6 +45,7 @@ export class GameState {
   private isPause: boolean;
   private combatSystem: CombatSystem;
   private eventTriggeredTiles: Set<string> = new Set<string>();
+  private pendingEvent: PendingEvent | null = null;
  // private eventSystem: GameEvent;
 
   constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
@@ -28,6 +56,16 @@ export class GameState {
     this.isPause = false;
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
    //this.eventSystem = new GameEvent();
+  }
+
+  // ─── Pending Event Getter / Clear ─────────────────────────────────────────
+
+  public getPendingEvent(): PendingEvent | null {
+    return this.pendingEvent;
+  }
+
+  public clearPendingEvent(): void {
+    this.pendingEvent = null;
   }
 
   private Pause(): void {
@@ -104,32 +142,80 @@ export class GameState {
   }
 }
   public eventTrap():void{
-    const damage = Event.prototype.Trap(this.player)
-    this.ShowMessage({type: "System" , text: `เจอกับดัก เสีย Hp ${damage}!!`})
+    // เซ็ต splash screen ก่อน execute logic
+    this.pendingEvent = {
+      name: "⚠ TRAP!",
+      grid: eventScreens.Trap.screen,
+      color: "#ef4444",
+    };
+    const damage = Event.prototype.Trap(this.player);
+    this.ShowMessage({ type: "System", text: `Trap triggered! Lost ${damage} HP!` });
   }
 
-  public eventTreasure():void{
-    const coin = Event.prototype.Treasure(this.player)
-    this.ShowMessage({type: "System" , text: `เจอสมบัติ ได้ coin ${coin}!!`})
+  public eventTreasure(): void {
+    this.pendingEvent = {
+      name: "★ TREASURE!",
+      grid: eventScreens.Treasure.screen,
+      color: "#fbbf24",
+    };
+    const coin = Event.prototype.Treasure(this.player);
+    this.ShowMessage({ type: "System", text: `Found Treasure! Gained ${coin} Coins!` });
   }
   
-  public eventPotion():void{
-    const Potion = Event.prototype.Potion()
-    this.ShowMessage({type: "System" , text: `เจอ Potion ${Potion.getName()}!!`})
+  private currentFoundPotion: Item | null = null;
+
+  public eventPotion(): void {
+    const potion = Event.prototype.Potion();
+    this.currentFoundPotion = potion;
+    this.pendingEvent = {
+      name: `⊕ FOUND: ${potion.getName()}`,
+      grid: eventScreens.Potion.screen,
+      color: "#22c55e",
+      isChoice: true,
+      potionItem: potion,
+    };
+    this.ShowMessage({ type: "System", text: `Found Potion: ${potion.getName()}! [1] Take  [2] Leave` });
   }
 
-  public eventShop():void{
-    const Potion = Event.prototype.Shop()
-    this.ShowMessage({type: "System" , text: `ว้าว เจอ shop แต่กูไม่ให้ซื้อยังทำระบบไม่เสร็จ`})
+  public takePotion(): boolean {
+    if (!this.currentFoundPotion) return false;
+    const added = this.player.getInventory().addItem(this.currentFoundPotion);
+    if (added) {
+      this.ShowMessage({ type: "System", text: `Added ${this.currentFoundPotion.getName()} to inventory!` });
+    } else {
+      this.ShowMessage({ type: "System", text: `Inventory is full! Could not take ${this.currentFoundPotion.getName()}.` });
+    }
+    this.currentFoundPotion = null;
+    this.clearPendingEvent();
+    return added;
   }
 
-  public eventNothing():void{
-    this.ShowMessage({type: "System" , text: `ปกติดีไม่มีอะไรเกิดขึ้น`})
+  public leavePotion(): void {
+    if (this.currentFoundPotion) {
+      this.ShowMessage({ type: "System", text: `Left ${this.currentFoundPotion.getName()} behind.` });
+    }
+    this.currentFoundPotion = null;
+    this.clearPendingEvent();
+  }
+
+  public eventShop(): void {
+    this.pendingEvent = {
+      name: "● SHOP",
+      grid: eventScreens.Shop.screen,
+      color: "#06b6d4",
+    };
+    const Potion = Event.prototype.Shop();
+    this.ShowMessage({ type: "System", text: `Found a Shop (Coming soon)!` });
+  }
+
+  public eventNothing(): void {
+    this.ShowMessage({ type: "System", text: `Nothing happened here.` });
   }
 
   public eventCombat():void{
     this.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
+
     const monster = this.combatSystem.getMonsterStats();
     this.ShowMessage({
       type: "System",
