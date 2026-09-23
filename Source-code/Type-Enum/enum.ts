@@ -17,3 +17,9 @@ export enum MapObject {
     Floor = "FLOOR",
     Exit = "EXIT",
 }
+
+export enum EndingType {
+  NONE,
+  GOOD_END,
+  BAD_END,
+}

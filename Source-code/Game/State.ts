@@ -3,7 +3,7 @@ import type { position, gameScreen,Direction,logType } from "../Type-Enum/type";
 import { DungeonMap } from"../DungeonMap/DungeonMap"
 import { CombatSystem } from "../System/CombatSystem"
 import { Event } from "../Event/Event"
-import { AttackingType, DefensiveType } from "../Type-Enum/enum";
+import { AttackingType, DefensiveType, EndingType } from "../Type-Enum/enum";
 import path from "path";
 
 
@@ -111,7 +111,17 @@ export class GameState {
   }
 
   public checkTileEvent(): void {
-  const key = `${this.player.Position.x},${this.player.Position.y}`;
+  const pos = this.player.Position;
+
+  if (pos.x === this.currentMap.wifePos.x && pos.y === this.currentMap.wifePos.y) {
+    if (!this.isGetWife) {
+      this.isGetWife = true;
+      this.ShowMessage({ type: "System", text: "💗 You found your wife! Let's get her out of this dungeon. 💗" });
+    }
+    return;
+  }
+
+  const key = `${pos.x},${pos.y}`;
 
   if (this.eventTriggeredTiles.has(key)) {
     return; 
@@ -272,7 +282,17 @@ export class GameState {
     return this.player.getHp() <= 0;
   }
 
-  public isVictory(): boolean {
-     return this.currentMap.getDistanceToExit(this.player.Position) === 0;
-  }
+public checkEnding(): EndingType {
+  const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
+  if (!reachedExit) return EndingType.NONE;
+  return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
+}
+
+public didRescueWife(): boolean {
+  return this.isGetWife;
+}
+
+public isVictory(): boolean {
+  return this.checkEnding() !== EndingType.NONE;
+}
 }
