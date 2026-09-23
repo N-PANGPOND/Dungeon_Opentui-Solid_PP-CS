@@ -288,8 +288,6 @@ export class GameState {
       this.wifeExitFightDone = true;
       this.isWifeExitFight = false;
      this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
-    } else {
-      this.ShowMessage({type:"System",text:"Monster isDead"})
     } else if (isBattleOver.Over) {
       this.ShowMessage({type:"System",text:"Monster isDead"})
       this.ShowMessage({type:"System",text:`Monster Drop Coin ${monsterCoin}`})
