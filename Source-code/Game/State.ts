@@ -205,7 +205,7 @@ export class GameState {
 
   public eventCombat():void{
     this.ShowMessage({ type: "System", text: "คุณเจอมอนสเตอร์!!" });
-    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
 
     const monster = this.combatSystem.getMonsterStats();
     this.ShowMessage({
