@@ -276,8 +276,11 @@ export class GameState {
     if (this.player.isDead()) {
       this.gameScreen = "GAMEOVER";
     } else if (isBattleOver.Over) {
-      this.ShowMessage({type:"System",text:"Monster isDead"})
-      this.ShowMessage({type:"System",text:`Monster Drop Coin ${monsterCoin}`})
+      if (isBattleOver.Escaped) {
+        this.ShowMessage({type:"System",text:"You Escaped From Battle!"})
+      } else {
+        this.ShowMessage({type:"System",text:"You Defeated The Monster!"})
+      }
       this.player.adjustCoin(monsterCoin)
       this.gameScreen = "DUNGEON";
     }
