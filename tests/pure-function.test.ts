@@ -96,6 +96,18 @@ describe("pure-function.ts", () => {
                 .toBe(AttackingType.Attack);
         });
 
+        test("randomValue เท่ากับผลรวมของ weight ควร throw Error", () => {
+            expect(() =>
+                getRandomAction("NORMAL MONS", 100, attackWeights)
+            ).toThrow("Invalid random value or monster type");
+        });
+
+        test("monsterType ที่ไม่มีใน weights ควร throw Error", () => {
+            expect(() =>
+                getRandomAction("UNKNOWN" as MonsterType, 0, attackWeights)
+            ).toThrow();
+        });
+
         test("weights ไม่ครอบคลุม randomValue ควร throw Error", () => {
             const incompleteWeights: Weights = {
                 "NORMAL MONS": { Attack: 20, Strike: 20, Run: 20 },
@@ -180,7 +192,7 @@ describe("pure-function.ts", () => {
             expect(calculateDamage(source, target, 2, 0.5)).toBe(30);
         });
 
-        test("ATK น้อยกว่า DEF ไม่ควรทำให้ damage ติดลบ", () => {
+        test("ATK น้อยกว่า DEF ควรได้ damage เป็น 0", () => {
             const source = createCharacter(5, 10, 0);
             const target = createCharacter(10, 10, 0);
 
@@ -235,6 +247,20 @@ describe("pure-function.ts", () => {
             const target = createCharacter(10, 5, 0);
 
             expect(calculateDamage(source, target, 1, 0.1)).toBe(15);
+        });
+
+        test("Critical ต้องเกิดเมื่อ random ต่ำกว่า critical chance เล็กน้อย", () => {
+            const source = createCharacter(20, 5, 1);
+            const target = createCharacter(10, 5, 0);
+
+            expect(calculateDamage(source, target, 1, 0.009)).toBe(30);
+        });
+
+        test("Critical ต้องไม่เกิดเมื่อ random สูงกว่า critical chance เล็กน้อย", () => {
+            const source = createCharacter(20, 5, 1);
+            const target = createCharacter(10, 5, 0);
+
+            expect(calculateDamage(source, target, 1, 0.011)).toBe(15);
         });
     });
 });

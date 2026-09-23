@@ -1,9 +1,21 @@
 {
-  "dependencies": {
-    "@opentui/solid": "^0.5.11",
-    "solid-js": "^1.9.15"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/bun": "^1.4.2"
+  },
+  "scripts": {
+    "test": "bun test tests",
+    "test:character": "bun test tests/character.test.ts",
+    "test:combat": "bun test tests/combatSystem.test.ts",
+    "test:console": "bun test tests/consoleio.test.ts",
+    "test:dungeon": "bun test tests/dungeonMap.test.ts",
+    "test:event": "bun test tests/event.test.ts",
+    "test:gameloop": "bun test tests/gameloop.test.ts",
+    "test:inventory": "bun test tests/inventory.test.ts",
+    "test:item": "bun test tests/item.test.ts",
+    "test:monster": "bun test tests/monster.test.ts",
+    "test:pure": "bun test tests/pure-function.test.ts",
+    "test:shop": "bun test tests/shop.test.ts",
+    "test:state": "bun test tests/state.test.ts"
   }
 }
