@@ -1,9 +1,10 @@
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
-import type { Direction,logType } from "../Type-Enum/type";
+import type { Direction,logType, gameScreen } from "../Type-Enum/type";
 import { render, useKeyboard, useRenderer } from "@opentui/solid"
 import { GameState } from "../Game/State";
 import { getCombat } from "../Tui/gameBridge";
 import type { EnemyUIProps, InventoryUIProps, PlayerUIProps } from "../Tui/uiTypes";
+
 
 export type GameInputIntent =
     | { type: "MOVE"; direction: Direction }
@@ -11,11 +12,26 @@ export type GameInputIntent =
     | { type: "OPEN_INVENTORY" }
     | { type: "PAUSE" }
     | { type: "QUIT" }
-    | { type: "UNKNOWN" };
+    | { type: "UNKNOWN" }
+    | { type: "SELECT_SLOT"; index: number }
+    | { type: "USE_ITEM" }
+    | { type: "DISCARD_ITEM" }; 
+    
 
-export function parseKeyIntent(key: string): GameInputIntent {
+export function parseKeyIntent(key: string, screen: gameScreen): GameInputIntent {
     const normalizedKey = key.toLowerCase().replace(/^arrow[-_]?/, "");
 
+    if (screen === "INVENTORY") {
+        if (/^[1-8]$/.test(normalizedKey)) {
+            return { type: "SELECT_SLOT", index: Number(normalizedKey) - 1 };
+        }
+        if (normalizedKey === "u") {
+            return { type: "USE_ITEM" };
+        }
+        if (normalizedKey === "x") {
+            return { type: "DISCARD_ITEM" };
+        }
+    }   
     switch (normalizedKey) {
         case "up":
         case "w":
