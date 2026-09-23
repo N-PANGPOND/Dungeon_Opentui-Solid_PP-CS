@@ -283,7 +283,7 @@ export class GameState {
       this.isWifeExitFight = false;
        }
       this.gameScreen = "GAMEOVER";
-    } else if (this.combatSystem.isBattleOver()) {
+    } else if (this.combatSystem.isBattleOver().Over) {
       if (this.isWifeExitFight) {
       this.wifeExitFightDone = true;
       this.isWifeExitFight = false;

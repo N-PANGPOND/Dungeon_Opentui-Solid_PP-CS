@@ -18,7 +18,7 @@ export class CombatSystem {
         
     }
     public fleeWithSmokeBomb(): void {
-    this.hasFled = true;
+        this.hasFled = true;
     }
 
     public getHasFled(): boolean {
