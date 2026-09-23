@@ -11,7 +11,7 @@
 // =============================================================
 
 import type { GameState } from "../Game/State";
-import type { EnemyUIProps, EventScreenUIProps, InventoryUIProps, PlayerUIProps, UIScreen } from "./uiTypes";
+import type { EnemyUIProps, EventScreenUIProps, InventoryUIProps, PlayerUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 
 // Inventory.maxSlots เป็น private (ค่าคือ 8) — ถ้าเปลี่ยนที่ Inventory.ts ให้แก้ค่านี้ตาม
 export const INVENTORY_MAX_SLOTS = 8;
@@ -32,7 +32,24 @@ export function resolveScreen(gs: GameState): UIScreen {
   if (gs.isVictory()) return "VICTORY";
   // ถ้ามี pendingEvent ค้างอยู่ ให้แสดง event splash screen ก่อน
   if (gs.getPendingEvent() !== null) return "EVENT";
+  if (gs.gameScreen === "SHOP") return "SHOP";
   return gs.gameScreen as UIScreen;
+}
+
+// ─── Shop ──────────────────────────────────────────────────────────────────
+
+export function getShopUIProps(gs: GameState): ShopUIProps | null {
+  const shop = gs.getShop();
+  if (!shop) return null;
+  return {
+    items: shop.getItems().map((it, idx) => ({
+      index: idx,
+      name: it.getName(),
+      description: it.getDesciption(),
+      price: it.getPrice(),
+    })),
+    playerCoins: gs.player.getCoin(),
+  };
 }
 
 

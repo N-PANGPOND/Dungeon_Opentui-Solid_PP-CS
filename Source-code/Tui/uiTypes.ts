@@ -48,8 +48,22 @@ export interface DungeonViewUIProps {
   exitPos: { x: number; y: number };
 }
 
+// ─── Shop UI Props ─────────────────────────────────────────────────────────
+
+export interface ShopItemUI {
+  index: number;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface ShopUIProps {
+  items: ShopItemUI[];
+  playerCoins: number;
+}
+
 // mirrors Type-Enum/type.ts gameScreen exactly
-export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
+export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "SHOP" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
 
 // ─── Event Splash Screen Props ─────────────────────────────────────────────────
 

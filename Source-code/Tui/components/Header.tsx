@@ -20,8 +20,16 @@ function combatHints(attacking: boolean): string {
     : "  1: Defend    2: Counter   3: Use Item    4: Run    ESC/Q: Quit";
 }
 
+function shopHints(): string {
+  return "  1-5: Buy    S: Sell Mode    B: Buy Mode    L/ESC: Leave Shop";
+}
+
 export const Header = (props: HeaderProps) => {
-  const hints = () => props.screen === "COMBAT" ? combatHints(props.isPlayerTurn ?? true) : dungeonHints()
+  const hints = () => {
+    if (props.screen === "COMBAT") return combatHints(props.isPlayerTurn ?? true);
+    if (props.screen === "SHOP") return shopHints();
+    return dungeonHints();
+  };
       
   const titleText = () => `${theme.icons.title}  ESCAPE DUNGEON  ${theme.icons.title}`;
 

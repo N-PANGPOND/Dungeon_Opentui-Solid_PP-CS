@@ -8,6 +8,7 @@ import path from "path";
 
 
 import { Item } from "../Item-Inventory/Item";
+import { Shop } from "../Event/Shop";
 
 // ─── Pending Event Type ──────────────────────────────────────────────────────
 
@@ -46,6 +47,7 @@ export class GameState {
   private combatSystem: CombatSystem;
   private eventTriggeredTiles: Set<string> = new Set<string>();
   private pendingEvent: PendingEvent | null = null;
+  private currentShop: Shop | null = null;
  // private eventSystem: GameEvent;
 
   constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
@@ -198,14 +200,43 @@ export class GameState {
     this.clearPendingEvent();
   }
 
+  public getShop(): Shop | null {
+    return this.currentShop;
+  }
+
   public eventShop(): void {
+    this.currentShop = new Shop();
     this.pendingEvent = {
       name: "● SHOP",
       grid: eventScreens.Shop.screen,
       color: "#06b6d4",
     };
-    const Potion = Event.prototype.Shop();
-    this.ShowMessage({ type: "System", text: `Found a Shop (Coming soon)!` });
+    this.gameScreen = "SHOP";
+    this.ShowMessage({ type: "System", text: "Welcome to the Shop! Buy items, sell loot, or leave." });
+  }
+
+  public buyFromShop(itemIndex: number): boolean {
+    if (!this.currentShop) return false;
+    const result = this.currentShop.buyItem(itemIndex, this.player);
+    this.ShowMessage({ type: "System", text: result.message });
+    return result.success;
+  }
+
+  public sellToShop(slotIndex: number): boolean {
+    if (!this.currentShop) return false;
+    const result = this.currentShop.sellItem(slotIndex, this.player);
+    this.ShowMessage({ type: "System", text: result.message });
+    return result.success;
+  }
+
+  public leaveShop(): void {
+    if (this.currentShop) {
+      this.currentShop.Leave();
+      this.currentShop = null;
+    }
+    this.clearPendingEvent();
+    this.gameScreen = "DUNGEON";
+    this.ShowMessage({ type: "System", text: "You left the shop and returned to the dungeon." });
   }
 
   public eventNothing(): void {
