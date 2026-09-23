@@ -8,12 +8,21 @@ import { DungeonMap } from "../DungeonMap/DungeonMap";
 export class CombatSystem {
     private monster: Monster;
     private isPlayerAttacker: boolean;
+    private hasFled: boolean = false;
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
         let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
         this.monster = MonsterFactory.createMonster(distToExit);
         this.isPlayerAttacker = true;
+        
     }
+    public fleeWithSmokeBomb(): void {
+    this.hasFled = true;
+    }
+
+    public getHasFled(): boolean {
+    return this.hasFled;
+   }
     startbattle(playerAction:AttackingType | DefensiveType): void {
         if (!this.player.isDead() && !this.monster.isDead()) {
             if (this.isPlayerAttacker) {
@@ -40,7 +49,7 @@ export class CombatSystem {
     }
 
     isBattleOver(): boolean {
-        return this.player.isDead() || this.monster.isDead();
+        return this.player.isDead() || this.monster.isDead() || this.hasFled;
     }
 
     getMonsterStats(): stats {

@@ -44,6 +44,9 @@ export class GameState {
   public selectedSlot: number | null;
 
   private isGetWife: boolean;
+  private isWifeExitFight: boolean = false;
+  private wifeExitFightDone: boolean = false;
+  private endingCause: EndingType = EndingType.NONE;
   private isPause: boolean;
   private combatSystem: CombatSystem;
   private eventTriggeredTiles: Set<string> = new Set<string>();
@@ -113,7 +116,8 @@ export class GameState {
 
   public checkTileEvent(): void {
   const pos = this.player.Position;
-
+  const isAtExit = pos.x === this.currentMap.getExitPos().x && pos.y === this.currentMap.getExitPos().y;
+  
   if (pos.x === this.currentMap.wifePos.x && pos.y === this.currentMap.wifePos.y) {
     if (!this.isGetWife) {
       this.isGetWife = true;
@@ -272,13 +276,22 @@ export class GameState {
     this.combatSystem.startbattle(action);
 
     if (this.player.isDead()) {
+       if (this.isWifeExitFight) {
+      this.endingCause = EndingType.BAD_END_DIED_TO_BOSS;
+      this.isWifeExitFight = false;
+       }
       this.gameScreen = "GAMEOVER";
     } else if (this.combatSystem.isBattleOver()) {
+      if (this.isWifeExitFight) {
+      this.wifeExitFightDone = true;
+      this.isWifeExitFight = false;
+     this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
+    } else {
       this.ShowMessage({type:"System",text:"Monster isDead"})
-      this.gameScreen = "DUNGEON";
     }
+    this.gameScreen = "DUNGEON";
   }
-
+  }
   public isGameOver(): boolean {
     return this.player.getHp() <= 0;
   }
@@ -286,6 +299,7 @@ export class GameState {
 public checkEnding(): EndingType {
   const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
   if (!reachedExit) return EndingType.NONE;
+  if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
   return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
 }
 
