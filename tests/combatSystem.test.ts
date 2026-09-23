@@ -133,6 +133,22 @@ describe("CombatSystem", () => {
             },
         );
 
+        test("processTurn ควรส่ง log ความเสียหายหลังโจมตีสำเร็จ", () => {
+            const logs: { type: "System"; text: string }[] = [];
+            const attacker = makeCharacter();
+            const defender = makeCharacter();
+            const combat = new CombatSystem(makePlayer(), mapStub as any, (log) => logs.push(log));
+            const restore = mockRandom(1);
+
+            try {
+                combat.processTurn(attacker, defender, AttackingType.Attack, DefensiveType.Defend);
+
+                expect(logs).toHaveLength(1);
+                expect(logs[0]?.text).toContain("damage");
+                expect(logs[0]?.text).toContain("HP เหลือ");
+            } finally { restore(); }
+        });
+
         test("Strike + Counter ควรสะท้อน damage กลับไปหา attacker", () => {
             const attacker = makeCharacter();
             const defender = makeCharacter();
@@ -175,6 +191,60 @@ describe("CombatSystem", () => {
             } finally {
                 restore();
             }
+        });
+    });
+
+    describe("สถานะการต่อสู้", () => {
+        test("เริ่มต้นควรเป็นตาของ Player", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            expect(combat.isPlayerTurn()).toBe(true);
+        });
+
+        test("ทำ turn สำเร็จแล้วควรสลับไปเป็นตาของ Monster", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const restore = mockRandom(0.99, 1);
+
+            try {
+                combat.startbattle(AttackingType.Attack);
+                expect(combat.isPlayerTurn()).toBe(false);
+            } finally { restore(); }
+        });
+
+        test("เริ่มรอบที่สองแล้วควรสลับกลับมาเป็นตาของ Player", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const restore = mockRandom(0.99, 1, 1);
+
+            try {
+                combat.startbattle(AttackingType.Attack);
+                combat.startbattle(DefensiveType.Defend);
+                expect(combat.isPlayerTurn()).toBe(true);
+            } finally { restore(); }
+        });
+
+        test("เริ่มต้นการต่อสู้ยังไม่ควรจบ battle", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            expect(combat.isBattleOver()).toBe(false);
+        });
+
+        test("Monster ตายแล้วควรถือว่า battle จบ", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const monster = (combat as any).monster as Character;
+            monster.takeDamage(999);
+
+            expect(combat.isBattleOver()).toBe(true);
+        });
+
+        test("getMonsterStats ควรคืนค่า stat ปัจจุบันของ Monster", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            expect(combat.getMonsterStats()).toEqual({
+                maxHp: 100,
+                hp: 100,
+                atk: 10,
+                def: 5,
+                luc: 5,
+                agi: 5,
+                coin: 10,
+            });
         });
     });
 

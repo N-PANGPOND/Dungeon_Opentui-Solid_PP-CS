@@ -22,4 +22,6 @@ export enum EndingType {
   NONE,
   GOOD_END,
   BAD_END,
+  BAD_END_DIED_TO_BOSS,    
+  BAD_END_WIFE_DIED, 
 }

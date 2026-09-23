@@ -92,7 +92,7 @@ const App = () => {
 
   // Signal สำหรับ Event Splash Screen
   const [eventData, setEventData] = createSignal<EventScreenUIProps | null>(null);
-  const [eventSecondsLeft, setEventSecondsLeft] = createSignal<number>(3);
+  const [eventSecondsLeft, setEventSecondsLeft] = createSignal<number>(2);
 
   // ติดตาม timer เพื่อ cancel ได้ถ้าจำเป็น
   let eventTimerHandle: ReturnType<typeof setTimeout> | null = null;
@@ -108,6 +108,7 @@ const App = () => {
       setShop(getShopUIProps(gameState));
       
       setScreen(resolveScreen(gameState));
+      
       setAttackTurn(isPlayerAttackTurn(gameState));
       setRescuedWife(gameState.didRescueWife());
     });
@@ -120,7 +121,7 @@ const App = () => {
     if (eventTickHandle !== null)  clearInterval(eventTickHandle);
 
     setEventData(ev);
-    setEventSecondsLeft(3);
+    setEventSecondsLeft(2);
 
     // ถ้าเป็น Event ที่ให้เลือก (เช่น Potion) -> ไม่นับถอยหลัง ให้รอผู้เล่นกด 1 หรือ 2
     if (ev.isChoice) {
@@ -138,7 +139,7 @@ const App = () => {
       gameState.clearPendingEvent();
       setEventData(null);
       refresh();
-    }, 3000);
+    }, 2000);
   }
 
   // Keyboard handler — ส่ง input ไปให้ Game Logic แล้ว refresh UI
