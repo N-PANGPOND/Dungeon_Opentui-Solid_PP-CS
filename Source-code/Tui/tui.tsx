@@ -19,6 +19,7 @@ import { Header } from "./components/Header";
 import { DungeonView } from "./components/DungeonView";
 import { PlayerPanel } from "./components/PlayerPanel";
 import { InventoryPanel } from "./components/InventoryPanel";
+import { InventoryView } from "./components/InventoryView";
 import { ActionPanel } from "./components/ActionPanel";
 import { ActionLog, formatLogText } from "./components/ActionLog";
 import { CombatView } from "./components/CombatView";
@@ -33,6 +34,7 @@ import {
   isPlayerAttackTurn,
   mapInputKey,
   resolveScreen,
+  getSelectedSlot,
 } from "./gameBridge";
 
 // ─── Sound Setup ────────────────────────────────────────────────────────────
@@ -84,6 +86,7 @@ const App = () => {
   const [shopMode,  setShopMode]  = createSignal<"buy" | "sell">("buy");
   const [map]                     = createSignal(gameState.currentMap.getGrid());
   const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+  const [selectedSlot, setSelectedSlot] = createSignal<number | null>(getSelectedSlot(gameState));
 
   // Signal สำหรับ Event Splash Screen
   const [eventData, setEventData] = createSignal<EventScreenUIProps | null>(null);
@@ -96,6 +99,7 @@ const App = () => {
   // Refresh ข้อมูลทั้งหมดจาก Game Logic (batch = วาดใหม่ครั้งเดียว ไม่กระพริบหลายรอบ)
   function refresh() {
     batch(() => {
+      setSelectedSlot(getSelectedSlot(gameState));
       consoleIO.ShowPlayer(gameState);
       consoleIO.ShowInventory(gameState);
       consoleIO.ShowEnemy(gameState);
@@ -334,6 +338,9 @@ const App = () => {
                       isPlayerTurn={attackTurn()}
                       lastLog={lastLog()}
                     />
+                  </Match>
+                  <Match when={screen() === "INVENTORY"}>
+                    <InventoryView items={inventory().items} maxSlots={inventory().maxSlots} selectedSlot={selectedSlot()} />
                   </Match>
                   <Match when={true}>
                     <DungeonView

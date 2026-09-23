@@ -41,6 +41,7 @@ export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
+  public selectedSlot: number | null;
 
   private isGetWife: boolean;
   private isPause: boolean;
@@ -274,5 +275,33 @@ export class GameState {
 
   public isVictory(): boolean {
      return this.currentMap.getDistanceToExit(this.player.Position) === 0;
+  }
+
+  public toggleInventory(): void {
+    if (this.gameScreen === "DUNGEON") {
+      this.gameScreen = "INVENTORY";
+    } else if (this.gameScreen === "INVENTORY") {
+      this.gameScreen = "DUNGEON";  
+    }
+  }
+
+  public selectSlot(index: number): void {
+    if (this.gameScreen !== "INVENTORY") return;
+      const items = this.player.getInventory().getItems();
+      if (index < 0 || index >= items.length) return;
+    this.selectedSlot = index;
+  }
+
+  public useSelectedItem(): void {
+    if (this.gameScreen !== "INVENTORY") return;  
+    if (this.selectedSlot === null) return;
+    this.player.getInventory().useItem(this.selectedSlot, this.player);
+    this.selectedSlot = null;
+  }
+  public discardSelectedItem(): void {
+    if (this.gameScreen !== "INVENTORY") return;
+    if (this.selectedSlot === null) return;
+    this.player.getInventory().removeItem(this.selectedSlot);
+    this.selectedSlot = null;
   }
 }
