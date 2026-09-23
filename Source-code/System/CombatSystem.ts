@@ -4,6 +4,7 @@ import type { MonsterType,stats, Weights,position,logType } from "../Type-Enum/t
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import { DungeonMap } from "../DungeonMap/DungeonMap";
 
+type BattleOver = {"Over":boolean,"monster":Monster}
 
 export class CombatSystem {
     private monster: Monster;
@@ -39,8 +40,9 @@ export class CombatSystem {
         return this.isPlayerAttacker;
     }
 
-    isBattleOver(): boolean {
-        return this.player.isDead() || this.monster.isDead();
+    isBattleOver(): BattleOver {
+        const Over : boolean = this.player.isDead() ? this.player.isDead() : this.monster.isDead()
+        return {"Over":Over,"monster":this.monster}
     }
 
     getMonsterStats(): stats {
