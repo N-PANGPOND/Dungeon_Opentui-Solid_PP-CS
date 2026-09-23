@@ -3,6 +3,7 @@ import { ConsoleIO, parseKeyIntent } from "../ConsoleIO/ConsoleIO";
 import type { GameInputIntent } from "../ConsoleIO/ConsoleIO";
 import { GameState } from "./State";
 import type { logType } from "../Type-Enum/type";
+import type { gameScreen } from "../Type-Enum/type";
 
 export class GameLoop {
     private isRunning: boolean;
@@ -26,7 +27,7 @@ export class GameLoop {
         if (!this.isRunning) {
             return;
         }
-        const intent: GameInputIntent = parseKeyIntent(key);
+        const intent: GameInputIntent = parseKeyIntent(key, this.gameState.gameScreen);
 
         switch (intent.type) {
             case "MOVE":
@@ -41,6 +42,17 @@ export class GameLoop {
                 this.end();
                 return;
             case "OPEN_INVENTORY":
+                this.gameState.toggleInventory();
+                break;
+            case "SELECT_SLOT":
+                this.gameState.selectSlot(intent.index);
+                break;
+            case "USE_ITEM":
+                this.gameState.useSelectedItem();
+                break;
+            case "DISCARD_ITEM":
+                this.gameState.discardSelectedItem();
+                break;
             case "PAUSE":
             case "UNKNOWN":
                 // TODO: Implement this input intent.

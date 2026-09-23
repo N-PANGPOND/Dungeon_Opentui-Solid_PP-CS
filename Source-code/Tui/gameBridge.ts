@@ -51,6 +51,10 @@ export function getInventoryUIProps(gs: GameState): InventoryUIProps {
       description: item.item.description,
     }));
   return { items, maxSlots: INVENTORY_MAX_SLOTS };
+} 
+
+export function getSelectedSlot(gs: GameState): number | null {
+  return gs.selectedSlot;
 }
 
 // ─── Combat ────────────────────────────────────────────────────────────────

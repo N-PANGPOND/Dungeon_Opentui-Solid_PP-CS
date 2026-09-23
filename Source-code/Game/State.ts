@@ -15,6 +15,7 @@ export class GameState {
   public gameScreen: gameScreen;
   public currentMap: DungeonMap;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
+  public selectedSlot: number | null;
 
   private ConsoleIO : ConsoleIO
   private isGetWife: boolean;
@@ -29,6 +30,7 @@ export class GameState {
     this.exploredTiles = new Set<position>();
     this.isGetWife = false;
     this.isPause = false;
+    this.selectedSlot = null;
     this.ConsoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog)
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
    //this.eventSystem = new GameEvent();
@@ -111,6 +113,11 @@ export class GameState {
   
   public eventPotion():void{
     const Potion = Event.prototype.Potion()
+    if (this.player.getInventory().isFull()) {
+        this.ConsoleIO.ShowMessage({ type: "System", text: `เจอ Potion ${Potion.getName()} แต่กระเป๋าเต็ม หยิบไม่ได้!!  ` });
+        return;
+    }
+    this.player.addItem(Potion);    
     this.ConsoleIO.ShowMessage({type: "System" , text: `เจอ Potion ${Potion.getName()}!!`})
   }
 
@@ -153,5 +160,33 @@ export class GameState {
 
   public isVictory(): boolean {
      return this.currentMap.getDistanceToExit(this.player.Position) === 0;
+  }
+
+  public toggleInventory(): void {
+    if (this.gameScreen === "DUNGEON") {
+      this.gameScreen = "INVENTORY";
+    } else if (this.gameScreen === "INVENTORY") {
+      this.gameScreen = "DUNGEON";  
+    }
+  }
+
+  public selectSlot(index: number): void {
+    if (this.gameScreen !== "INVENTORY") return;
+      const items = this.player.getInventory().getItems();
+      if (index < 0 || index >= items.length) return;
+    this.selectedSlot = index;
+  }
+
+  public useSelectedItem(): void {
+    if (this.gameScreen !== "INVENTORY") return;  
+    if (this.selectedSlot === null) return;
+    this.player.getInventory().useItem(this.selectedSlot, this.player);
+    this.selectedSlot = null;
+  }
+  public discardSelectedItem(): void {
+    if (this.gameScreen !== "INVENTORY") return;
+    if (this.selectedSlot === null) return;
+    this.player.getInventory().removeItem(this.selectedSlot);
+    this.selectedSlot = null;
   }
 }

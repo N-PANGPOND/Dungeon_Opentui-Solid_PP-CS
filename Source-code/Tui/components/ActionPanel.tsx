@@ -16,9 +16,11 @@ interface ActionPanelProps {
 
 export const ActionPanel = (props: ActionPanelProps) => {
   const isCombat = () => props.screen === "COMBAT";
+  const isInventory = () => props.screen === "INVENTORY";
   const attacking = () => props.isPlayerTurn ?? true;
 
   const title = () => {
+    if (isInventory()) return " INVENTORY ";    
     if (!isCombat()) return " CONTROLS ";
     return attacking() ? " ATTACK TURN " : " DEFEND TURN ";
   };
@@ -46,16 +48,16 @@ export const ActionPanel = (props: ActionPanelProps) => {
       }}
     >
       <text fg={isCombat() ? (attacking() ? theme.colors.danger : theme.colors.info) : theme.colors.primary}>
-        {pad(isCombat() ? row1() : "W/A/S/D  Move", 30)}
+      {pad(isCombat() ? row1() : isInventory() ? "1-8      Select" : "W/A/S/D  Move", 30)}
       </text>
       <text fg={isCombat() ? theme.colors.warning : theme.colors.textDim}>
-        {pad(isCombat() ? row2() : "Arrow    Move", 30)}
+        {pad(isCombat() ? row2() : isInventory() ? "U        Use" : "Arrow    Move", 30)}
       </text>
       <text fg={isCombat() ? theme.colors.success : theme.colors.textDim}>
-        {pad(isCombat() ? `3  ${theme.icons.potion} Use Item` : "I        Inventory", 30)}
+        {pad(isCombat() ? `3  ${theme.icons.potion} Use Item` : isInventory() ? "X        Discard" : "I        Inventory", 30)}
       </text>
       <text fg={isCombat() ? theme.colors.info : theme.colors.textDim}>
-        {pad(isCombat() ? `4  ${theme.icons.bullet} Run` : "ESC      Quit", 30)}
+        {pad(isCombat() ? `4  ${theme.icons.bullet} Run` : isInventory() ? "I        Back" : "ESC      Quit", 30)}
       </text>
     </box>
   );

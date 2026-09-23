@@ -18,6 +18,7 @@ import { Header } from "./components/Header";
 import { DungeonView } from "./components/DungeonView";
 import { PlayerPanel } from "./components/PlayerPanel";
 import { InventoryPanel } from "./components/InventoryPanel";
+import { InventoryView } from "./components/InventoryView";
 import { ActionPanel } from "./components/ActionPanel";
 import { ActionLog, formatLogText } from "./components/ActionLog";
 import { CombatView } from "./components/CombatView";
@@ -32,6 +33,7 @@ import {
   isPlayerAttackTurn,
   mapInputKey,
   resolveScreen,
+  getSelectedSlot,
 } from "./gameBridge";
 
 // ─── Sound Setup ────────────────────────────────────────────────────────────
@@ -75,12 +77,14 @@ const App = () => {
   const [attackTurn, setAttackTurn] = createSignal<boolean>(true);
   const [map]                     = createSignal(gameState.currentMap.getGrid());
   const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
+  const [selectedSlot, setSelectedSlot] = createSignal<number | null>(getSelectedSlot(gameState));
 
   // Refresh ข้อมูลทั้งหมดจาก Game Logic (batch = วาดใหม่ครั้งเดียว ไม่กระพริบหลายรอบ)
   function refresh() {
     batch(() => {
       setPlayer(getPlayerUIProps(gameState));
       setInventory(getInventoryUIProps(gameState));
+      setSelectedSlot(getSelectedSlot(gameState));
       setScreen(resolveScreen(gameState));
       setEnemy(getEnemyUIProps(gameState));
       setAttackTurn(isPlayerAttackTurn(gameState));
@@ -172,24 +176,27 @@ const App = () => {
                   height: 37,
                 }}
               >
-                <Show
-                  when={screen() === "COMBAT" && enemy()}
-                  fallback={
+              <Switch>
+                  <Match when={screen() === "COMBAT" && enemy()}>
+                    <CombatView
+                      player={player()}
+                      enemy={enemy()!}
+                      isPlayerTurn={attackTurn()}
+                      lastLog={lastLog()}
+                    />
+                  </Match>
+                  <Match when={screen() === "INVENTORY"}>
+                    <InventoryView items={inventory().items} maxSlots={inventory().maxSlots} selectedSlot={selectedSlot()} />
+                  </Match>
+                  <Match when={true}>
                     <DungeonView
                       grid={map()}
                       playerPos={player().position}
                       exitPos={exitPos()}
                     />
-                  }
-                >
-                  <CombatView
-                    player={player()}
-                    enemy={enemy()!}
-                    isPlayerTurn={attackTurn()}
-                    lastLog={lastLog()}
-                  />
-                </Show>
-                <ActionLog logs={logs()} />
+                  </Match>
+                </Switch>
+                <ActionLog logs={logs()} /> 
               </box>
 
               {/* ── Right: Sidebar ────────────────────────────────────── */}
