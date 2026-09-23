@@ -11,7 +11,7 @@ export class Event {
     }
 
     public Treasure(Player: Player): number {
-        const coin = Math.floor(Math.random() * 100) + 1;
+        const coin = Math.floor(Math.random() * 150) + 1;
         Player.adjustCoin(coin);
         return coin;
     }

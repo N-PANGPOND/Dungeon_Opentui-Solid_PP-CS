@@ -56,8 +56,9 @@ export class GameState {
 
   constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
     this.gameScreen = "DUNGEON";
-    this.player = new Player({maxHp:160,hp:160,atk:30,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
+    this.player = new Player({maxHp:160,hp:160,atk:25,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
+    this.selectedSlot = null;
     this.isGetWife = false;
     this.isPause = false;
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
@@ -140,10 +141,10 @@ export class GameState {
     }[] = [
       { name: "monster", weight: 0.25, action: () => this.eventCombat() },
       { name: "Trap", weight: 0.07, action: () => this.eventTrap() },
-      { name: "Treasure", weight: 0.10, action: () => this.eventTreasure() },
+      { name: "Treasure", weight: 0.08, action: () => this.eventTreasure() },
       { name: "Potion", weight: 0.04, action: () => this.eventPotion() },
       { name: "shop", weight: 0.09, action: () => this.eventShop() },
-      { name: "Nothing", weight: 0.50, action: () => this.eventNothing() },
+      { name: "Nothing", weight: 0.52, action: () => this.eventNothing() },
     ];
 
     const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0);
@@ -272,7 +273,8 @@ export class GameState {
 
   public handleCombatAction(action: AttackingType | DefensiveType): void {
     if (this.gameScreen !== "COMBAT") return;
-
+    const isBattleOver = this.combatSystem.isBattleOver()
+    const monsterCoin = isBattleOver.monster.getCoin()
     this.combatSystem.startbattle(action);
 
     if (this.player.isDead()) {
@@ -288,6 +290,11 @@ export class GameState {
      this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
     } else {
       this.ShowMessage({type:"System",text:"Monster isDead"})
+    } else if (isBattleOver.Over) {
+      this.ShowMessage({type:"System",text:"Monster isDead"})
+      this.ShowMessage({type:"System",text:`Monster Drop Coin ${monsterCoin}`})
+      this.player.adjustCoin(monsterCoin)
+      this.gameScreen = "DUNGEON";
     }
     this.gameScreen = "DUNGEON";
   }
