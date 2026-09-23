@@ -108,6 +108,7 @@ const App = () => {
       setShop(getShopUIProps(gameState));
       
       setScreen(resolveScreen(gameState));
+      
       setAttackTurn(isPlayerAttackTurn(gameState));
       setRescuedWife(gameState.didRescueWife());
     });

@@ -10,47 +10,40 @@ export class CombatSystem {
     private monster: Monster;
     private isPlayerAttacker: boolean;
     private escaped: boolean = false;
+    private hasFled: boolean = false;
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
         let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
         this.monster = MonsterFactory.createMonster(distToExit);
         this.isPlayerAttacker = true;
+        
     }
-       startbattle(
-        playerAction: AttackingType | DefensiveType): void {
-        if (this.isBattleOver().Over) {
-            return;
-        }
+    public fleeWithSmokeBomb(): void {
+        this.hasFled = true;
+    }
 
-        if (
-            this.player.isDead() ||
-            this.monster.isDead()
-        ) {
-            return;
-        }
-        if (this.isPlayerAttacker) {
-            if ( !Object.values(AttackingType).includes(playerAction as AttackingType)  ) {
-                throw new Error( "Player is Attacking But Action Is Not AttackingType");
-            }
-            const monsterAction: DefensiveType = this.monster.decideDefensiveAction();
-
-            this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}`});
-
-            const escaped = this.processTurn(this.player, this.monster, playerAction as AttackingType, monsterAction );
-
-            if (escaped) {
-                return;
-            }
-        }
-        else {
-            if ( !Object.values(DefensiveType) .includes(playerAction as DefensiveType)
-            ) {
-                throw new Error( "Player is Defensive But Action Is Not DefensiveType"); }
-            const monsterAction = this.monster.decideAttackingAction(); 
-            this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
-            const escaped = this.processTurn( this.monster, this.player, monsterAction, playerAction as DefensiveType );
-            if (escaped) {
-                return;
+    public getHasFled(): boolean {
+    return this.hasFled;
+   }
+    startbattle(playerAction:AttackingType | DefensiveType): void {
+         if (this.isBattleOver().Over) {return;}
+        if (!this.player.isDead() && !this.monster.isDead()) {
+            if (this.isPlayerAttacker) {
+                if (!Object.values(AttackingType).includes(playerAction as AttackingType)) {
+                    throw new Error("Player is Attacking But Action Is Not AttackingType");
+                }
+                const monsterAction : DefensiveType = this.monster.decideDefensiveAction()
+                this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
+              const escaped = this.processTurn(this.player, this.monster, playerAction as AttackingType, monsterAction );
+              if (escaped) return;
+            } else {
+                if (!Object.values(DefensiveType).includes(playerAction as DefensiveType)) {
+                    throw new Error("Player is Defensive But Action Is Not DefensiveType");
+                }
+                const monsterAction = this.monster.decideAttackingAction();
+                this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
+                const escaped = this.processTurn( this.monster, this.player, monsterAction, playerAction as DefensiveType );
+                if (escaped) return;
             }
         }
         this.isPlayerAttacker =

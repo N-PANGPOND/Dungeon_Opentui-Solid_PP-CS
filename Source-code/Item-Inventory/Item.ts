@@ -48,18 +48,18 @@ export class Itemfactory {
  }
     public static CreatePOTION_ATK(): Item {
     return new Item(
-        {name: "POTION_ATK", description: "Increase ATK by 5", price: 75},
+        {name: "POTION_ATK", description: "Increase ATK by 3", price: 90},
         (target: Character) => {
-            const attackAmount = 5;
+            const attackAmount = 3;
             target.IncreaseATK(attackAmount);
         }
     );
  }
     public static CreatePOTION_DEF(): Item {
     return new Item(
-        {name: "POTION_DEF", description: "Increase DEF by 5", price: 70},
+        {name: "POTION_DEF", description: "Increase DEF by 2", price: 100},
         (target: Character) => {
-            const defenseAmount = 5;
+            const defenseAmount = 2;
             target.IncreaseDEF(defenseAmount);
         }
     );

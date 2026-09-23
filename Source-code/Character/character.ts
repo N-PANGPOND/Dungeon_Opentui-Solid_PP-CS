@@ -76,12 +76,12 @@ export class Character {
 
 export class MonsterFactory {
     public static createMonster(distToExit: number): Monster {
-        if (distToExit < 3) {
-            return new Monster({ maxHp: 250, hp: 250, atk: 35, def: 25, luc: 5, agi: 5, coin: 9999 }, 'BOSS');
+        if (distToExit < 4) {
+            return new Monster({ maxHp: 350, hp: 350, atk: 40, def: 40, luc: 5, agi: 5, coin: 9999 }, 'BOSS');
         } else if (distToExit < 15) { 
-            return new Monster({ maxHp: 180, hp: 180, atk: 25, def: 15, luc: 5, agi: 5, coin: 100 }, 'ELITE MONS');
+            return new Monster({ maxHp: 200, hp: 200, atk: 30, def: 20, luc: 5, agi: 5, coin: 100 }, 'ELITE MONS');
         } else {
-            return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 50 }, 'NORMAL MONS');
+            return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 35 }, 'NORMAL MONS');
         }
     }
 }
