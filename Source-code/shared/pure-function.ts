@@ -24,5 +24,6 @@ export function calculateDamage(damageSource: Character, damageTarget: Character
         throw new Error("multiplier or random Shouldn't less than 0");
     }
     const critical = (damageSource.getLuc() * 0.01) > random ? 2 : 1;
-    return (damageSource.getAtk() - damageTarget.getDef()) * multiplier * critical;
+    const Damage = (damageSource.getAtk() - damageTarget.getDef()) * multiplier * critical 
+    return Damage <= 0 ? 0.1 : Damage
 }
