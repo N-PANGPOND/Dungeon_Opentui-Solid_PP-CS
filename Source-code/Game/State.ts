@@ -274,32 +274,34 @@ export class GameState {
 
   public handleCombatAction(action: AttackingType | DefensiveType): void {
     if (this.gameScreen !== "COMBAT") return;
-    const isBattleOver = this.combatSystem.isBattleOver()
-    const monsterCoin = isBattleOver.monster.getCoin()
     this.combatSystem.startbattle(action);
+    const battleResult = this.combatSystem.isBattleOver();
 
     if (this.player.isDead()) {
-       if (this.isWifeExitFight) {
-      this.endingCause = EndingType.BAD_END_DIED_TO_BOSS;
-      this.isWifeExitFight = false;
-       }
-      this.gameScreen = "GAMEOVER";
-    } else if (this.combatSystem.isBattleOver().Over) {
       if (this.isWifeExitFight) {
-      this.wifeExitFightDone = true;
-      this.isWifeExitFight = false;
-     this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
-    } else if (isBattleOver.Over) {
-      if (isBattleOver.Escaped) {
-        this.ShowMessage({type:"System",text:"You Escaped From Battle!"})
-      } else {
-        this.ShowMessage({type:"System",text:"You Defeated The Monster!"})
+        this.endingCause = EndingType.BAD_END_DIED_TO_BOSS;
+        this.isWifeExitFight = false;
       }
-      this.player.adjustCoin(monsterCoin)
+      this.gameScreen = "GAMEOVER";
+      return;
+    }
+
+    if (battleResult.Over) {
+      if (this.isWifeExitFight) {
+        this.wifeExitFightDone = true;
+        this.isWifeExitFight = false;
+        this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
+      } else {
+        if (battleResult.Escaped) {
+          this.ShowMessage({ type: "System", text: "You Escaped From Battle!" });
+        } else {
+          this.ShowMessage({ type: "System", text: "You Defeated The Monster!" });
+          this.player.adjustCoin(battleResult.monster.getCoin());
+          this.ShowMessage({ type: "System", text: `Monster Drop Coin ${battleResult.monster.getCoin()}` });
+        }
+      }
       this.gameScreen = "DUNGEON";
     }
-    this.gameScreen = "DUNGEON";
-  }
   }
   public isGameOver(): boolean {
     return this.player.getHp() <= 0;
