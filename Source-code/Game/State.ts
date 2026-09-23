@@ -39,21 +39,25 @@ const eventScreens = eventJsonRaw["event@"];
 export class GameState {
   public player: Player;
   public gameScreen: gameScreen;
+  public currentMap: DungeonMap;
   public exploredTiles: Set<position>; // Set of explored tile positions in the format "x,y"
 
+  private ConsoleIO : ConsoleIO
   private isGetWife: boolean;
   private isPause: boolean;
   private combatSystem: CombatSystem;
   private pendingEvent: PendingEvent | null = null;
  // private eventSystem: GameEvent;
 
-  constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
+  constructor(currentMap: DungeonMap,addLog: (log: logType) => void = () => {}) {
     this.gameScreen = "DUNGEON";
+    this.currentMap = currentMap;
     this.player = new Player({maxHp:160,hp:160,atk:30,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
     this.isGetWife = false;
     this.isPause = false;
-    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
+    this.ConsoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog)
+    this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
    //this.eventSystem = new GameEvent();
   }
 
@@ -95,7 +99,7 @@ export class GameState {
     }
 
     if (!this.currentMap.isWalkable(nextPos)) {
-      this.ShowMessage({type:"System",text:"is Not Walkable"})
+      this.ConsoleIO.ShowMessage({type:"System",text:"is Not Walkable"})
       return false;
     }
 
@@ -108,20 +112,27 @@ export class GameState {
   }
 
   public checkTileEvent(): void {
-    const tileEvents : {
-      name:string,
-      weight:number,
-      action:() => void 
+  const key = `${this.player.Position.x},${this.player.Position.y}`;
+  if (this.eventTriggeredTiles.has(key)) {
+    return; 
+  } else {
+    this.eventTriggeredTiles.add(key);
+
+    const tileEvents: {
+      name: string;
+      weight: number;
+      action: () => void;
     }[] = [
-      {name : "monster",weight : 0.25,action : () => this.eventCombat()},
-      {name : "Trap",weight : 0.07,action : () => this.eventTrap()},
-      {name : "Treasure",weight : 0.10,action : () => this.eventTreasure()},
-      {name : "Potion",weight : 0.04,action : () => this.eventPotion()},
-      {name : "shop",weight : 0.09,action : () => this.eventShop()},
-      {name : "Nothing",weight : 0.50,action : () => this.eventNothing()}
-    ]
-    const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0)
-    let chance = Math.random()*totalWeight;
+      { name: "monster", weight: 0.25, action: () => this.eventCombat() },
+      { name: "Trap", weight: 0.07, action: () => this.eventTrap() },
+      { name: "Treasure", weight: 0.10, action: () => this.eventTreasure() },
+      { name: "Potion", weight: 0.04, action: () => this.eventPotion() },
+      { name: "shop", weight: 0.09, action: () => this.eventShop() },
+      { name: "Nothing", weight: 0.50, action: () => this.eventNothing() },
+    ];
+
+    const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0);
+    let chance = Math.random() * totalWeight;
 
     for (const event of tileEvents) {
       if (chance < event.weight) {
@@ -131,6 +142,7 @@ export class GameState {
       chance -= event.weight;
     }
   }
+}
 
   public eventTrap():void{
     // เซ็ต splash screen ก่อน execute logic
@@ -208,7 +220,7 @@ export class GameState {
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ConsoleIO.ShowMessage(log));
 
     const monster = this.combatSystem.getMonsterStats();
-    this.ShowMessage({
+    this.ConsoleIO.ShowMessage({
       type: "System",
       text: `Monster stats: HP ${monster.hp}/${monster.maxHp}, ATK ${monster.atk}, DEF ${monster.def}, LUC ${monster.luc}, AGI ${monster.agi}, Coin ${monster.coin}`,
     });
@@ -223,7 +235,7 @@ export class GameState {
     if (this.player.isDead()) {
       this.gameScreen = "GAMEOVER";
     } else if (this.combatSystem.isBattleOver()) {
-      this.ShowMessage({type:"System",text:"Monster isDead"})
+      this.ConsoleIO.ShowMessage({type:"System",text:"Monster isDead"})
       this.gameScreen = "DUNGEON";
     }
   }
