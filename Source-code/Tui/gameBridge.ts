@@ -11,10 +11,16 @@
 // =============================================================
 
 import type { GameState } from "../Game/State";
-import type { EnemyUIProps, InventoryUIProps, PlayerUIProps, UIScreen } from "./uiTypes";
+import type { EnemyUIProps, EventScreenUIProps, InventoryUIProps, PlayerUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 
 // Inventory.maxSlots เป็น private (ค่าคือ 8) — ถ้าเปลี่ยนที่ Inventory.ts ให้แก้ค่านี้ตาม
 export const INVENTORY_MAX_SLOTS = 8;
+
+// ─── Event Screen ───────────────────────────────────────────────────────────────
+
+export function getEventScreenProps(gs: GameState): EventScreenUIProps | null {
+  return gs.getPendingEvent();
+}
 
 // ─── Screen ────────────────────────────────────────────────────────────────
 
@@ -24,21 +30,25 @@ export const INVENTORY_MAX_SLOTS = 8;
 export function resolveScreen(gs: GameState): UIScreen {
   if (gs.isGameOver() || gs.gameScreen === "GAMEOVER") return "GAMEOVER";
   if (gs.isVictory()) return "VICTORY";
+  // ถ้ามี pendingEvent ค้างอยู่ ให้แสดง event splash screen ก่อน
+  if (gs.getPendingEvent() !== null) return "EVENT";
+  if (gs.gameScreen === "SHOP") return "SHOP";
   return gs.gameScreen as UIScreen;
 }
 
-// ─── Player / Inventory ────────────────────────────────────────────────────
+// ─── Shop ──────────────────────────────────────────────────────────────────
 
-export function getPlayerUIProps(gs: GameState): PlayerUIProps {
-  const p = gs.player;
+export function getShopUIProps(gs: GameState): ShopUIProps | null {
+  const shop = gs.getShop();
+  if (!shop) return null;
   return {
-    name: "HERO",
-    hp: p.getHp(),
-    maxHp: p.getMaxHp(),
-    atk: p.getAtk(),
-    def: p.getDef(),
-    coin: p.getCoin(),
-    position: p.getPosition(),
+    items: shop.getItems().map((it, idx) => ({
+      index: idx,
+      name: it.getName(),
+      description: it.getDesciption(),
+      price: it.getPrice(),
+    })),
+    playerCoins: gs.player.getCoin(),
   };
 }
 
@@ -61,27 +71,12 @@ export function getSelectedSlot(gs: GameState): number | null {
 
 // คืน CombatSystem ปัจจุบัน เฉพาะตอนอยู่ในหน้า COMBAT จริง ๆ
 // (นอก combat ตัวแปรนี้ยังค้างศัตรูของสู้ครั้งก่อนอยู่ จึงห้ามอ่าน)
-function getCombat(gs: GameState) {
+export function getCombat(gs: GameState) {
   if (gs.gameScreen !== "COMBAT") return null;
   return gs["combatSystem"] ?? null;
 }
 
-export function getEnemyUIProps(gs: GameState): EnemyUIProps | null {
-  const combat = getCombat(gs);
-  if (!combat) return null;
 
-  const stats = combat.getMonsterStats();
-
-  // ชนิดมอนสเตอร์ (NORMAL MONS / ELITE MONS / BOSS) ไม่มี getter — อ่านไม่ได้ก็ใช้ชื่อกลาง
-  let name = "MONSTER";
-  try {
-    name = combat["monster"]["MonsterType"] ?? name;
-  } catch {
-    /* ใช้ชื่อกลางต่อไป */
-  }
-
-  return { name, hp: stats.hp, maxHp: stats.maxHp, atk: stats.atk, def: stats.def };
-}
 
 // true = ถึงตา player โจมตี (เลือก Attack/Strike/...), false = ถึงตา monster โจมตี (player เลือก Defend/Counter/...)
 export function isPlayerAttackTurn(gs: GameState): boolean {

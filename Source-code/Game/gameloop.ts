@@ -13,14 +13,11 @@ export class GameLoop {
     constructor(addLog: (log: logType) => void = () => {}) {
         this.isRunning = false;
         this.gameState = new GameState(mapSystem.prototype.randomMaps(),addLog);
-        this.consoleIO = new ConsoleIO(()=>{},()=>{},()=>{}, addLog);
+        this.consoleIO = new ConsoleIO(addLog);
     }
 
     public start(): void {
         this.isRunning = true;
-        this.consoleIO.Clear();
-
-        // this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
     }
 
     public handleInput(key: string): void {
@@ -71,13 +68,10 @@ export class GameLoop {
             return;
         }
 
-        this.consoleIO.Clear();
-        // this.consoleIO.renderMap(this.gameState.currentMap, this.gameState.Player.getPosition());
     }
 
     public end(): void {
         this.isRunning = false;
-        this.consoleIO.Clear();
         this.consoleIO.ShowMessage({ type: "System", text: "จบเกม ขอบคุณที่เล่น" });
     }
 

@@ -3,8 +3,7 @@
 // แสดงแผนที่ดันเจี้ยน + ตำแหน่ง Player และ Exit
 // ไม่คำนวณ movement หรือ collision ใด ๆ
 //
-// แมพจริงใหญ่กว่ากล่อง MAP (เช่น 46x27 ช่อง แต่กล่องแสดงได้ ~40x20 ช่อง)
-// จึงแสดงเป็น viewport ที่เลื่อนตามตัวผู้เล่น (camera)
+// แมพจริงขนาด 46x27 ช่อง พอดีกับกล่อง MAP (VIEW_COLS=46, VIEW_ROWS=27)
 // =============================================================
 
 import { theme } from "../theme";
@@ -12,8 +11,8 @@ import { MapObject } from "../../Type-Enum/enum";
 import type { DungeonViewUIProps } from "../uiTypes";
 import { Show } from "solid-js";
 
-// พื้นที่ใช้งานได้ภายในกล่อง MAP (กล่องกว้าง 82 / สูง 22 หักขอบแล้ว) 
-// แต่ละช่องของแมพกว้าง 2 ตัวอักษร
+// พื้นที่ใช้งานได้ภายในกล่อง MAP (กล่องกว้าง 94 หักขอบ 2 ข้าง = 92 chars / สูง 29 หักขอบ = 27 บรรทัด)
+// แต่ละช่องของแมพกว้าง 2 ตัวอักษร (46 * 2 = 92)
 const VIEW_COLS = 46; // ช่อง
 const VIEW_ROWS = 27; // แถว
 
@@ -21,7 +20,7 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-// ตำแหน่งมุมซ้ายบนของ viewport (หน่วย: ช่อง) ให้ player อยู่กลางจอ แต่ไม่เลยขอบแมพ
+// ตำแหน่งมุมซ้ายบนของ viewport
 function cameraOrigin(
   grid: MapObject[][],
   player: { x: number; y: number }
@@ -34,9 +33,7 @@ function cameraOrigin(
   };
 }
 
-// แปลงส่วนของ MapObject[][] ที่อยู่ในกล้องเป็น string (แต่ละ cell = 2 char)
-// ช่อง Exit วาดเป็นพื้นว่างไว้ก่อน แล้ววางไอคอนประตูทับด้วย overlay
-// (ไอคอน emoji กว้าง 2 คอลัมน์พอดี แต่ถ้าสอดใน string แล้วเทอร์มินัลวัดความกว้างต่างกัน แถวนั้นจะเพี้ยน)
+// แปลงส่วนของ MapObject[][] เป็น string (แต่ละ cell = 2 char)
 function formatViewport(grid: MapObject[][], cam: { x: number; y: number }): string {
   return grid
     .slice(cam.y, cam.y + VIEW_ROWS)

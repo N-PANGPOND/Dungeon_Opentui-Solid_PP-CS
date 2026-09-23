@@ -48,8 +48,32 @@ export interface DungeonViewUIProps {
   exitPos: { x: number; y: number };
 }
 
+// ─── Shop UI Props ─────────────────────────────────────────────────────────
+
+export interface ShopItemUI {
+  index: number;
+  name: string;
+  description: string;
+  price: number;
+}
+
+export interface ShopUIProps {
+  items: ShopItemUI[];
+  playerCoins: number;
+}
+
 // mirrors Type-Enum/type.ts gameScreen exactly
-export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
+export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "SHOP" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
+
+// ─── Event Splash Screen Props ─────────────────────────────────────────────────
+
+export interface EventScreenUIProps {
+  name: string;       // ชื่อ event เช่น "⚠ TRAP!" หรือ "★ TREASURE!"
+  grid: number[][];   // pixel grid 27×46 จาก event.json (0=พื้น, 1=สี)
+  color: string;      // สีหลักของ event
+  isChoice?: boolean; // ต้องให้ผู้เล่นกดเลือกหรือไม่
+  potionName?: string; // ชื่อ potion ที่พบ
+}
 
 // ─── Combat Props ──────────────────────────────────────────────────────────
 
