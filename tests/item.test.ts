@@ -181,16 +181,16 @@ describe("Itemfactory", () => {
     test("Smoke Bomb เรียก Effect ได้ แต่ยังใช้สำหรับหนีจาก Combat ไม่ได้", () => {
         const consoleLog = mock(() => {});
 
-        const originalConsoleLog = console.log;
-        console.log = consoleLog;
+        const originalConsoleLog = consoleLog.log;
+        consoleLog.log = consoleLog;
 
         try {
             const item = Itemfactory.CreateSMOKE_BOMB();
 
             expect(() => item.use(character)).not.toThrow();
-            expect(consoleLog).toHaveBeenCalled();
+            expect(consoleLog).toHaveBeenNthCalledWith(1, "Smoke Bomb is used!");
         } finally {
-            console.log = originalConsoleLog;
+            consoleLog.log = originalConsoleLog;
         }
     });
 });

@@ -14,7 +14,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowUp", "up"],
         ["arrow-up", "up"],
         ["arrow_up", "up"],
-    ])("ควรแปลง %s เป็น MOVE up", (key: string, direction: "up") => {
+    ])("ควรแปลง %s เป็น MOVE up", (key, direction) => {
         expect(parseKeyIntent(key)).toEqual({
             type: "MOVE",
             direction,
@@ -28,7 +28,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowDown", "down"],
         ["arrow-down", "down"],
         ["arrow_down", "down"],
-    ])("ควรแปลง %s เป็น MOVE down", (key : string, direction: "down") => {
+    ])("ควรแปลง %s เป็น MOVE down", (key, direction) => {
         expect(parseKeyIntent(key)).toEqual({
             type: "MOVE",
             direction,
@@ -42,7 +42,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowLeft", "left"],
         ["arrow-left", "left"],
         ["arrow_left", "left"],
-    ])("ควรแปลง %s เป็น MOVE left", (key: string, direction: "left") => {
+    ])("ควรแปลง %s เป็น MOVE left", (key, direction) => {
         expect(parseKeyIntent(key)).toEqual({
             type: "MOVE",
             direction,
@@ -56,7 +56,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowRight", "right"],
         ["arrow-right", "right"],
         ["arrow_right", "right"],
-    ])("ควรแปลง %s เป็น MOVE right", (key: string, direction: "right") => {
+    ])("ควรแปลง %s เป็น MOVE right", (key, direction) => {
         expect(parseKeyIntent(key)).toEqual({
             type: "MOVE",
             direction,
@@ -72,7 +72,7 @@ describe("parseKeyIntent()", () => {
         ["6", DefensiveType.Counter],
         ["7", DefensiveType.UseItem],
         ["8", DefensiveType.Run],
-    ])("ควรแปลง key %s เป็น COMBAT_ACTION", (key: string, action: AttackingType | DefensiveType) => {
+    ])("ควรแปลง key %s เป็น COMBAT_ACTION", (key, action) => {
         expect(parseKeyIntent(key)).toEqual({
             type: "COMBAT_ACTION",
             action,
@@ -88,13 +88,13 @@ describe("parseKeyIntent()", () => {
         ["Q", "QUIT"],
         ["escape", "QUIT"],
         ["ESCAPE", "QUIT"],
-    ])("ควรแปลง key %s เป็น %s", (key: string, type: string) => {
+    ])("ควรแปลง key %s เป็น %s", (key, type) => {
         expect(parseKeyIntent(key)).toEqual({ type });
     });
 
     it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
         "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
-        (key: string) => {
+        (key) => {
             expect(parseKeyIntent(key)).toEqual({ type: "UNKNOWN" });
         },
     );
