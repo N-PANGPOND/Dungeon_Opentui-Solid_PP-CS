@@ -52,6 +52,20 @@ export function getShopUIProps(gs: GameState): ShopUIProps | null {
   };
 }
 
+export function getInventoryUIProps(gs: GameState): InventoryUIProps {
+  const items = gs.player
+    .getInventory()
+    .getItems()
+    .map((item) => ({
+      name: item.item.name,
+      description: item.item.description,
+    }));
+  return { items, maxSlots: INVENTORY_MAX_SLOTS };
+} 
+
+export function getSelectedSlot(gs: GameState): number | null {
+  return gs.selectedSlot;
+}
 
 // ─── Combat ────────────────────────────────────────────────────────────────
 

@@ -17,12 +17,14 @@ interface ActionPanelProps {
 
 export const ActionPanel = (props: ActionPanelProps) => {
   const isCombat = () => props.screen === "COMBAT";
+  const isInventory = () => props.screen === "INVENTORY";
   const isShop = () => props.screen === "SHOP";
   const isChoice = () => props.screen === "EVENT" && (props.isEventChoice ?? false);
   const isAutoEvent = () => props.screen === "EVENT" && !props.isEventChoice;
   const attacking = () => props.isPlayerTurn ?? true;
 
   const title = () => {
+    if (isInventory()) return " INVENTORY ";
     if (isShop()) return " SHOP CONTROLS ";
     if (isChoice()) return " EVENT CHOICE ";
     if (isAutoEvent()) return " EVENT ";
@@ -75,17 +77,17 @@ export const ActionPanel = (props: ActionPanelProps) => {
         paddingTop: 1,
       }}
     >
-      <text fg={isChoice() ? theme.colors.success : isCombat() ? (attacking() ? theme.colors.danger : theme.colors.info) : isAutoEvent() ? theme.colors.textDim : theme.colors.primary}>
-        {pad(row1(), 30)}
+      <text fg={isCombat() ? (attacking() ? theme.colors.danger : theme.colors.info) : theme.colors.primary}>
+      {pad(isCombat() ? row1() : isInventory() ? "1-8      Select" : "W/A/S/D  Move", 30)}
       </text>
-      <text fg={isChoice() ? theme.colors.danger : isCombat() ? theme.colors.warning : theme.colors.textDim}>
-        {pad(row2(), 30)}
+      <text fg={isCombat() ? theme.colors.warning : theme.colors.textDim}>
+        {pad(isCombat() ? row2() : isInventory() ? "U        Use" : "Arrow    Move", 30)}
       </text>
       <text fg={isCombat() ? theme.colors.success : theme.colors.textDim}>
-        {pad(row3(), 30)}
+        {pad(isCombat() ? `3  ${theme.icons.potion} Use Item` : isInventory() ? "X        Discard" : "I        Inventory", 30)}
       </text>
-      <text fg={theme.colors.textDim}>
-        {pad(row4(), 30)}
+      <text fg={isCombat() ? theme.colors.info : theme.colors.textDim}>
+        {pad(isCombat() ? `4  ${theme.icons.bullet} Run` : isInventory() ? "I        Back" : "ESC      Quit", 30)}
       </text>
     </box>
   );
