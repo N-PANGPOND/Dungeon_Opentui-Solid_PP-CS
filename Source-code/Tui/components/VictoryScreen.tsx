@@ -1,19 +1,16 @@
-// =============================================================
-// VictoryScreen.tsx — Victory Full-Screen Panel
-// แสดงเมื่อ player ถึง Exit (VICTORY screen)
-// =============================================================
-
 import { theme, pad, fmtNum } from "../theme";
 import type { PlayerUIProps } from "../uiTypes";
 
 interface VictoryScreenProps {
   player: PlayerUIProps;
+  rescuedWife: boolean;
 }
 
 export const VictoryScreen = (props: VictoryScreenProps) => {
   const p = () => props.player;
+  const isGood = () => props.rescuedWife;
 
-  const lines = [
+  const victoryLines = [
     "",
     "  ██╗   ██╗██╗ ██████╗████████╗ ██████╗ ██████╗ ██╗   ██╗",
     "  ██║   ██║██║██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗╚██╗ ██╔╝",
@@ -24,11 +21,25 @@ export const VictoryScreen = (props: VictoryScreenProps) => {
     "",
   ];
 
+  const escapedLines = [
+    "",
+    "  ███████╗███████╗ ██████╗ █████╗ ██████╗ ███████╗██████╗ ",
+    "  ██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗",
+    "  █████╗  ███████╗██║     ███████║██████╔╝█████╗  ██║  ██║",
+    "  ██╔══╝  ╚════██║██║     ██╔══██║██╔═══╝ ██╔══╝  ██║  ██║",
+    "  ███████╗███████║╚██████╗██║  ██║██║     ███████╗██████╔╝",
+    "  ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚═════╝ ",
+    "",
+  ];
+
+  const lines = () => (isGood() ? victoryLines : escapedLines);
+  const themeColor = () => (isGood() ? theme.colors.success : theme.colors.warning);
+
   return (
     <box
       style={{
         borderStyle: theme.border.outer,
-        borderColor: theme.colors.success,
+        borderColor: themeColor(),
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
@@ -40,10 +51,21 @@ export const VictoryScreen = (props: VictoryScreenProps) => {
       <text fg={theme.colors.coin}>{pad("  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦  ✦", 78)}</text>
       <text>{" "}</text>
 
-      {/* ASCII art title */}
-      {lines.map((line) => (
-        <text fg={theme.colors.success}>{pad(line, 78)}</text>
+      {/* ASCII art title — สลับตาม isGood() */}
+      {lines().map((line) => (
+        <text fg={themeColor()}>{pad(line, 78)}</text>
       ))}
+
+      {/* ข้อความอธิบาย ending */}
+      <text fg={isGood() ? theme.colors.wife : theme.colors.textDim}>
+        {pad(
+          isGood()
+            ? "  💗  You rescued your wife and made it home together!  💗"
+            : "  💀  You escaped alone... your wife is still trapped inside  💀",
+          78
+        )}
+      </text>
+      <text>{" "}</text>
 
       {/* Divider */}
       <text fg={theme.colors.muted}>{pad("─".repeat(50), 78)}</text>
