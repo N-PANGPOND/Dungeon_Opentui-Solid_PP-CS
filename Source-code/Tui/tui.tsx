@@ -25,12 +25,11 @@ import { CombatView } from "./components/CombatView";
 import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import { EventSplashScreen } from "./components/EventSplashScreen";
-import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, EventScreenUIProps, UIScreen } from "./uiTypes";
+import { ShopView } from "./components/ShopView";
+import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, EventScreenUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 import {
-  getPlayerUIProps,
-  getInventoryUIProps,
-  getEnemyUIProps,
   getEventScreenProps,
+  getShopUIProps,
   isPlayerAttackTurn,
   mapInputKey,
   resolveScreen,
@@ -60,13 +59,6 @@ soundSystem.loadManifest({
 const App = () => {
   const renderer = useRenderer();
   
-  // Signals ที่ UI ใช้แสดงผล
-  const [player,    setPlayer]    = createSignal<PlayerUIProps>();
-  const [inventory, setInventory] = createSignal<InventoryUIProps>();
-  const [enemy,     setEnemy]     = createSignal<EnemyUIProps | null>(null);
-  const [attackTurn, setAttackTurn] = createSignal<boolean>(true);
- 
-  
   // ─── Game Setup ─────────────────────────────────────────────────────────────
   const [logs, setLogs] = createSignal<logType[]>([]);
   
@@ -80,11 +72,16 @@ const App = () => {
   gameLoop.start();
   
   const gameState = gameLoop.getGameState();
-  setPlayer(consoleIO.getPlayerUIProps(gameState));
-  setInventory(consoleIO.getInventoryUIProps(gameState));
 
+  // Signals ที่ UI ใช้แสดงผล
+  const [player,    setPlayer]    = createSignal<PlayerUIProps>(consoleIO.getPlayerUIProps(gameState));
+  const [inventory, setInventory] = createSignal<InventoryUIProps>(consoleIO.getInventoryUIProps(gameState));
+  const [enemy,     setEnemy]     = createSignal<EnemyUIProps | null>(null);
+  const [attackTurn, setAttackTurn] = createSignal<boolean>(true);
   
   const [screen,    setScreen]    = createSignal<UIScreen>(resolveScreen(gameState));
+  const [shop,      setShop]      = createSignal<ShopUIProps | null>(getShopUIProps(gameState));
+  const [shopMode,  setShopMode]  = createSignal<"buy" | "sell">("buy");
   const [map]                     = createSignal(gameState.currentMap.getGrid());
   const [exitPos]                 = createSignal(gameState.currentMap.getExitPos());
 
@@ -101,8 +98,8 @@ const App = () => {
     batch(() => {
       consoleIO.ShowPlayer(gameState);
       consoleIO.ShowInventory(gameState);
-      consoleIO.ShowEnemy(gameState)
-    
+      consoleIO.ShowEnemy(gameState);
+      setShop(getShopUIProps(gameState));
       
       setScreen(resolveScreen(gameState));
       setAttackTurn(isPlayerAttackTurn(gameState));
@@ -151,6 +148,37 @@ const App = () => {
     const s = screen();
     if (s === "GAMEOVER" || s === "VICTORY") return;
 
+    // จัดการ input ในหน้า SHOP
+    if (s === "SHOP") {
+      if (name === "l" || name === "escape") {
+        gameState.leaveShop();
+        refresh();
+        return;
+      }
+      if (name === "s") {
+        setShopMode("sell");
+        return;
+      }
+      if (name === "b") {
+        setShopMode("buy");
+        return;
+      }
+      if (/^[1-8]$/.test(name)) {
+        const num = parseInt(name, 10);
+        if (shopMode() === "buy") {
+          if (num >= 1 && num <= 5) {
+            gameState.buyFromShop(num - 1);
+            refresh();
+          }
+        } else {
+          gameState.sellToShop(num - 1);
+          refresh();
+        }
+        return;
+      }
+      return;
+    }
+
     // จัดการ input ในหน้า EVENT (ถ้าเป็น Potion Choice ให้กด 1=เก็บ, 2=ไม่เก็บ)
     if (s === "EVENT") {
       const ev = eventData();
@@ -163,6 +191,15 @@ const App = () => {
         }
         if (name === "2" || name === "n" || name === "escape") {
           gameState.leavePotion();
+          setEventData(null);
+          refresh();
+          return;
+        }
+      } else {
+        if (name === "space" || name === "enter" || name === "return" || name === " " || name === "e") {
+          if (eventTimerHandle !== null) clearTimeout(eventTimerHandle);
+          if (eventTickHandle !== null) clearInterval(eventTickHandle);
+          gameState.clearPendingEvent();
           setEventData(null);
           refresh();
           return;
@@ -281,6 +318,13 @@ const App = () => {
                       isChoice={eventData()!.isChoice}
                       potionName={eventData()!.potionName}
                       secondsLeft={eventSecondsLeft()}
+                    />
+                  </Match>
+                  <Match when={screen() === "SHOP" && shop() !== null}>
+                    <ShopView
+                      shop={shop()!}
+                      inventory={inventory()!}
+                      mode={shopMode()}
                     />
                   </Match>
                   <Match when={screen() === "COMBAT" && enemy()}>

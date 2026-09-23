@@ -1,4 +1,4 @@
-export type gameScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "Merchant " | "INVENTORY" | "VICTORY" | "GAMEOVER";
+export type gameScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "SHOP" | "Merchant " | "INVENTORY" | "VICTORY" | "GAMEOVER";
 
 export type MonsterType = 'NORMAL MONS' | 'ELITE MONS' | 'BOSS'
 export type Direction = "up" | "down" | "left" | "right" | "w" | "a" | "s" | "d";

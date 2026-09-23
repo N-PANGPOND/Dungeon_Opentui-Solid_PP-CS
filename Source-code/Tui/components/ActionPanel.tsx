@@ -17,20 +17,23 @@ interface ActionPanelProps {
 
 export const ActionPanel = (props: ActionPanelProps) => {
   const isCombat = () => props.screen === "COMBAT";
+  const isShop = () => props.screen === "SHOP";
   const isChoice = () => props.screen === "EVENT" && (props.isEventChoice ?? false);
   const isAutoEvent = () => props.screen === "EVENT" && !props.isEventChoice;
   const attacking = () => props.isPlayerTurn ?? true;
 
   const title = () => {
+    if (isShop()) return " SHOP CONTROLS ";
     if (isChoice()) return " EVENT CHOICE ";
     if (isAutoEvent()) return " EVENT ";
     if (!isCombat()) return " CONTROLS ";
     return attacking() ? " ATTACK TURN " : " DEFEND TURN ";
   };
-  const titleColor = () => (isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.title);
-  const borderColor = () => (isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.borderPanel);
+  const titleColor = () => (isShop() ? theme.colors.info : isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.title);
+  const borderColor = () => (isShop() ? theme.colors.info : isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.borderPanel);
 
   const row1 = () => {
+    if (isShop()) return "1-5      Buy Item";
     if (isChoice()) return `1  ${theme.icons.potion} Take Potion`;
     if (isAutoEvent()) return "   (Please wait...)";
     if (isCombat()) return attacking() ? `1  ${theme.icons.atk} Attack` : `1  ${theme.icons.def} Defend`;
@@ -38,6 +41,7 @@ export const ActionPanel = (props: ActionPanelProps) => {
   };
 
   const row2 = () => {
+    if (isShop()) return "S        Sell Mode (1-8)";
     if (isChoice()) return `2  ${theme.icons.bullet} Leave / Skip`;
     if (isAutoEvent()) return "   Auto-returning";
     if (isCombat()) return attacking() ? `2  ${theme.icons.bullet} Strike` : `2  ${theme.icons.bullet} Counter`;
@@ -45,12 +49,14 @@ export const ActionPanel = (props: ActionPanelProps) => {
   };
 
   const row3 = () => {
+    if (isShop()) return "B        Buy Mode";
     if (isChoice() || isAutoEvent()) return " ";
     if (isCombat()) return `3  ${theme.icons.potion} Use Item`;
     return "I        Inventory";
   };
 
   const row4 = () => {
+    if (isShop()) return "L / ESC  Leave Shop";
     if (isCombat()) return `4  ${theme.icons.bullet} Run`;
     return "ESC      Quit";
   };
