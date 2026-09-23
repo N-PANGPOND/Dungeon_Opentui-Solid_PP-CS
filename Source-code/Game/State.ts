@@ -53,7 +53,7 @@ export class GameState {
 
   constructor(public currentMap: DungeonMap, private ShowMessage: (log: logType) => void = () => {}) {
     this.gameScreen = "DUNGEON";
-    this.player = new Player({maxHp:160,hp:160,atk:25,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
+    this.player = new Player({maxHp:160,hp:160,atk:20,def:5,luc:10,agi:25,coin:50},currentMap.getStartPos());;
     this.exploredTiles = new Set<position>();
     this.selectedSlot = null;
     this.isGetWife = false;
