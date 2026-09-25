@@ -13,6 +13,8 @@ export type logType = {
     text : string 
 }
 
+export type storyType = "useBombWithBoss" | "badEndSmokeBomb" | "happyEnd" | "getWife" | "start"
+
 export type Weights = {
     [key in MonsterType]: {
         Attack: number;

@@ -5,6 +5,7 @@
 // =============================================================
 
 import type { MapObject } from "../Type-Enum/enum";
+import type { storyType } from "../Type-Enum/type";
 
 // ─── Player UI Props ───────────────────────────────────────────────────────
 
@@ -30,6 +31,12 @@ export interface InventoryUIProps {
   maxSlots: number;
 }
 
+// StoryViewUIProps
+export interface StoryViewUIProps {
+  story: storyType;
+  lineIndex: number;
+  onComplete: () => void;
+}
 // ─── Enemy UI Props ────────────────────────────────────────────────────────
 
 export interface EnemyUIProps {
