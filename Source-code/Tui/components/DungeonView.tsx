@@ -40,7 +40,7 @@ function formatViewport(grid: MapObject[][], cam: { x: number; y: number }): str
     .map((row) =>
       row
         .slice(cam.x, cam.x + VIEW_COLS)
-        .map((cell) => (cell === MapObject.Wall ? theme.icons.wall : theme.icons.floor))
+        .map((cell) => (cell === MapObject.Wall ? theme.icons.wall[Math.floor(Math.random() * theme.icons.wall.length)] : theme.icons.floor))
         .join("")
     )
     .join("\n");

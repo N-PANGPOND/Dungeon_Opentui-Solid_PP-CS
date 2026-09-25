@@ -19,7 +19,30 @@ export const getStoryLineCount = (story: StoryViewUIProps["story"]): number =>
 
 export const StoryText = (prop:StoryViewUIProps) => {
   const lines = storyJsonRaw.story[prop.story];
-
+  const dash = "-".repeat(100)
+  if (prop.story === "start") {
+    lines.push(`██╗    ██╗███████╗██╗     ██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ████████╗ ██████╗     
+██║    ██║██╔════╝██║     ██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ╚══██╔══╝██╔═══██╗    
+██║ █╗ ██║█████╗  ██║     ██║     ██║     ██║   ██║██╔████╔██║█████╗         ██║   ██║   ██║    
+██║███╗██║██╔══╝  ██║     ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝         ██║   ██║   ██║    
+╚███╔███╔╝███████╗███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗       ██║   ╚██████╔╝    
+ ╚══╝╚══╝ ╚══════╝╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝       ╚═╝    ╚═════╝     
+                                                                                                
+                ██████╗ ██╗   ██╗███╗   ██╗ ██████╗ ███████╗ ██████╗ ███╗   ██╗                 
+                ██╔══██╗██║   ██║████╗  ██║██╔════╝ ██╔════╝██╔═══██╗████╗  ██║                 
+                ██║  ██║██║   ██║██╔██╗ ██║██║  ███╗█████╗  ██║   ██║██╔██╗ ██║                 
+                ██║  ██║██║   ██║██║╚██╗██║██║   ██║██╔══╝  ██║   ██║██║╚██╗██║                 
+                ██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████╗╚██████╔╝██║ ╚████║                 
+                ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝                 
+                                                                                                
+                        ███████╗███████╗ ██████╗ █████╗ ██████╗ ███████╗                        
+                        ██╔════╝██╔════╝██╔════╝██╔══██╗██╔══██╗██╔════╝                        
+                        █████╗  ███████╗██║     ███████║██████╔╝█████╗                          
+                        ██╔══╝  ╚════██║██║     ██╔══██║██╔═══╝ ██╔══╝                          
+                        ███████╗███████║╚██████╗██║  ██║██║     ███████╗                        
+                        ╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝     ╚══════╝                        
+                                                                                                `)
+  }
     return (
         <box
           title=" Story "
@@ -34,9 +57,22 @@ export const StoryText = (prop:StoryViewUIProps) => {
             alignItems: "center",
             overflow: "hidden",
           }}
-        >
-          <text>{lines[prop.lineIndex] ?? ""}</text>
-          <text fg={theme.colors.borderPanel}>[Enter / Space] Continue</text>
+            ><box
+            style={{
+                flexDirection: "column",
+                width: "85%",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden"
+            }}>
+              <text fg={theme.colors.borderPanel}>{dash}</text>
+              <text fg={theme.colors.borderPanel}></text>
+              <text>{(lines[prop.lineIndex] ?? "").normalize('NFC')}</text>
+              <text fg={theme.colors.borderPanel}></text>
+              <text fg={theme.colors.borderPanel}>{dash}</text>
+              <text fg={theme.colors.borderPanel}>[Enter / Space] Continue   [S] Skip</text>
+            </box>
         </box>
     )
 }

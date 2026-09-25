@@ -156,14 +156,22 @@ const App = () => {
     }
 
     if (story() !== null) {
-      if (name !== "enter" && name !== "space" && name !== "return" && name !== " ") {
+      if(name === "q"){
+        renderer.destroy();
+        return
+      }
+      // กดแล้วยังไม่ออก
+      if(name === "s"){
+        setStoryLineIndex(getStoryLineCount(story()!) - 1);
         return;
       }
-
+      if (name !== "space" && name !== "return" && name !== " ") {
+        return;
+      }
       if (storyLineIndex() >= getStoryLineCount(story()!) - 1) {
         setStory(null);
         setStoryLineIndex(0);
-      } else {
+      }else{
         setStoryLineIndex((index) => index + 1);
       }
       return;

@@ -60,7 +60,7 @@ export const theme = {
     title:   "⚔",
     arrow:   "▶",
     bullet:  "•",
-    wall:    "██",
+    wall:     ["██","█▒","▒█","▓▒"],
     floor:   "  ",
   },
 
