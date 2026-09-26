@@ -342,11 +342,22 @@ public isVictory(): boolean {
     if (this.gameScreen !== "INVENTORY") return;  
     if (this.selectedSlot === null) return;
     const slotIndex = this.selectedSlot;
+
     if (this.inventoryReturnScreen === "COMBAT") {
       if (!this.combatSystem.usePlayerItem(slotIndex)) return;
+
+      // ไอเทมอาจทำให้การต่อสู้จบไปแล้ว (เช่น Smoke Bomb หนีสำเร็จ)
+      // ต้องเช็คตรงนี้ แทนที่จะรอให้ toggleInventory() พากลับไปหน้า COMBAT แบบเดิมเสมอ
+      if (this.combatSystem.isBattleOver().Over) {
+        this.inventoryReturnScreen = "DUNGEON";
+        this.gameScreen = "DUNGEON";
+        this.selectedSlot = null;
+        return;
+      }
     } else {
       this.player.getInventory().useItem(slotIndex, this.player);
     }
+
     this.selectedSlot = null;
   }
   public discardSelectedItem(): void {

@@ -67,11 +67,8 @@ export class Itemfactory {
 
     public static CreateSMOKE_BOMB(): Item {
     return new Item(
-        {name: "SMOKE_BOMB", description: "Escape from battle", price: 100},
-        (target: Character) => {
-            // Implement escape logic here
-            console.log(`${target} used SMOKE_BOMB to escape!`);
-        }
-    );
- }
+        { name: "SMOKE_BOMB", description: "80% chance to escape from battle", price: 100 }
+        // ไม่ต้องใส่ Addeffects — effect จริงถูกจัดการที่ CombatSystem.usePlayerItem() แทน
+        );
+    }
 }
