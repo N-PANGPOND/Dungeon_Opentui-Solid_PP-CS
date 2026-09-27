@@ -40,15 +40,15 @@ function formatViewport(grid: MapObject[][], cam: { x: number; y: number }): str
     .map((row) =>
       row
         .slice(cam.x, cam.x + VIEW_COLS)
-        .map((cell) => (cell === MapObject.Wall ? theme.icons.wall : theme.icons.floor))
+        .map((cell) => (cell === MapObject.Wall ? theme.icons.wall[Math.floor(Math.random() * theme.icons.wall.length)] : theme.icons.floor))
         .join("")
     )
     .join("\n");
 }
-
+let mapStr = ''
 export const DungeonView = (props: DungeonViewUIProps) => {
   const cam = () => cameraOrigin(props.grid, props.playerPos);
-  const mapStr = () => formatViewport(props.grid, cam());
+  mapStr = mapStr === '' ? formatViewport(props.grid, cam()) : mapStr
 
   // ตำแหน่งบนจอ = (ตำแหน่งในแมพ - ตำแหน่งกล้อง) — x คูณ 2 เพราะแต่ละ cell กว้าง 2 char
   const playerLeft = () => (props.playerPos.x - cam().x) * 2;
@@ -58,13 +58,11 @@ export const DungeonView = (props: DungeonViewUIProps) => {
   const exitRow = () => props.exitPos.y - cam().y;
   const exitVisible = () =>
     exitCol() >= 0 && exitCol() < VIEW_COLS && exitRow() >= 0 && exitRow() < VIEW_ROWS;
-
   const wifeCol = () => props.wifePos.x - cam().x;
   const wifeRow = () => props.wifePos.y - cam().y;
   const wifeVisible = () =>
     !props.isGetWife &&   // ช่วยแล้วให้ซ่อน ไม่โชว์ซ้ำ
     wifeCol() >= 0 && wifeCol() < VIEW_COLS && wifeRow() >= 0 && wifeRow() < VIEW_ROWS;
-
   return (
     <box
       title=" MAP "
@@ -78,7 +76,7 @@ export const DungeonView = (props: DungeonViewUIProps) => {
         overflow: "hidden",
       }}
     >
-      <text fg={theme.colors.wall}>{mapStr()}</text>
+      <text fg={theme.colors.wall}>{mapStr}</text>
 
       {/* Exit overlay — วาดก่อน player เพื่อให้ player ทับได้ */}
       <Show when={exitVisible()}>

@@ -11,7 +11,7 @@ import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
 import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
 
-import type { logType } from "../Type-Enum/type";
+import type { logType, storyType } from "../Type-Enum/type";
 
 // ─── UI Components ─────────────────────────────────────────────────────────
 import { theme } from "./theme";
@@ -27,6 +27,7 @@ import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import { EventSplashScreen } from "./components/EventSplashScreen";
 import { ShopView } from "./components/ShopView";
+import { getStoryLineCount, StoryText } from "./components/StoryText";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, EventScreenUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 import {
   getEventScreenProps,
@@ -89,11 +90,14 @@ const App = () => {
   const [wifePos] = createSignal(gameState.currentMap.getWifePos());
   const [rescuedWife, setRescuedWife] = createSignal(gameState.didRescueWife());
   const [selectedSlot, setSelectedSlot] = createSignal<number | null>(getSelectedSlot(gameState));
+  const [story, setStory] = createSignal<storyType | null>("start");
+  const [storyLineIndex, setStoryLineIndex] = createSignal(0);
 
   // Signal สำหรับ Event Splash Screen
   const [eventData, setEventData] = createSignal<EventScreenUIProps | null>(null);
   const [eventSecondsLeft, setEventSecondsLeft] = createSignal<number>(2);
 
+  let countShowGetwife = 0
   // ติดตาม timer เพื่อ cancel ได้ถ้าจำเป็น
   let eventTimerHandle: ReturnType<typeof setTimeout> | null = null;
   let eventTickHandle: ReturnType<typeof setInterval> | null = null;
@@ -111,6 +115,10 @@ const App = () => {
       
       setAttackTurn(isPlayerAttackTurn(gameState));
       setRescuedWife(gameState.didRescueWife());
+      if (rescuedWife() && countShowGetwife < 1) {
+        countShowGetwife += 1
+        setStory("getWife")
+      }
     });
   }
 
@@ -152,6 +160,28 @@ const App = () => {
       return;
     }
 
+    if (story() !== null) {
+      if(name === "q"){
+        renderer.destroy();
+        return
+      }
+      // กดแล้วยังไม่ออก
+      if(name === "s"){
+        setStoryLineIndex(getStoryLineCount(story()!) - 1);
+        return;
+      }
+      if (name !== "space" && name !== "return" && name !== " ") {
+        return;
+      }
+      if (storyLineIndex() >= getStoryLineCount(story()!) - 1) {
+        setStory(null);
+        setStoryLineIndex(0);
+      }else{
+        setStoryLineIndex((index) => index + 1);
+      }
+      return;
+    }
+
     // Block input บน end screens (ยกเว้น ESC ที่ใช้ออกจากโปรแกรม)
     const s = screen();
       if (s === "GAMEOVER" || s === "VICTORY") {
@@ -160,7 +190,6 @@ const App = () => {
      }
       return;
     }
-
     // จัดการ input ในหน้า SHOP
     if (s === "SHOP") {
       if (name === "l" || name === "escape") {
@@ -267,13 +296,11 @@ const App = () => {
       }
     }
   });
-
   const lastLog = () => {
     const all = logs();
     const last = all[all.length - 1];
     return last ? formatLogText(last.text) : undefined;
   };
-
   return (
     // ─── Outer centering wrapper ──────────────────────────────────────
     <box
@@ -317,7 +344,19 @@ const App = () => {
                 height: 37,
               }}
             >
+              <Show when={story() !== null}>
+                <StoryText
+                  story={story()!}
+                  lineIndex={storyLineIndex()}
+                  onComplete={() => {
+                    setStory(null);
+                    setStoryLineIndex(0);
+                  }}
+                />
+              </Show>
+
               {/* ── Left: Map (หรือ Event / Combat) + Log ────────────────────── */}
+              <Show when={story() === null}>
               <box
                 style={{
                   flexDirection: "column",
@@ -383,6 +422,7 @@ const App = () => {
                   isEventChoice={eventData()?.isChoice ?? false}
                 />
               </box>
+              </Show>
             </box>
 
             {/* ─── Footer key hints ─────────────────────────────────── */}
