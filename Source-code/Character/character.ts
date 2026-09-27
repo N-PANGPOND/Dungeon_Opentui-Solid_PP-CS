@@ -120,6 +120,11 @@ export class Monster extends Character {
         let randomValue = Math.random() * Sumweights;
         return getRandomAction(this.MonsterType, randomValue, weights) as DefensiveType;
     }
+
+    public getMonsterType(): MonsterType { 
+        return this.MonsterType;
+    }
+
 }
 
 export class Player extends Character {
