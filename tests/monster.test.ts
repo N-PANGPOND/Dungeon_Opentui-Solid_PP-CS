@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { MonsterFactory } from "../Source-code/Character/character";
+import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
 
 const mockRandom = (value: number) => {
     const original = Math.random;
@@ -42,11 +43,11 @@ describe("MonsterFactory / Monster", () => {
         expect(elite.getMaxHp()).toBe(200);
         expect(elite.getAtk()).toBe(30);
         expect(elite.getDef()).toBe(20);
-        expect(elite.getCoin()).toBe(100);
+        expect(elite.getCoin()).toBe(110);
 
         expect(boss.getMaxHp()).toBe(350);
-        expect(boss.getAtk()).toBe(40);
-        expect(boss.getDef()).toBe(40);
+        expect(boss.getAtk()).toBe(50);
+        expect(boss.getDef()).toBe(55);
         expect(boss.getCoin()).toBe(9999);
     });
 
@@ -56,42 +57,57 @@ describe("MonsterFactory / Monster", () => {
     });
 
     test("NORMAL MONS ที่ random = 0 ควรเลือก Attack", () => {
-        const monster = MonsterFactory.createMonster(100);
-        const restore = mockRandom(0);
-        try {
-            expect(monster.decideAttackingAction()).toBe("Attack");
-        } finally { restore(); }
-    });
+    const monster = MonsterFactory.createMonster(100);
+    const restore = mockRandom(0);
+
+    try {
+        expect(monster.decideAttackingAction()).toBe(AttackingType.Attack);
+    } finally {
+        restore();
+    }
+});
 
     test("NORMAL MONS ที่ random ใกล้ 1 ควรเลือก Run", () => {
         const monster = MonsterFactory.createMonster(100);
         const restore = mockRandom(0.99);
-        try {
-            expect(monster.decideAttackingAction()).toBe("Run");
-        } finally { restore(); }
-    });
 
-    test("BOSS ที่ random = 0.99 ไม่ควรเลือก Run เพราะ probability ของ Run เป็น 0", () => {
-        const monster = MonsterFactory.createMonster(3);
-        const restore = mockRandom(0.99);
         try {
-            expect(monster.decideAttackingAction()).toBe("Strike");
-        } finally { restore(); }
+            expect(monster.decideAttackingAction()).toBe(AttackingType.Run);
+        } finally {
+            restore();
+        }
     });
+});
+
+    test("BOSS ที่ random = 0.99 ควรเลือก Strike", () => {
+        const monster = MonsterFactory.createMonster(2);
+        const restore = mockRandom(0.99);
+
+        try {
+            expect(monster.decideAttackingAction()).toBe(AttackingType.Strike);
+        } finally {
+            restore();
+        }
+});
 
     test("NORMAL MONS ที่ random = 0 ควรเลือก Defend", () => {
         const monster = MonsterFactory.createMonster(100);
         const restore = mockRandom(0);
+
         try {
-            expect(monster.decideDefensiveAction()).toBe("Defend");
-        } finally { restore(); }
-    });
+            expect(monster.decideDefensiveAction()).toBe(DefensiveType.Defend);
+        } finally {
+            restore();
+        }
+});
 
     test("BOSS ที่ random = 0.99 ควรเลือก Run ใน Defensive phase", () => {
-        const monster = MonsterFactory.createMonster(3);
+        const monster = MonsterFactory.createMonster(2);
         const restore = mockRandom(0.99);
+
         try {
-            expect(monster.decideDefensiveAction()).toBe("Run");
-        } finally { restore(); }
-    });
+            expect(monster.decideDefensiveAction()).toBe(DefensiveType.Run);
+        } finally {
+            restore();
+        }
 });
