@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run Tui/tui.tsx",
+    "start": "bun run Tui/tui.tsx",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test ../tests",
     "test:character": "bun test ../tests/character.test.ts",
