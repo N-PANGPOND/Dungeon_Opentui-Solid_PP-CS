@@ -16,15 +16,13 @@ const storyJsonRaw = await Bun.file(eventDataPath).json() as {
 export const getStoryLineCount = (story: StoryViewUIProps["story"]): number =>
   storyJsonRaw.story[story].length;
 
-const TYPE_SPEED_MS = 25;   // ความเร็วพิมพ์เนื้อเรื่อง (ms/ตัวอักษร)
-const PULSE_TICK_MS = 40;   // ความถี่อัปเดตความสว่าง (ms) ยิ่งน้อยยิ่งลื่น
-const PULSE_PERIOD_MS = 2400; // เวลาต่อ 1 รอบหายใจเข้า-ออก (ms)
+const TYPE_SPEED_MS = 25;
+const PULSE_TICK_MS = 40;
+const PULSE_PERIOD_MS = 2400;
 
-// สีปลายทั้งสองฝั่งของการ pulse ดึงจาก theme.ts ล้วนๆ
 const PULSE_BRIGHT = theme.colors.title;
 const PULSE_DIM = theme.colors.muted;
 
-// ผสมสีระหว่างสองจุดตามสัดส่วน t (0 = dim, 1 = bright)
 function lerpColor(hexA: string, hexB: string, t: number): string {
   const a = parseInt(hexA.slice(1), 16);
   const b = parseInt(hexB.slice(1), 16);
@@ -34,6 +32,25 @@ function lerpColor(hexA: string, hexB: string, t: number): string {
   const g = Math.round(ag + (bg - ag) * t);
   const bch = Math.round(ab + (bb - ab) * t);
   return `#${((1 << 24) + (r << 16) + (g << 8) + bch).toString(16).slice(1)}`;
+}
+
+// ── สถานะ "พิมพ์จบบรรทัดหรือยัง" ให้ tui.tsx เอาไปเช็คก่อนเลื่อนบรรทัด ──
+export const [isLineTypingDone, setIsLineTypingDone] = createSignal(true);
+
+let activeTimer: ReturnType<typeof setInterval> | null = null;
+let activeFullLine = "";
+let activeSetDisplayedText: ((s: string) => void) | null = null;
+
+// เรียกจาก tui.tsx เมื่อผู้เล่นกด Enter/Space ระหว่างกำลังพิมพ์ เพื่อโชว์บรรทัดเต็มทันที
+export function completeCurrentLine() {
+  if (activeTimer) {
+    clearInterval(activeTimer);
+    activeTimer = null;
+  }
+  if (activeSetDisplayedText) {
+    activeSetDisplayedText(activeFullLine);
+  }
+  setIsLineTypingDone(true);
 }
 
 export const StoryText = (prop: StoryViewUIProps) => {
@@ -71,13 +88,13 @@ export const StoryText = (prop: StoryViewUIProps) => {
     const fullLine = (lines[prop.lineIndex] ?? "").normalize('NFC');
 
     if (isLogoLine) {
-      // โลโก้: โชว์เต็มทันที แล้วไล่ความสว่างขึ้น-ลงแบบนุ่มๆ (หายใจเข้า-ออก)
+      // โลโก้: ไม่ต้องพิมพ์ทีละตัว ถือว่า "พิมพ์จบ" ทันที กด Enter ครั้งเดียวเลื่อนได้เลย
       setDisplayedText(fullLine);
+      setIsLineTypingDone(true);
 
       const startTime = Date.now();
       const pulseTimer = setInterval(() => {
         const elapsed = (Date.now() - startTime) % PULSE_PERIOD_MS;
-        // sine wave: 0 -> 1 -> 0 ตลอดหนึ่งรอบ ให้จังหวะช้าที่ปลายทั้งสองข้าง
         const t = (Math.sin((elapsed / PULSE_PERIOD_MS) * Math.PI * 2 - Math.PI / 2) + 1) / 2;
         setLogoColor(lerpColor(PULSE_DIM, PULSE_BRIGHT, t));
       }, PULSE_TICK_MS);
@@ -86,7 +103,11 @@ export const StoryText = (prop: StoryViewUIProps) => {
       return;
     }
 
-    // เนื้อเรื่องปกติ: ค่อยๆ พิมพ์ทีละตัวอักษร
+    // เนื้อเรื่องปกติ: ค่อยๆ พิมพ์ทีละตัวอักษร + เก็บ ref ไว้ให้ completeCurrentLine() เรียกใช้ได้
+    activeFullLine = fullLine;
+    activeSetDisplayedText = setDisplayedText;
+    setIsLineTypingDone(false);
+
     let charIndex = 0;
     setDisplayedText("");
     const typeTimer = setInterval(() => {
@@ -94,9 +115,18 @@ export const StoryText = (prop: StoryViewUIProps) => {
       setDisplayedText(fullLine.slice(0, charIndex));
       if (charIndex >= fullLine.length) {
         clearInterval(typeTimer);
+        activeTimer = null;
+        setIsLineTypingDone(true);
       }
     }, TYPE_SPEED_MS);
-    onCleanup(() => clearInterval(typeTimer));
+    activeTimer = typeTimer;
+
+    onCleanup(() => {
+      if (activeTimer) {
+        clearInterval(activeTimer);
+        activeTimer = null;
+      }
+    });
   });
 
   const isLogoLine = () => prop.story === "start" && prop.lineIndex === lines.length - 1;
