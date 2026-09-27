@@ -168,12 +168,12 @@ describe("Shop", () => {
         test("ราคาที่คูณ 0.8 แล้วมีเศษควรปัดเศษทิ้ง (Math.floor)", () => {
             const shop = new Shop();
             const player = makePlayer();
-            const item = Itemfactory.CreatePOTION_ATK(); // ราคา 75 -> 60 พอดี ใช้ Smoke Bomb แทน
+            const item = Itemfactory.CreatePOTION_ATK(); // ราคา 90 -> 72
             const smokeBomb = Itemfactory.CreateSMOKE_BOMB(); // ราคา 100 -> 80 พอดี
             player.addItem(item);
             player.addItem(smokeBomb);
 
-            expect(shop.sell(item, player.getInventory())).toBe(60);
+            expect(shop.sell(item, player.getInventory())).toBe(72);
             expect(shop.sell(smokeBomb, player.getInventory())).toBe(80);
         });
     });

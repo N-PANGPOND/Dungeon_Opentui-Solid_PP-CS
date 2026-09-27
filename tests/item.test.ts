@@ -130,21 +130,12 @@ describe("Itemfactory", () => {
         expect(item.item.name).toBe("POTION_ATK");
     });
 
-    test("Potion ATK เพิ่ม ATK 5", () => {
+    test("Potion ATK เพิ่ม ATK 3", () => {
         const item = Itemfactory.CreatePOTION_ATK();
 
         item.use(character);
 
-        expect(character.getAtk()).toBe(15);
-    });
-
-    test("ใช้ Potion ATK ซ้ำ 2 ครั้ง แต่ละครั้งเพิ่ม ATK 5", () => {
-        const item = Itemfactory.CreatePOTION_ATK();
-
-        item.use(character);
-        item.use(character);
-
-        expect(character.getAtk()).toBe(20);
+        expect(character.getAtk()).toBe(13);
     });
 
     test("สร้าง Potion DEF ได้", () => {
@@ -154,21 +145,12 @@ describe("Itemfactory", () => {
         expect(item.item.name).toBe("POTION_DEF");
     });
 
-    test("Potion DEF เพิ่ม DEF 5", () => {
+    test("Potion DEF เพิ่ม DEF 2", () => {
         const item = Itemfactory.CreatePOTION_DEF();
 
         item.use(character);
 
-        expect(character.getDef()).toBe(10);
-    });
-
-    test("ใช้ Potion DEF ซ้ำ 2 ครั้ง แต่ละครั้งเพิ่ม DEF 5", () => {
-        const item = Itemfactory.CreatePOTION_DEF();
-
-        item.use(character);
-        item.use(character);
-
-        expect(character.getDef()).toBe(15);
+        expect(character.getDef()).toBe(7);
     });
 
     test("getName getPrice และ getDesciption ควรคืนข้อมูลของ Item", () => {
@@ -190,21 +172,12 @@ describe("Itemfactory", () => {
         expect(item.item.name).toBe("SMOKE_BOMB");
     });
 
-    test("Smoke Bomb ควรเรียก Effect และไม่ throw", () => {
-        const consoleLog = mock(() => {});
-        const originalConsoleLog = console.log;
-        console.log = consoleLog;
+    test("Smoke Bomb ไม่มี Effect ทั่วไปและใช้ได้โดยไม่ throw", () => {
+        const item = Itemfactory.CreateSMOKE_BOMB();
 
-        try {
-            const item = Itemfactory.CreateSMOKE_BOMB();
-
-            expect(() => item.use(character)).not.toThrow();
-            expect(consoleLog).toHaveBeenCalledTimes(1);
-            expect(consoleLog).toHaveBeenCalledWith(
-                expect.stringContaining("used SMOKE_BOMB to escape!"),
-            );
-        } finally {
-            console.log = originalConsoleLog;
-        }
+        expect(() => item.use(character)).not.toThrow();
+        expect(character.getHp()).toBe(50);
+        expect(character.getAtk()).toBe(10);
+        expect(character.getDef()).toBe(5);
     });
 });

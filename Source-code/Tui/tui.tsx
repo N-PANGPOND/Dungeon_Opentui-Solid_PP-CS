@@ -9,7 +9,7 @@ import path from "path";
 
 import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
-import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
+import { ConsoleIO, normalizeKeyName } from "../ConsoleIO/ConsoleIO";
 
 import type { logType, storyType } from "../Type-Enum/type";
 
@@ -27,7 +27,7 @@ import { GameOverScreen } from "./components/GameOverScreen";
 import { VictoryScreen } from "./components/VictoryScreen";
 import { EventSplashScreen } from "./components/EventSplashScreen";
 import { ShopView } from "./components/ShopView";
-import { getStoryLineCount, StoryText } from "./components/StoryText";
+import { getStoryLineCount, StoryText, isLineTypingDone, completeCurrentLine } from "./components/StoryText";
 import type { PlayerUIProps, InventoryUIProps, EnemyUIProps, EventScreenUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 import {
   getEventScreenProps,
@@ -152,7 +152,7 @@ const App = () => {
 
   // Keyboard handler — ส่ง input ไปให้ Game Logic แล้ว refresh UI
   useKeyboard((key) => {
-    const name = key.name.toLowerCase();
+    const name = normalizeKeyName(key.name.toLowerCase());
     
     // ESC / Q = ออกจากโปรแกรม (Q ถูก gameloop ตีความเป็น QUIT ซึ่งจะทำให้เกมหยุดแต่ UI ค้าง)
     if (name === "q") {
@@ -170,7 +170,12 @@ const App = () => {
         setStoryLineIndex(getStoryLineCount(story()!) - 1);
         return;
       }
-      if (name !== "space" && name !== "return" && name !== " " && name !== "s") {
+            if (name !== "space" && name !== "return" && name !== " " && name !== "s") {
+        return;
+      }
+      // กด Enter/Space ครั้งแรกขณะกำลังพิมพ์อยู่ → โชว์บรรทัดเต็มก่อน ยังไม่เลื่อน (ยกเว้นกด s ซึ่งข้ามอยู่แล้ว)
+      if (name !== "s" && !isLineTypingDone()) {
+        completeCurrentLine();
         return;
       }
       if (storyLineIndex() >= getStoryLineCount(story()!) - 1 || (name === "s" && story() !== 'start')) {

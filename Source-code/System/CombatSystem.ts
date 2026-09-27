@@ -4,13 +4,14 @@ import type { MonsterType,stats, Weights,position,logType } from "../Type-Enum/t
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import { DungeonMap } from "../DungeonMap/DungeonMap";
 
-type BattleOver = {"Over":boolean,"monster":Monster,"Escaped"?:boolean}
+type BattleOver = {"Over":boolean,"monster":Monster,"Escaped"?:boolean,"Escaper"?: "PLAYER" | "MONSTER" | null};
 
 export class CombatSystem {
     private monster: Monster;
     private isPlayerAttacker: boolean;
     private escaped: boolean = false;
     private hasFled: boolean = false;
+    private escaper: "PLAYER" | "MONSTER" | null = null;
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
         let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
@@ -84,7 +85,7 @@ export class CombatSystem {
 
     isBattleOver(): BattleOver {
         const Over : boolean =  this.escaped || this.player.isDead() || this.monster.isDead();
-        return {"Over":Over,"monster":this.monster,"Escaped":this.escaped};
+        return {"Over":Over,"monster":this.monster,"Escaped":this.escaped,"Escaper":this.escaper};
     }
 
     getMonsterStats(): stats {
@@ -122,9 +123,27 @@ export class CombatSystem {
 
     if (isBossEscape) {
         this.ShowMessage({ type: "System", text: "You can't escape from the BOSS!" });
-    } else {
-        this.ShowMessage({ type: "System", text: `${defensive === this.player ? "Player" : "Monster"} failed to escape!` });
+    } 
+        const runnerName = defensive === this.player ? "Player" : "Monster";
+
+        if (random < escapeChance) {
+            this.escaped = true;
+            this.escaper = defensive === this.player ? "PLAYER" : "MONSTER";
+            this.ShowMessage({
+                type: "System",
+                text: `${runnerName} escaped!`,
+            });
+
+            return true;
         }
+
+        this.ShowMessage({
+            type: "System",
+            text: `${runnerName} failed to escape!`,
+        });
+
+
+        return false;
     }
 
         const multipliers: Partial<Record<AttackingType, Partial<Record<DefensiveType, number>>>> = {
