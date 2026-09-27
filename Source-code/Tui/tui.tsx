@@ -63,7 +63,7 @@ const App = () => {
   const renderer = useRenderer();
   
   // ─── Game Setup ─────────────────────────────────────────────────────────────
-  const [logs, setLogs] = createSignal<logType[]>([]);
+  const [logs, setLogs] = createSignal<logType[]>([{type : "System",text: "TIP : SLAY SLIME AND EXPLORE TO UP YOUR STATS. | GOODLUCK."},{type : "System",text: "ทิป : จงสยบเหล่าสไลม์ และออกท่องห้วงเหวลึกไร้แสง เพื่อปลุกพลังในกายเจ้า"},{type : "System",text: "ขอให้ทวยเทพคุ้มครอง"}]);
   
   const consoleIO = new ConsoleIO(
     (entry: logType) => {setLogs((prev) => [...prev, entry])}, // โยนฟังชั่นไว้ set ให้ console io ไปเรียกใช้งาน

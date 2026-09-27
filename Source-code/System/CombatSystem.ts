@@ -13,7 +13,7 @@ export class CombatSystem {
     private hasFled: boolean = false;
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
-        let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
+        let distToExit: number = Math.abs((DungeonMap.getExitPos().x - this.player.getPosition().x) * 2) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
         this.monster = MonsterFactory.createMonster(distToExit);
         this.isPlayerAttacker = true;
         
