@@ -145,7 +145,7 @@ export class GameState {
       { name: "Treasure", weight: 0.08, action: () => this.eventTreasure() },
       { name: "Potion", weight: 0.04, action: () => this.eventPotion() },
       { name: "shop", weight: 0.09, action: () => this.eventShop() },
-      { name: "Nothing", weight: 0.52, action: () => this.eventNothing() },
+      { name: "Nothing", weight: 1000.52, action: () => this.eventNothing() },
     ];
 
     const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0);
@@ -310,7 +310,7 @@ export class GameState {
 public checkEnding(): EndingType {
   const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
   if (!reachedExit) return EndingType.NONE;
-  if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
+  // if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
   return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
 }
 

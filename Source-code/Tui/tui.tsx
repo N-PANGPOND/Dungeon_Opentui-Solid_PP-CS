@@ -97,6 +97,7 @@ const App = () => {
   const [eventData, setEventData] = createSignal<EventScreenUIProps | null>(null);
   const [eventSecondsLeft, setEventSecondsLeft] = createSignal<number>(2);
 
+  let countShowGetwife = 0
   // ติดตาม timer เพื่อ cancel ได้ถ้าจำเป็น
   let eventTimerHandle: ReturnType<typeof setTimeout> | null = null;
   let eventTickHandle: ReturnType<typeof setInterval> | null = null;
@@ -114,6 +115,10 @@ const App = () => {
       
       setAttackTurn(isPlayerAttackTurn(gameState));
       setRescuedWife(gameState.didRescueWife());
+      if (rescuedWife() && countShowGetwife < 1) {
+        countShowGetwife += 1
+        setStory("getWife")
+      }
     });
   }
 
@@ -185,7 +190,6 @@ const App = () => {
      }
       return;
     }
-
     // จัดการ input ในหน้า SHOP
     if (s === "SHOP") {
       if (name === "l" || name === "escape") {
@@ -292,13 +296,11 @@ const App = () => {
       }
     }
   });
-
   const lastLog = () => {
     const all = logs();
     const last = all[all.length - 1];
     return last ? formatLogText(last.text) : undefined;
   };
-
   return (
     // ─── Outer centering wrapper ──────────────────────────────────────
     <box

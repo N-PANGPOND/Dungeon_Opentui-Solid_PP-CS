@@ -7,7 +7,6 @@ const storyJsonRaw = await Bun.file(eventDataPath).json() as {
     "story" : {
         "start" : string[],
         "getWife" : string[],
-        "happyEnd" : string[],
         "badEndSmokeBomb" : string[],
         "useBombWithBoss" : string[]
     }
@@ -15,7 +14,6 @@ const storyJsonRaw = await Bun.file(eventDataPath).json() as {
 
 export const getStoryLineCount = (story: StoryViewUIProps["story"]): number =>
   storyJsonRaw.story[story].length;
-
 
 export const StoryText = (prop:StoryViewUIProps) => {
   const lines = storyJsonRaw.story[prop.story];
