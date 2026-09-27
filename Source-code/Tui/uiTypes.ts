@@ -72,7 +72,7 @@ export interface ShopUIProps {
 }
 
 // mirrors Type-Enum/type.ts gameScreen exactly
-export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "SHOP" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "PAUSE";
+export type UIScreen = "DUNGEON" | "EXPLORE" | "COMBAT" | "EVENT" | "SHOP" | "INVENTORY" | "VICTORY" | "GAMEOVER" | "BADSMOKEBOMB";
 
 // ─── Event Splash Screen Props ─────────────────────────────────────────────────
 

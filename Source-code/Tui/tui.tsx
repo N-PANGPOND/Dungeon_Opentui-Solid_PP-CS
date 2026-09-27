@@ -37,6 +37,7 @@ import {
   resolveScreen,
   getSelectedSlot,
 } from "./gameBridge";
+import { GameOverSmokeBoss } from "./components/GameOverSmokeBoss";
 
 // ─── Sound Setup ────────────────────────────────────────────────────────────
 const soundDir = path.join(import.meta.dir, "../assets/sound");
@@ -63,8 +64,7 @@ const App = () => {
   const renderer = useRenderer();
   
   // ─── Game Setup ─────────────────────────────────────────────────────────────
-  const [logs, setLogs] = createSignal<logType[]>([]);
-  
+  const [logs, setLogs] = createSignal<logType[]>([{type : "System",text: "TIP : SLAY SLIME AND EXPLORE TO UP YOUR STATS. | GOODLUCK."},{type : "System",text: "ทิป : จงสยบเหล่าสไลม์ และออกท่องห้วงเหวลึกไร้แสง เพื่อปลุกพลังในกายเจ้า"},{type : "System",text: "ขอให้ทวยเทพคุ้มครอง"}]);  
   const consoleIO = new ConsoleIO(
     (entry: logType) => {setLogs((prev) => [...prev, entry])}, // โยนฟังชั่นไว้ set ให้ console io ไปเรียกใช้งาน
     (entry: InventoryUIProps) => {setInventory(entry)},
@@ -98,6 +98,7 @@ const App = () => {
   const [eventSecondsLeft, setEventSecondsLeft] = createSignal<number>(2);
 
   let countShowGetwife = 0
+  let countShowSmokebombBoss = 0
   // ติดตาม timer เพื่อ cancel ได้ถ้าจำเป็น
   let eventTimerHandle: ReturnType<typeof setTimeout> | null = null;
   let eventTickHandle: ReturnType<typeof setInterval> | null = null;
@@ -118,6 +119,9 @@ const App = () => {
       if (rescuedWife() && countShowGetwife < 1) {
         countShowGetwife += 1
         setStory("getWife")
+      }else if(gameState.getCombatSystem().getSmokeWithBoss() && countShowSmokebombBoss<1){
+        countShowSmokebombBoss += 1
+        countShowGetwife < 1 ? setStory("useBombWithBoss") : setStory("badEndSmokeBomb")
       }
     });
   }
@@ -179,6 +183,9 @@ const App = () => {
         return;
       }
       if (storyLineIndex() >= getStoryLineCount(story()!) - 1 || (name === "s" && story() !== 'start')) {
+        if (story() === 'badEndSmokeBomb'||story() === 'useBombWithBoss') {
+          setScreen("BADSMOKEBOMB")
+        }
         setStory(null);
         setStoryLineIndex(0);
       }else{
@@ -321,6 +328,9 @@ const App = () => {
           ต้องใช้ Switch/Match — component ของ Solid รันครั้งเดียว
           `if (screen() === ...) return` จะเช็กแค่ตอนสร้างและไม่อัปเดตตามภายหลัง */}
       <Switch>
+        <Match when={screen() === "BADSMOKEBOMB"}>
+          <GameOverSmokeBoss player={player()!} />
+        </Match>
         <Match when={screen() === "GAMEOVER"}>
           <GameOverScreen player={player()!} />
         </Match>
