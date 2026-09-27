@@ -166,14 +166,14 @@ const App = () => {
         return
       }
       // กดแล้วยังไม่ออก
-      if(name === "s"){
+      if(name === "s" &&story() === 'start'){
         setStoryLineIndex(getStoryLineCount(story()!) - 1);
         return;
       }
-      if (name !== "space" && name !== "return" && name !== " ") {
+      if (name !== "space" && name !== "return" && name !== " " && name !== "s") {
         return;
       }
-      if (storyLineIndex() >= getStoryLineCount(story()!) - 1) {
+      if (storyLineIndex() >= getStoryLineCount(story()!) - 1 || (name === "s" && story() !== 'start')) {
         setStory(null);
         setStoryLineIndex(0);
       }else{

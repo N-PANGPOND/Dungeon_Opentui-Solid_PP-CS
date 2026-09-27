@@ -69,7 +69,7 @@ export const StoryText = (prop:StoryViewUIProps) => {
               <text>{(lines[prop.lineIndex] ?? "").normalize('NFC')}</text>
               <text fg={theme.colors.borderPanel}></text>
               <text fg={theme.colors.borderPanel}>{dash}</text>
-              <text fg={theme.colors.borderPanel}>[Enter / Space] Continue   [S] Skip</text>
+              <text fg={theme.colors.borderPanel}>[Enter / Space] Continue   |  [S] Skip</text>
             </box>
         </box>
     )
