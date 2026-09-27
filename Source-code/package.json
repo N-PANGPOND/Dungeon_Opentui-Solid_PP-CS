@@ -6,22 +6,27 @@
   "scripts": {
     "dev": "bun run Tui/tui.tsx",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "bun test ../tests",
-    "test:character": "bun test ../tests/character.test.ts",
-    "test:combat": "bun test ../tests/combatSystem.test.ts",
-    "test:console": "bun test ../tests/consoleio.test.ts",
-    "test:dungeon": "bun test ../tests/dungeonMap.test.ts",
-    "test:event": "bun test ../tests/event.test.ts",
-    "test:gameloop": "bun test ../tests/gameloop.test.ts",
-    "test:inventory": "bun test ../tests/inventory.test.ts",
-    "test:item": "bun test ../tests/item.test.ts",
-    "test:monster": "bun test ../tests/monster.test.ts",
-    "test:pure": "bun test ../tests/pure-function.test.ts",
-    "test:shop": "bun test ../tests/shop.test.ts",
-    "test:state": "bun test ../tests/state.test.ts"
+    "test": "bun test ./Tests",
+    "test:character": "bun test ./Tests/character.test.ts",
+    "test:combat": "bun test ./Tests/combatSystem.test.ts",
+    "test:console": "bun test ./Tests/consoleio.test.ts",
+    "test:dungeon": "bun test ./Tests/dungeonMap.test.ts",
+    "test:event": "bun test ./Tests/event.test.ts",
+    "test:gameloop": "bun test ./Tests/gameloop.test.ts",
+    "test:inventory": "bun test ./Tests/inventory.test.ts",
+    "test:item": "bun test ./Tests/item.test.ts",
+    "test:monster": "bun test ./Tests/monster.test.ts",
+    "test:pure": "bun test ./Tests/pure-function.test.ts",
+    "test:shop": "bun test ./Tests/shop.test.ts",
+    "test:state": "bun test ./Tests/state.test.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@babel/core": "^8.0.6",
+    "@babel/preset-typescript": "^8.0.1",
+    "@types/bun": "latest",
+    "babel-plugin-module-resolver": "^5.0.3",
+    "babel-preset-solid": "^1.9.15",
+    "reselect": "^5.3.0"
   },
   "peerDependencies": {
     "typescript": "^7"
