@@ -18,7 +18,8 @@
     "test:monster": "bun test ../tests/monster.test.ts",
     "test:pure": "bun test ../tests/pure-function.test.ts",
     "test:shop": "bun test ../tests/shop.test.ts",
-    "test:state": "bun test ../tests/state.test.ts"
+    "test:state": "bun test ../tests/state.test.ts",
+    "test:map": "bun test ../tests/mapSystem.test.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

@@ -63,7 +63,7 @@ describe("Event", () => {
     });
 
     describe("Treasure()", () => {
-        test("ควรเพิ่ม coin ให้ Player ตามค่าที่สุ่มได้ (1-100)", () => {
+        test("ควรเพิ่ม coin ให้ Player ตามค่าที่สุ่มได้ (1-150)", () => {
             const event = new Event();
             const player = makePlayer(100, 0);
             const restore = mockRandom(0);
@@ -77,15 +77,15 @@ describe("Event", () => {
             }
         });
 
-        test("random ใกล้ 1 ควรได้ coin สูงสุด 100", () => {
+        test("random ใกล้ 1 ควรได้ coin สูงสุด 150", () => {
             const event = new Event();
             const player = makePlayer(100, 0);
             const restore = mockRandom(0.999);
 
             try {
                 const coin = event.Treasure(player);
-                expect(coin).toBe(100);
-                expect(player.getCoin()).toBe(100);
+                expect(coin).toBe(150);
+                expect(player.getCoin()).toBe(150);
             } finally {
                 restore();
             }

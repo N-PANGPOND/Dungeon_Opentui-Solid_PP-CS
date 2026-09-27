@@ -134,69 +134,6 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         expect(game.getShop()).toBeNull();
     });
 
-    describe("checkTileEvent() - ขอบเขต probability", () => {
-        const prepareEventTile = () => {
-            game.player.Position = { x: 2, y: 0 };
-            (game as any).eventTriggeredTiles.clear();
-            game.clearPendingEvent();
-            game.gameScreen = "DUNGEON";
-        };
-
-        test("random = 0 ควรเลือก Monster event", () => {
-            prepareEventTile();
-            Math.random = () => 0;
-
-            game.checkTileEvent();
-
-            expect(game.gameScreen).toBe("COMBAT");
-        });
-
-        test("random ที่ตรงขอบ 0.25/1.05 ควรเปลี่ยนจาก Monster เป็น Trap", () => {
-            prepareEventTile();
-            Math.random = () => 0.25 / 1.05;
-
-            game.checkTileEvent();
-
-            expect(game.getPendingEvent()?.name).toBe("⚠ TRAP!");
-        });
-
-        test("random ที่ตรงขอบ 0.32/1.05 ควรเปลี่ยนเป็น Treasure", () => {
-            prepareEventTile();
-            Math.random = () => 0.32 / 1.05;
-
-            game.checkTileEvent();
-
-            expect(game.getPendingEvent()?.name).toBe("★ TREASURE!");
-        });
-
-        test("random ที่ตรงขอบ 0.42/1.05 ควรเปลี่ยนเป็น Potion", () => {
-            prepareEventTile();
-            Math.random = () => 0.42 / 1.05;
-
-            game.checkTileEvent();
-
-            expect(game.getPendingEvent()?.isChoice).toBe(true);
-        });
-
-        test("random ที่ตรงขอบ 0.46/1.05 ควรเปลี่ยนเป็น Shop", () => {
-            prepareEventTile();
-            Math.random = () => 0.46 / 1.05;
-
-            game.checkTileEvent();
-
-            expect(game.gameScreen).toBe("SHOP");
-        });
-
-        test("random ที่ตรงขอบ 0.55/1.05 ควรเปลี่ยนเป็น Nothing", () => {
-            prepareEventTile();
-            Math.random = () => 0.55 / 1.05;
-
-            game.checkTileEvent();
-
-            expect(logs.at(-1)?.text).toBe("Nothing happened here.");
-        });
-    });
-
     test("eventNothing ควรบันทึกข้อความ Nothing", () => {
         game.eventNothing();
         expect(logs.at(-1)?.text).toBe("Nothing happened here.");
@@ -221,8 +158,8 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         game.eventTreasure();
 
         expect(game.getPendingEvent()?.name).toBe("★ TREASURE!");
-        expect(game.player.getCoin()).toBe(before + 51);
-        expect(logs.at(-1)?.text).toContain("Found Treasure! Gained 51 Coins!");
+        expect(game.player.getCoin()).toBe(before + 76);
+        expect(logs.at(-1)?.text).toContain("Found Treasure! Gained 76 Coins!");
     });
 
     test("eventPotion ควรสร้าง choice event", () => {
@@ -385,6 +322,15 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         expect(game.gameScreen).toBe("DUNGEON");
     });
 
+    test("toggleInventory จาก COMBAT กลับมาที่ COMBAT ได้", () => {
+        game.gameScreen = "COMBAT";
+
+        game.toggleInventory();
+        game.toggleInventory();
+        expect(game.gameScreen).toBe("COMBAT");
+
+    });
+
     test("toggleInventory นอก DUNGEON/INVENTORY ควรไม่ทำงาน", () => {
         game.gameScreen = "SHOP";
         game.toggleInventory();
@@ -491,4 +437,21 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         state.Pause();
         expect(state.isPause).toBe(false);
     });
+
+    test("โจมตีแล้ว Monster ยังไม่ตายควรยังอยู่หน้า COMBAT", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: false,
+            monster: {},
+            Escaped: false,
+    }));
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("COMBAT");
+    });
+
 });

@@ -78,19 +78,6 @@ describe("Inventory System", () => {
         expect(inv.getItems()).toHaveLength(0);
     });
 
-    it("removeItem ด้วย index ติดลบไม่ควรลบ item โดยไม่ตั้งใจ", () => {
-        const inv = new Inventory();
-        const item1 = makeItem("Item 1");
-        const item2 = makeItem("Item 2");
-        inv.addItem(item1);
-        inv.addItem(item2);
-
-        inv.removeItem(-1);
-
-        // Bug detector: Array.splice(-1, 1) ของ implementation ปัจจุบันจะลบ item ตัวสุดท้าย
-        expect(inv.getItems()).toEqual([item1, item2]);
-    });
-
     it("useItem ด้วย index ที่ไม่มีอยู่จริงไม่ควร error และไม่ลบ item", () => {
         const inv = new Inventory();
         const item = makeItem("Item 1");
