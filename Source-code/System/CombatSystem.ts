@@ -105,15 +105,25 @@ export class CombatSystem {
     }
 
     processTurn(Attacker:Character,defensive:Character,AttackerAct:AttackingType,defensiveAct:DefensiveType):boolean | void {
-         if (defensiveAct === DefensiveType.Run) {
+    if (defensiveAct === DefensiveType.Run) {
 
-        const escapeChance =
-            AttackerAct === AttackingType.Run
-                ? 0.5
-                : 0.25;
+        const isBossEscape = defensive === this.player && this.monster.getMonsterType() === "BOSS";
 
+        const escapeChance = isBossEscape
+        ? 0
+        : (AttackerAct === AttackingType.Run ? 0.5 : 0.25);
+    
         const random = Math.random();
+    
+    if (random < escapeChance) {
+        this.escaped = true;
+        this.ShowMessage({ type: "System", text: `${defensive === this.player ? "Player" : "Monster"} escaped!` });
+        return true;
+    }
 
+    if (isBossEscape) {
+        this.ShowMessage({ type: "System", text: "You can't escape from the BOSS!" });
+    } 
         const runnerName = defensive === this.player ? "Player" : "Monster";
 
         if (random < escapeChance) {
