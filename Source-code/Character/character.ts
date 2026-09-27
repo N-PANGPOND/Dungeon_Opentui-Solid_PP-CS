@@ -76,9 +76,9 @@ export class Character {
 
 export class MonsterFactory {
     public static createMonster(distToExit: number): Monster {
-        if (distToExit < 4) {
-            return new Monster({ maxHp: 350, hp: 350, atk: 50, def: 55, luc: 5, agi: 5, coin: 9999 }, 'BOSS');
-        } else if (distToExit < 15) { 
+        if (distToExit < 3) {
+            return new Monster({ maxHp: 350, hp: 350, atk: 65, def: 60, luc: 5, agi: 5, coin: 9999 }, 'BOSS');
+        } else if (distToExit < 10) {  
             return new Monster({ maxHp: 200, hp: 200, atk: 30, def: 20, luc: 5, agi: 5, coin: 110 }, 'ELITE MONS');
         } else {
             return new Monster({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 35 }, 'NORMAL MONS');
@@ -120,6 +120,11 @@ export class Monster extends Character {
         let randomValue = Math.random() * Sumweights;
         return getRandomAction(this.MonsterType, randomValue, weights) as DefensiveType;
     }
+
+    public getMonsterType(): MonsterType { 
+        return this.MonsterType;
+    }
+
 }
 
 export class Player extends Character {

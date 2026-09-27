@@ -12,10 +12,11 @@ export class CombatSystem {
     private escaped: boolean = false;
     private hasFled: boolean = false;
     private escaper: "PLAYER" | "MONSTER" | null = null;
+    private smokeWithBoss: boolean = false;
+
     constructor(private player: Player,DungeonMap:DungeonMap, private ShowMessage: (log: logType) => void = () => {}) { 
         this.player = player;
-        let distToExit: number = Math.abs(DungeonMap.getExitPos().x - this.player.getPosition().x) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);
-        this.monster = MonsterFactory.createMonster(distToExit);
+        let distToExit: number = Math.abs((DungeonMap.getExitPos().x - this.player.getPosition().x) * 2) + Math.abs(DungeonMap.getExitPos().y - this.player.getPosition().y);        this.monster = MonsterFactory.createMonster(distToExit);
         this.isPlayerAttacker = true;
         
     }
@@ -35,8 +36,8 @@ export class CombatSystem {
                 }
                 const monsterAction : DefensiveType = this.monster.decideDefensiveAction()
                 this.ShowMessage({ type: "System", text: `Monster เลือก action: ${monsterAction}` });
-              const escaped = this.processTurn(this.player, this.monster, playerAction as AttackingType, monsterAction );
-              if (escaped) return;
+                const escaped = this.processTurn(this.player, this.monster, playerAction as AttackingType, monsterAction );
+                if (escaped) return;
             } else {
                 if (!Object.values(DefensiveType).includes(playerAction as DefensiveType)) {
                     throw new Error("Player is Defensive But Action Is Not DefensiveType");
@@ -58,20 +59,23 @@ export class CombatSystem {
             return false;
         }
         if (item.getName() === "SMOKE_BOMB") {
-        this.player.getInventory().removeItem(slotIndex);   // ใช้ทิ้งเลย ไม่เรียก item.use() ทั่วไป
-        const success = Math.random() < 0.8;
+            this.player.getInventory().removeItem(slotIndex);   // ใช้ทิ้งเลย ไม่เรียก item.use() ทั่วไป
+            if (this.monster.getMonsterType() === "BOSS") {
+                this.smokeWithBoss = true
+                return true
+            }
+            const success = Math.random() < 0.8;
+            if (success) {
+                this.escaped = true;
+                this.fleeWithSmokeBomb();   // ใช้ field ที่มีอยู่แล้ว (hasFled) เพื่อแยกแยะว่าหนีด้วยไอเทม ไม่ใช่หนีปกติ
+                this.ShowMessage({ type: "System", text: "💨 Smoke Bomb! You escaped from battle!" });
+            } else {
+                this.ShowMessage({ type: "System", text: "💨 The smoke wasn't thick enough... you're still in battle!" });
+            }
 
-        if (success) {
-            this.escaped = true;
-            this.fleeWithSmokeBomb();   // ใช้ field ที่มีอยู่แล้ว (hasFled) เพื่อแยกแยะว่าหนีด้วยไอเทม ไม่ใช่หนีปกติ
-            this.ShowMessage({ type: "System", text: "💨 Smoke Bomb! You escaped from battle!" });
-        } else {
-            this.ShowMessage({ type: "System", text: "💨 The smoke wasn't thick enough... you're still in battle!" });
+            this.isPlayerAttacker = true;
+            return true;   // ไอเทมถูกใช้ไปแล้ว (แม้หนีไม่สำเร็จก็ถือว่าใช้แล้ว)
         }
-
-        this.isPlayerAttacker = true;
-        return true;   // ไอเทมถูกใช้ไปแล้ว (แม้หนีไม่สำเร็จก็ถือว่าใช้แล้ว)
-    }
 
         this.player.getInventory().useItem(slotIndex, this.player);
         this.ShowMessage({ type: "System", text: `Player ใช้ ${item.getName()}` });
@@ -86,6 +90,10 @@ export class CombatSystem {
     isBattleOver(): BattleOver {
         const Over : boolean =  this.escaped || this.player.isDead() || this.monster.isDead();
         return {"Over":Over,"monster":this.monster,"Escaped":this.escaped,"Escaper":this.escaper};
+    }
+ 
+    getSmokeWithBoss():boolean{
+        return this.smokeWithBoss
     }
 
     getMonsterStats(): stats {
@@ -105,54 +113,53 @@ export class CombatSystem {
     }
 
     processTurn(Attacker:Character,defensive:Character,AttackerAct:AttackingType,defensiveAct:DefensiveType):boolean | void {
-         if (defensiveAct === DefensiveType.Run) {
+    let escape : boolean = false
+        if (defensiveAct === DefensiveType.Run) {
 
-        const escapeChance =
-            AttackerAct === AttackingType.Run
-                ? 0.5
-                : 0.25;
+            const isBossEscape = defensive === this.player && this.monster.getMonsterType() === "BOSS";
 
-        const random = Math.random();
+            const escapeChance = isBossEscape
+            ? 0
+            : (AttackerAct === AttackingType.Run ? 0.5 : 0.25);
+        
+            const random = Math.random();
 
-        const runnerName = defensive === this.player ? "Player" : "Monster";
-
-        if (random < escapeChance) {
-            this.escaped = true;
-            this.escaper = defensive === this.player ? "PLAYER" : "MONSTER";
-            this.ShowMessage({
+            if (isBossEscape) {
+                this.ShowMessage({ type: "System", text: "You can't escape from the BOSS!" });
+            } 
+            const runnerName = defensive === this.player ? "Player" : "Monster";    
+            if (random < escapeChance) {
+                this.escaped = true;
+                this.escaper = defensive === this.player ? "PLAYER" : "MONSTER";
+                this.ShowMessage({
+                    type: "System",
+                    text: `${runnerName} escaped!`,
+                }); 
+                escape = true;
+            }else{   
+                this.ShowMessage({
                 type: "System",
-                text: `${runnerName} escaped!`,
-            });
-
-            return true;
+                text: `${runnerName} failed to escape!`,
+                }); 
+                escape = false
+            };
         }
-
-        this.ShowMessage({
-            type: "System",
-            text: `${runnerName} failed to escape!`,
-        });
-
-
-        return false;
-    }
 
         const multipliers: Partial<Record<AttackingType, Partial<Record<DefensiveType, number>>>> = {
             [AttackingType.Attack]: {
                 [DefensiveType.Defend]: 0.5,
                 [DefensiveType.Counter]: 1.5,
-                [DefensiveType.Run]: 0.25,
+                [DefensiveType.Run]: 2,
             },
             [AttackingType.Strike]: {
                 [DefensiveType.Defend]: 2.0,
                 [DefensiveType.Counter]: 2.0,
-                [DefensiveType.Run]: 0.25,
+                [DefensiveType.Run]: 2.5,
             },
         };
         const multiplier = multipliers[AttackerAct]?.[defensiveAct] ?? 0;
 
-        if (multiplier === 0) {
-            return;
-        }
+        if (multiplier === 0) {return;}
 
         const isCounter = defensiveAct === DefensiveType.Counter && AttackerAct === AttackingType.Strike;
         const damageTarget = isCounter ? Attacker : defensive;
@@ -168,6 +175,7 @@ export class CombatSystem {
             type: "System",
             text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
         });
+        return escape
     }
 
     // test
