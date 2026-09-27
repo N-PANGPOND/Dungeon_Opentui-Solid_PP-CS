@@ -17,6 +17,22 @@ export type GameInputIntent =
     | { type: "USE_ITEM" }
     | { type: "DISCARD_ITEM" }; 
     
+const THAI_KEDMANEE_TO_QWERTY: Record<string, string> = {
+  "ๅ": "1", "/": "2", "-": "3", "ภ": "4", "ถ": "5", "ุ": "6", "ึ": "7", "ค": "8",
+  "ๆ": "q", "ไ": "w", "ำ": "e", "พ": "r", "ะ": "t", "ั": "y", "ี": "u", "ร": "i", "น": "o", "ย": "p",
+  "ฟ": "a", "ห": "s", "ก": "d", "ด": "f", "เ": "g", "้": "h", "่": "j", "า": "k", "ส": "l",
+  "ผ": "z", "ป": "x", "แ": "c", "อ": "v", "ิ": "b", "ื": "n", "ท": "m",
+};
+
+const NUMPAD_TO_DIGIT: Record<string, string> = {
+  kp0: "0", kp1: "1", kp2: "2", kp3: "3", kp4: "4",
+  kp5: "5", kp6: "6", kp7: "7", kp8: "8", kp9: "9",
+};
+
+export function normalizeKeyName(name: string): string {
+  if (name in NUMPAD_TO_DIGIT) return NUMPAD_TO_DIGIT[name]!;
+  return THAI_KEDMANEE_TO_QWERTY[name] ?? name;
+}
 
 export function parseKeyIntent(key: string, screen: gameScreen): GameInputIntent {
     const normalizedKey = key.toLowerCase().replace(/^arrow[-_]?/, "");
