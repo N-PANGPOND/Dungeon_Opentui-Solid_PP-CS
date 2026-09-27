@@ -293,7 +293,11 @@ export class GameState {
         this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
       } else {
         if (battleResult.Escaped) {
-          this.ShowMessage({ type: "System", text: "You Escaped From Battle!" });
+          if (battleResult.Escaper === "PLAYER") {
+            this.ShowMessage({ type: "System", text: "You Escaped From Battle!" });
+          } else if (battleResult.Escaper === "MONSTER") {
+            this.ShowMessage({ type: "System", text: "Monster Escaped From Battle!" });
+          }
         } else {
           this.ShowMessage({ type: "System", text: "You Defeated The Monster!" });
           this.player.adjustCoin(battleResult.monster.getCoin());
