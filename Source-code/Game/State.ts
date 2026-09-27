@@ -145,7 +145,7 @@ export class GameState {
       { name: "Treasure", weight: 0.08, action: () => this.eventTreasure() },
       { name: "Potion", weight: 0.04, action: () => this.eventPotion() },
       { name: "shop", weight: 0.09, action: () => this.eventShop() },
-      { name: "Nothing", weight: 0.52, action: () => this.eventNothing() },
+      { name: "Nothing", weight: 1000.52, action: () => this.eventNothing() },
     ];
 
     const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0);
@@ -310,7 +310,7 @@ export class GameState {
 public checkEnding(): EndingType {
   const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
   if (!reachedExit) return EndingType.NONE;
-  if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
+  // if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
   return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
 }
 
@@ -342,11 +342,22 @@ public isVictory(): boolean {
     if (this.gameScreen !== "INVENTORY") return;  
     if (this.selectedSlot === null) return;
     const slotIndex = this.selectedSlot;
+
     if (this.inventoryReturnScreen === "COMBAT") {
       if (!this.combatSystem.usePlayerItem(slotIndex)) return;
+
+      // ไอเทมอาจทำให้การต่อสู้จบไปแล้ว (เช่น Smoke Bomb หนีสำเร็จ)
+      // ต้องเช็คตรงนี้ แทนที่จะรอให้ toggleInventory() พากลับไปหน้า COMBAT แบบเดิมเสมอ
+      if (this.combatSystem.isBattleOver().Over) {
+        this.inventoryReturnScreen = "DUNGEON";
+        this.gameScreen = "DUNGEON";
+        this.selectedSlot = null;
+        return;
+      }
     } else {
       this.player.getInventory().useItem(slotIndex, this.player);
     }
+
     this.selectedSlot = null;
   }
   public discardSelectedItem(): void {

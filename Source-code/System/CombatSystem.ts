@@ -56,6 +56,21 @@ export class CombatSystem {
             this.ShowMessage({ type: "System", text: "ไม่มีไอเท็มให้ใช้" });
             return false;
         }
+        if (item.getName() === "SMOKE_BOMB") {
+        this.player.getInventory().removeItem(slotIndex);   // ใช้ทิ้งเลย ไม่เรียก item.use() ทั่วไป
+        const success = Math.random() < 0.8;
+
+        if (success) {
+            this.escaped = true;
+            this.fleeWithSmokeBomb();   // ใช้ field ที่มีอยู่แล้ว (hasFled) เพื่อแยกแยะว่าหนีด้วยไอเทม ไม่ใช่หนีปกติ
+            this.ShowMessage({ type: "System", text: "💨 Smoke Bomb! You escaped from battle!" });
+        } else {
+            this.ShowMessage({ type: "System", text: "💨 The smoke wasn't thick enough... you're still in battle!" });
+        }
+
+        this.isPlayerAttacker = true;
+        return true;   // ไอเทมถูกใช้ไปแล้ว (แม้หนีไม่สำเร็จก็ถือว่าใช้แล้ว)
+    }
 
         this.player.getInventory().useItem(slotIndex, this.player);
         this.ShowMessage({ type: "System", text: `Player ใช้ ${item.getName()}` });
