@@ -360,6 +360,27 @@ describe("CombatSystem", () => {
 
             expect(monster.isDead()).toBe(true);
         });
+        test("กด Run แล้วควรหนีออกจากการต่อสู้ได้เมื่อสุ่มสำเร็จ", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const monster = (combat as any).monster;
+
+            monster.decideDefensiveAction = mock(() => DefensiveType.Run);
+
+            const restore = mockRandom(0.49);
+
+            try {
+                combat.startbattle(AttackingType.Run);
+
+                expect(combat.isBattleOver()).toEqual(
+                    expect.objectContaining({
+                    Over: true,
+                    Escaped: true,
+                }),
+        );
+            } finally {
+                restore();
+            }
+        });
     });
 
     describe("Smoke Bomb", () => {
