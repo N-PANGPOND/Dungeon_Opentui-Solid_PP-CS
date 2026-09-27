@@ -9,7 +9,7 @@ import path from "path";
 
 import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
-import { ConsoleIO } from "../ConsoleIO/ConsoleIO";
+import { ConsoleIO, normalizeKeyName } from "../ConsoleIO/ConsoleIO";
 
 import type { logType, storyType } from "../Type-Enum/type";
 
@@ -152,7 +152,7 @@ const App = () => {
 
   // Keyboard handler — ส่ง input ไปให้ Game Logic แล้ว refresh UI
   useKeyboard((key) => {
-    const name = key.name.toLowerCase();
+    const name = normalizeKeyName(key.name.toLowerCase());
     
     // ESC / Q = ออกจากโปรแกรม (Q ถูก gameloop ตีความเป็น QUIT ซึ่งจะทำให้เกมหยุดแต่ UI ค้าง)
     if (name === "q") {
@@ -166,14 +166,14 @@ const App = () => {
         return
       }
       // กดแล้วยังไม่ออก
-      if(name === "s"){
+      if(name === "s" &&story() === 'start'){
         setStoryLineIndex(getStoryLineCount(story()!) - 1);
         return;
       }
-      if (name !== "space" && name !== "return" && name !== " ") {
+      if (name !== "space" && name !== "return" && name !== " " && name !== "s") {
         return;
       }
-      if (storyLineIndex() >= getStoryLineCount(story()!) - 1) {
+      if (storyLineIndex() >= getStoryLineCount(story()!) - 1 || (name === "s" && story() !== 'start')) {
         setStory(null);
         setStoryLineIndex(0);
       }else{
