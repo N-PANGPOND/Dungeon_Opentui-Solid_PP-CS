@@ -150,27 +150,31 @@ feature ของโปรเจกต์นี้
 
 ## 3. Game Rules 
 
-## 3.1 Exploration
+## 3.01 Exploration
 
 ผู้เล่นต้องจะต้องตามหาภรรยาใน Dungeon ก่อนที่จะผจญภัยต่อสู้กับ Moster และ Boss ถึงจะสามารถออกจาก Dungeon  ได้สำเร็จ
 Map
 
 ใช้ Grid เช่น:
 
-##########
-#P.......#
-#.####...#
-#........#
-#..####..#
-#......E.#
-##########
+```text
+██████████████
+█🦸          ██ 
+████████     ██
+█            ██
+█    ██████████
+█        🚪██
+█████████████
+```
 
 ความหมาย:
 
-# = Wall
-. = Floor
-P = Player
-E = Exit
+```text
+"█"  = Wall
+" "  = Floor
+"🦸" = Player
+"🚪" = Exit
+```
 
 ### Controls
 
@@ -203,8 +207,7 @@ Random Encounter // สุ่ม Event
 Resolve Event // จัดการ Event
 ```
 
-เมื่อพบ Event ระบบจะดำเนินผลตามประเภทของ Event เช่น
-*****ระบุ probability ของแต่ละ Event ที่กลุ่มกำหนดจริง เช่น Monster 40%, Trap 15%, Treasure 15%, Potion 10%, Merchant 10%, Nothing 10%
+เมื่อพบ Event ระบบจะดำเนินผลตามประเภทของ Event เช่น Monster 25%, Trap 7%, Treasure 8%, Potion 4%, Merchant 9%, Nothing 52%
 
 | Event    | ผลลัพธ์             |
 | -------- | -------------------|
@@ -217,7 +220,7 @@ Resolve Event // จัดการ Event
 
 ---
 
-## 3.2 Combat
+## 3.02 Combat
 
 ## เมื่อพบ Monster เกมจะเข้าสู่ระบบ Combat แบบ Turn-based โดย Player และ Monster จะผลัดกันเลือก Action ในแต่ละ Turn
  
@@ -262,19 +265,19 @@ Run // หนี
 *****: สูตรคำนวณ Damage / Critical / Miss Chance ของกลุ่ม --> <!-- TODO: สูตร/เงื่อนไขของ Counter, Defend (ลดดาเมจกี่ % เป็นต้น)
 ---
 
-## 3.3 Item
+## 3.03 Item
 
 ผู้เล่นสามารถพบหรือซื้อ Item ระหว่างการเล่น
 
 Item หลักของเกม ได้แก่
 
-| Item         | Effect             |
-| ------------ | ------------------ |
-| Potion       | ฟื้น HP 25 หน่วย  |
-| High Potion  | ฟื้น HP 50 หน่วย     |
-| Increase ATK | เพิ่ม ATK ครั้งแรก 2 หน่วย และครั้งถัดไปเพิ่ม 5 หน่วย          |
-| Increase DEF | เพิ่ม ATK ครั้งแรก 2 หน่วย และครั้งถัดไปเพิ่ม 5 หน่วย          |
-| Smoke Bomb   | หนีจากการต่อสู้สำเร็จ 100% ต่อ 1 ลูก |
+| Item         | Effect                       |    
+| ------------ | ---------------------------- | 
+| Potion       | ฟื้น HP 25 หน่วย                |
+| High Potion  | ฟื้น HP 50 หน่วย                |
+| Increase ATK | เพิ่ม ATK 3 หน่วย               |
+| Increase DEF | เพิ่ม DEF 2 หน่วย               |
+| Smoke Bomb   | หนีจากการต่อสู้สำเร็จ 80% ต่อ 1 ลูก |
 
 การใช้ Item จะทำให้ Item นั้นถูกนำออกจาก Inventory
 
@@ -282,7 +285,7 @@ Item หลักของเกม ได้แก่
 
 ---
 
-## 3.4 Inventory
+## 3.04 Inventory
 
 - ผู้เล่นสามารถเก็บ Item ได้สูงสุด **8 ช่อง**
 - Item แต่ละชิ้นจะใช้ 1 ช่อง และไม่สามารถ Stack รวมกันได้
@@ -301,19 +304,28 @@ Slot 3 = High Potion
 
 ---
 
-## 3.5 Shop
+## 3.05 Shop
 
 เมื่อผู้เล่นพบ Merchant จะสามารถเข้าสู่ Shop ได้
 
 ผู้เล่นสามารถเลือก:
 
 -Buy — ซื้อ Item โดยใช้เงิน
--Sell — ขาย Item ที่มีอยู่ใน Inventory เพื่อรับเงิน
+-Sell — ขาย Item ที่มีอยู่ใน Inventory เพื่อรับเงิน [ การขายจะให้เงินคืนผู้เล่น 80% จากราคา item ] 
 -Leave — ออกจาก Shop และกลับเข้าสู่ Exploration
 
+# สิ่งที่สามารถซื้อ/ขายได้ ใน Shop
+| Item         | Effect                        |  Price  | Sell |
+| ------------ | ----------------------------- | ------- | ---- |
+| Potion       | ฟื้น HP 25 หน่วย                |   20    |  16  |
+| High Potion  | ฟื้น HP 50 หน่วย                |   50    |  40   |
+| Increase ATK | เพิ่ม ATK 3 หน่วย               |   90    |  72   | 
+| Increase DEF | เพิ่ม DEF 2 หน่วย               |  100    |  80   | 
+| Smoke Bomb   | หนีจากการต่อสู้สำเร็จ 80% ต่อ 1 ลูก |  100    |  80   | 
+  
 ---
 
-## 3.6 Monster Difficulty
+## 3.06 Monster Difficulty
 
 Monster จะมีความยากแตกต่างกันตามตำแหน่งภายใน Dungeon
 
@@ -342,13 +354,32 @@ Exit
 → Boss Monster
 
 Monster List
-<!-- TODO: ตารางรายชื่อ Monster อย่างน้อย 3 ชนิด พร้อม stat/พฤติกรรม -->
-ชื่อ	HP	ATK	DEF	พฤติกรรมเด่น
+<!-- TODO: ตารางรายชื่อ Monster  3 ชนิด พร้อม stat/พฤติกรรม -->
+|  ชื่อ มอนเตอร์    |	HP	  | ATK	 | DEF	 | 
+| -------------  | -----  | ----  | ------ | 
+| Normal Monster | 100    | 10    | 5      | 
+| Elite Monster  | 200    | 30    | 20     | 
+| Boss Monster   | 350    | 40    | 40     | 
+
+# ถ้า monster เป็นฝ่าย เลือก Action ( ฝ่ายโจมตี )
+|  ชื่อ มอนเตอร์    |    การโจมตี       |      การสไตรค์        |    การหลบหนี       |
+| -------------  | ---------------  | ---------------      | ----------------- |
+| Normal Monster | Atk Chance : 65% | Strike Chance : 25%  | Run Chance : 10%  |
+| Elite Monster  | Atk Chance : 60% | Strike Chance : 37%  | Run Chance : 3%   |
+| Boss Monster   | Atk Chance : 50% | Strike Chance : 50%  | Run Chance : 0%   |
+
+# ถ้า monster เป็นฝ่าย เลือก Action ( ฝ่ายป้องกัน )
+|  ชื่อ มอนเตอร์    |    การป้องกัน       |   การเคาเตอร์           |    การหลบหนี      |
+| -------------  | ---------------   | ---------------       | ----------------- |
+| Normal Monster | Def Chance : 50%  | Counter Chance : 30%  | Run Chance : 20%  |
+| Elite Monster  | Def Chance : 40%  | Counter Chance : 40%  | Run Chance : 20%  |
+| Boss Monster   | Def Chance : 50%  | Counter Chance : 50%  | Run Chance : 0%   |
+
 *****
 
 ---
 
-## 3.7 Exit & Ending
+## 3.07 Exit & Ending
 
 หลังจากผู้เล่นช่วยเหลือปูเป้แล้ว ผู้เล่นจะต้องพาเธอเดินทางไปยังพื้นที่ของ Boss เพื่อหาทางออกจาก Dungeon
 
@@ -427,7 +458,7 @@ BAD ENDING
 
 ---
 
-## 3.9 Game Over
+## 3.09 Game Over
 
 ผู้เล่นจะเข้าสู่ **Game Over** เมื่อ HP ลดลงจนเหลือ 0 หรือต่ำกว่า
 
@@ -455,18 +486,47 @@ Are you sure you want to quit? (Y/N)
 ## 4. Architecture
 
 ## 4.1 Project Structure
-// โครงสร้างหลักของระบบ ที่บอกว่าระบบของเราจะถูกแบ่งเป็นส่วนประกอบ (Components) อะไรบ้าง และแต่ละส่วนจะคุยกันหรือส่งข้อมูลหากันอย่างไร
-
-//test
-
+<!-- ความหมายของ Project Structure : โครงสร้างหลักของระบบ ที่บอกว่าระบบของเราจะถูกแบ่งเป็นส่วนประกอบ (Components) อะไรบ้าง และแต่ละส่วนจะคุยกันหรือส่งข้อมูลหากันอย่างไร -->
 ```text
 *****
-src/
-├── gameloop/       # ส่วนควบคุม Logic และรับ Request จาก User
-|  └──
-├── models/         # ส่วนจัดการโครงสร้างข้อมูลและการเชื่อมต่อ Database
-├── views/          # ส่วนแสดงผล UI หน้าเว็บ
-└── config/         # ไฟล์ตั้งค่าระบบต่างๆ (Environment Variables)
+my-game-project/
+├── src/
+│   ├── domains/               # ส่วนข้อมูลหลักและ Logic ของเกม (Domain/Entities)
+│   │   ├── character/         # ระบบตัวละคร
+│   │   │   ├── character.ts
+│   │   │   ├── attack-type.ts  # Enum: Normal, Skill, Ult
+│   │   │   └── defense-type.ts # Enum: Normal, Block, Dodge
+│   │   ├── player/            # ผู้เล่นและกระเป๋าเก็บของ
+│   │   │   ├── player.ts
+│   │   │   └── inventory.ts
+│   │   └── items/             # ไอเทมภายในเกม
+│   │       ├── item.ts
+│   │       └── item-factory.ts # Factory Pattern สำหรับสร้างไอเทม
+│   │
+│   ├── systems/               # ระบบควบคุมและกลไกหลักของเกม (Systems/Core)
+│   │   ├── game-loop.ts       # คลาสหลัก GameLoop
+│   │   ├── game-state.ts      # จัดการสถานะและการบันทึกเกม (GameState, FileHandler)
+│   │   ├── map/               # ระบบแผนที่และการเคลื่อนที่
+│   │   │   ├── map-system.ts
+│   │   │   └── map-provider.ts
+│   │   ├── interaction/       # ระบบการโต้ตอบในเกม
+│   │   │   ├── interaction-main.ts
+│   │   │   ├── event.ts       # ระบบเหตุการณ์สุ่มหรือเนื้อเรื่อง
+│   │   │   └── shop.ts        # ระบบร้านค้าและการซื้อขาย
+│   │   └── monsters/          # ระบบจัดการมอนสเตอร์
+│   │       └── monster-factory.ts
+│   │
+│   ├── utils/                 # เครื่องมือช่วยเหลือทั่วไป
+│   │   └── constant-type.ts   # ประเภทค่าคงที่ต่าง ๆ (เช่น ConsoleUI)
+│   │
+│   └── main.ts                # จุดเริ่มต้นของแอปพลิเคชัน (Entry Point)
+│
+├── dist/                      # โฟลเดอร์สำหรับโค้ด JavaScript ที่ Compile แล้ว
+├── tests/                     # โฟลเดอร์สำหรับเขียน Unit Test แยกตามโมดูล
+├── package.json               # ไฟล์จัดการ Dependencies และ Scripts ของโปรเจกต์
+├── tsconfig.json              # ไฟล์ตั้งค่าสำหรับ TypeScript Compiler
+└── README.md                  # เอกสารอธิบายวิธีการติดตั้งและรันโปรเจกต์
+
 
 ```
 
@@ -477,8 +537,20 @@ src/
 ---
 
 ## 5. How to Run
+
+To install dependencies:
 ```bash
-use " bun run index.tsx "
+bun install
+```
+
+To run:
+
+```bash
+เข้าในโฟลเดอร์
+cd .\Source-code\
+
+รันไฟล์
+bun run start
 ```
 
 ## 6. How to test 
@@ -517,30 +589,25 @@ KL-06	JSON Persistence	การบันทึกข้อมูลใช้ JS
 KL-07 Random Event	ผลของ Encounter มีความไม่แน่นอนตาม Probability
 ```
 
-# example
-
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-เข้าในโฟลเดอร์
-cd .\Source-code\
-
-รันไฟล์
-bun run .\Tui\tui.tsx
-```
-
 This project was created using `bun init` in bun v1.4.0. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
 
 ## Credits
-ชื่อ	รหัสนักศึกษา	หน้าที่
+| Name            | aka   | Std-id        | Main part       |
+ :--- | :---: | :--- | :--- |
+|1.Suteekan       | POND  | 68162110191-8 | code            |
+|2.Siwakorn       | POOM  | 65162110355-0 | code            | 
+|3.Peeranat       | TEN   | 68162110281-9 | test            | 
+|4.Pongsatorn     | Pee   | 68162110470-9 | code            |
+|5.Patsakorn      | Focus | 68162110265-3 | test            |
+|6.Harirak        | TON   | 65162110472-5 | code            |
+|7.Sattawat       | HART  | 68162110253-5 | Designer        |
+|8.Chotirat       | CHO   | 68162110075-3 | Doc             |
+|9.Apiwatthana    | Boss  | 68162110496-5 | Doc             |
+|10.Siraphat      | Pun   | 68162110297-7 | Doc             |
+|11.Nanphiphat    | Pump  | 67162110529-1 | Presentation Lead |
+|12.Phatcharathon | Time  | 68162110290-7 | code            |
 *****
 
 
 
-|---------------------- end of 13 Sep work --------------------------|
+
