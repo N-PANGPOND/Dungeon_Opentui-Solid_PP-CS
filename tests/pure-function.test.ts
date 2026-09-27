@@ -192,18 +192,18 @@ describe("pure-function.ts", () => {
             expect(calculateDamage(source, target, 2, 0.5)).toBe(30);
         });
 
-        test("ATK น้อยกว่า DEF ควรได้ damage เป็น 0", () => {
+        test("ATK น้อยกว่า DEF ควรได้ damage ขั้นต่ำ 0.1 ตาม implementation ปัจจุบัน", () => {
             const source = createCharacter(5, 10, 0);
             const target = createCharacter(10, 10, 0);
 
-            expect(calculateDamage(source, target, 1, 0.5)).toBe(0);
+            expect(calculateDamage(source, target, 1, 0.5)).toBe(0.1);
         });
 
-        test("ATK เท่ากับ DEF ควรได้ damage เป็น 0", () => {
+        test("ATK เท่ากับ DEF ควรได้ damage ขั้นต่ำ 0.1", () => {
             const source = createCharacter(10, 10, 0);
             const target = createCharacter(10, 10, 0);
 
-            expect(calculateDamage(source, target, 1, 0.5)).toBe(0);
+            expect(calculateDamage(source, target, 1, 0.5)).toBe(0.1);
         });
 
         test("multiplier = 0 ควร throw Error ตาม validation ปัจจุบัน", () => {
