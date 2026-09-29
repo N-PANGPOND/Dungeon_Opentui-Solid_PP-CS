@@ -342,11 +342,10 @@ Hard Monster
   ↓
 Exit
 ```
-
 | Distance to Exit | Monster Type | Difficulty Level |
-| :---: | :--- | :---: | :--- |
-| **0 – 2** | 💀 **BOSS** | Extreme | 
-| **3 – 14** | ⚔️ **ELITE MONS** | Hard | 
+| :---: | :--- | :---: |
+| **0 – 2** | 💀 **BOSS** | Extreme |
+| **3 – 14** | ⚔️ **ELITE MONS** | Hard |
 | **15 ขึ้นไป** | 👾 **NORMAL MONS** | Normal |
 
 เกมใช้ **Manhattan Distance** ในการคำนวณระยะห่างระหว่างตำแหน่งของผู้เล่นกับ Exit
