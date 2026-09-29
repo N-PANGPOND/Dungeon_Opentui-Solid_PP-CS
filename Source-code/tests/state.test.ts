@@ -429,11 +429,79 @@ describe("GameState - ทดสอบครอบคลุม", () => {
             Over: false,
             monster: {},
             Escaped: false,
-    }));
+        }
+    ));
 
         game.handleCombatAction(AttackingType.Attack);
 
         expect(game.gameScreen).toBe("COMBAT");
     });
+    test("Player หนีออกจาก Combat สำเร็จแล้วควรกลับ DUNGEON", () => {
+        game.eventCombat();
 
+        const combat = (game as any).combatSystem;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: true,
+            Escaper: "PLAYER",
+            monster: {} as any,
+        })
+    );
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(logs.at(-1)?.text).toBe("You Escaped From Battle!");
+    });
+
+    test("Monster หนีออกจาก Combat สำเร็จแล้วควรกลับ DUNGEON", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: true,
+            Escaper: "MONSTER",
+            monster: {} as any,
+        })
+    );
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(logs.at(-1)?.text).toBe("Monster Escaped From Battle!");
+});
+
+    test("Monster ตายแล้วควรกลับ DUNGEON และได้รับ coin จาก Monster", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+        const monsterCoin = 35;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: false,
+            Escaper: null,
+            monster: {
+                getCoin: () => monsterCoin,
+            }
+        }
+    ));
+
+        const coinBefore = game.player.getCoin();
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(game.player.getCoin()).toBe(coinBefore + monsterCoin);
+        expect(logs).toContainEqual({
+            type: "System",
+            text: `Monster Drop Coin ${monsterCoin}`,
+        });
+    });
 });

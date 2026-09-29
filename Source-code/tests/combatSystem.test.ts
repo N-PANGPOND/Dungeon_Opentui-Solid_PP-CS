@@ -87,12 +87,12 @@ describe("CombatSystem", () => {
         const cases = [
             [AttackingType.Attack, DefensiveType.Defend, 2.5],
             [AttackingType.Attack, DefensiveType.Counter, 7.5],
-            [AttackingType.Attack, DefensiveType.Run, 0],
+            [AttackingType.Attack, DefensiveType.Run, 10],
             [AttackingType.Attack, DefensiveType.UseItem, 0],
 
             [AttackingType.Strike, DefensiveType.Defend, 10],
             [AttackingType.Strike, DefensiveType.Counter, 10],
-            [AttackingType.Strike, DefensiveType.Run, 0],
+            [AttackingType.Strike, DefensiveType.Run, 12.5],
             [AttackingType.Strike, DefensiveType.UseItem, 0],
 
             [AttackingType.UseItem, DefensiveType.Defend, 0],
@@ -214,10 +214,9 @@ describe("CombatSystem", () => {
             try {
                 expect(combat.processTurn(attacker, defender, AttackingType.Attack, DefensiveType.Run)).toBe(false);
                 expect(combat.isBattleOver().Over).toBe(false);
-                expect(defender.getHp()).toBe(100);
+                expect(defender.getHp()).toBe(90);
             } finally { restore(); }
         });
-
         test("Run + Run เมื่อ random ต่ำกว่า 0.5 ควรหนีสำเร็จ", () => {
             const combat = new CombatSystem(makePlayer(), mapStub as any);
             const attacker = makeCharacter();
@@ -225,9 +224,18 @@ describe("CombatSystem", () => {
             const restore = mockRandom(0.49);
 
             try {
-                expect(combat.processTurn(attacker, defender, AttackingType.Run, DefensiveType.Run)).toBe(true);
+                combat.processTurn(
+                    attacker,
+                    defender,
+                    AttackingType.Run,
+                    DefensiveType.Run,
+                );
+
+                expect(combat.isBattleOver().Over).toBe(true);
                 expect(combat.isBattleOver().Escaped).toBe(true);
-            } finally { restore(); }
+            } finally {
+                restore();
+            }
         });
     });
 
@@ -255,6 +263,14 @@ describe("CombatSystem", () => {
                 agi: 5,
                 coin: 35,
             });
+        });
+
+        test("getMonsterStats ควรสะท้อน HP ปัจจุบันหลัง Monster ได้รับ damage", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const monster = (combat as any).monster as Character;
+            monster.takeDamage(25);
+
+            expect(combat.getMonsterStats().hp).toBe(75);
         });
     });
 
@@ -381,9 +397,41 @@ describe("CombatSystem", () => {
                 restore();
             }
         });
+        test("Run สำเร็จแล้วยังจะยังได้รับ damage", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const attacker = makeCharacter();
+            const defender = makeCharacter();
+            const restore = mockRandom(0.24);
+
+            try {
+                expect(
+                    combat.processTurn(
+                        attacker,
+                        defender,
+                        AttackingType.Attack,
+                        DefensiveType.Run,
+                 ),
+                ).toBe(true);
+
+                expect(defender.getHp()).toBe(90);
+            } finally {
+                restore();
+            }
+        });
     });
 
     describe("Smoke Bomb", () => {
+        test("ใช้ Smoke Bomb กับ BOSS ควรตั้งสถานะ smokeWithBoss", () => {
+            const bossMap = { getExitPos: () => ({ x: 0, y: 2 }) };
+            const player = makePlayer();
+            player.addItem(Itemfactory.CreateSMOKE_BOMB());
+            const combat = new CombatSystem(player, bossMap as any);
+
+            expect(combat.usePlayerItem(0)).toBe(true);
+            expect(combat.getSmokeWithBoss()).toBe(true);
+            expect(player.getInventory().getItems()).toHaveLength(0);
+        });
+
         test("ใช้ Smoke Bomb แล้ว random < 0.8 ควรหนีสำเร็จและลบไอเทม", () => {
             const player = makePlayer();
             player.addItem(Itemfactory.CreateSMOKE_BOMB());
@@ -421,6 +469,24 @@ describe("CombatSystem", () => {
     });
 
     describe("checkEvasion()", () => {
+        test("เมื่อ random เท่ากับ AGI ควรหลบได้", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const character = new Character({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 0, agi: 80, coin: 0 });
+            const restore = mockRandom(0.8);
+            try {
+                expect(combat.checkEvasion(character)).toBe(true);
+            } finally { restore(); }
+        });
+
+        test("AGI = 100 และ random ใกล้ 1 ควรหลบได้", () => {
+            const combat = new CombatSystem(makePlayer(), mapStub as any);
+            const character = new Character({ maxHp: 100, hp: 100, atk: 10, def: 5, luc: 0, agi: 100, coin: 0 });
+            const restore = mockRandom(0.999999);
+            try {
+                expect(combat.checkEvasion(character)).toBe(true);
+            } finally { restore(); }
+        });
+
         test("ควรใช้ Math.random และ EvadeCheck เพื่อตรวจการหลบ", () => {
             const combat = new CombatSystem(makePlayer(), mapStub as any);
             const character = new Character({
