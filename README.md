@@ -4,7 +4,7 @@
 | ชื่อโปรเจกต์       | Dungeon Escape               |
 | วัตถุประสงค์       | นันทนาการ เเละ การทำ Project   |
 | ผู้ใช้งานเป้าหมาย   | กลุ่ม CS Rmuti                  |
-| ขอบเขต (Scope)  | Game Console Terminal 2d PC  |
+| ขอบเขต (Scope)  | Game Console Terminal 2D PC  |
 
 ## Objective
 ผู้เล่นต้องเดินผ่าน Dungeon และหาทางออก โดยระหว่างทางสามารถเจอ Monster, Trap, Treasure และ Merchant (Shop) โดยมีเป้าหมายหลักคือตามหา ปูเป้ก่อนเดินทางไปเผชิญหน้ากับ Boss เพื่อออกจาก Dungeon
@@ -104,7 +104,7 @@ BAD END (ตัวเอกเริ่มสู้ไม่ไหวจึง�
 | หัวข้อ         | ข้อกำหนด                    |
 |--------------|-----------------------------|
 | Interface    | Console เช่น TUI             |
-| Language     | Typescript                  |
+| Language     | TypeScript                  |
 | Runtime      | Bun                         |
 | OOP          | Class and Interface         |
 | FP           | Pure Function, Higher-order |
@@ -114,10 +114,13 @@ BAD END (ตัวเอกเริ่มสู้ไม่ไหวจึง�
 | Docs         | README + Class Diagram      |
 
 ## 2.2 Tech Stack
-*****library/dependency เพิ่มเติมที่ใช้จริง เช่น สำหรับวาด TUI, testing framework ฯลฯ 
-รายการ	เวอร์ชัน	หมายเหตุ
-Bun	<!-- TODO -->	Runtime
-TypeScript	<!-- TODO -->	Language
+
+| รายการ | เวอร์ชัน | หมายเหตุ |
+|---|---|---|
+| Bun | 1.4.0 | Runtime |
+| TypeScript | ^7 | Language |
+| OpenTUI | ^0.5.10 | TUI |
+| Solid.js | ^1.9.15 | UI Framework |
 
 
 ## 2.3 Functional Requirements (FR)
@@ -130,15 +133,13 @@ feature ของโปรเจกต์นี้
 | FR-03 |  ระบบต่อสู้        |   Turn-based; Attacker เลือกได้จาก Attack/Strike/Use Item/Run, Defender เลือกได้จาก Defend/Counter/Use Item/Run |
 | FR-04 |  ระบบร้านค้า      |   ผู้เล่นทำได้ 3 อย่าง: Buy, Sell, Leave |
 | FR-05 |  ระบบ Inventory |   มีของได้ไม่เกิน 8 ช่อง, ของแต่ละชิ้นนับแยก ไม่รวมกัน (ไม่ stack) |
-| FR-06 |  ระบบไอเทม      |   มีอย่างน้อย 4 ชนิด: Potion, High Potion, Increase ATK, Increase DEF พร้อมบอกสรรพคุณและ effect ของแต่ละชิ้น |
+| FR-06 |  ระบบ Item      |   มี 5 ชนิด: Potion, High Potion, Increase ATK, Increase DEF, Smoke Bomb พร้อมบอกสรรพคุณและ effect ของแต่ละชิ้น |
 | FR-07 |  ระบบจัดการ Game |   เปลี่ยนหน้าจอ/state ได้ เช่น Explore, Combat, Shop, Inventory, Victory, Game Over |
-| FR-08 |  ระบบ Player    |   มี stat อย่างน้อย HP, ATK, DEF |
-| FR-09 |  ระบบหมอก (Fog of War) |   ผู้เล่นมองเห็นได้แค่รอบตัวในรัศมีที่กำหนด, tile ที่เคยเห็นแต่พ้นระยะจะจำ layout ไว้แบบจาง |
-| FR-10 |  ระบบ Mob Decide |   Monster ตัดสินใจเลือก action เองได้ระหว่าง Combat |
-| FR-11 | ระบบหยุดเกม (Pause) | กด P เพื่อหยุดทุกอย่างชั่วคราว ไม่รับ key อื่นจนกว่าจะกด P ซ้ำเพื่อเล่นต่อ (แยกจาก Q ที่ใช้ Quit ออกจากเกมถาวร) |
-| FR-12 |  ระบบปรับความยากตามระยะทาง | คำนวณระยะจากแต่ละจุดถึง Exit แล้วปรับความเก่งของ Monster ตาม (ใกล้ Exit = ยาก, ใกล้ Start = ง่าย) |
-| FR-13 |  เงื่อนไขจบเกม    |   Victory เมื่อเดินถึง Exit, Game Over เมื่อ HP <= 0 |
-| FR-14 |  ระบบ Monster   |   มี Monster อย่างน้อย 3 ชนิด ที่มี stat/พฤติกรรมต่างกัน |
+| FR-08 |  ระบบ Player    |   ผู้เล่นมีค่าเริ่มต้น 160 HP, ATK 20 , DEF 5 |
+| FR-09 |  ระบบ Mob Decide |   Monster ตัดสินใจเลือก action เองได้ระหว่าง Combat |
+| FR-10 |  ระบบปรับความยากตามระยะทาง | คำนวณระยะจากแต่ละจุดถึง Exit แล้วปรับความเก่งของ Monster ตาม (ใกล้ Exit = ยาก, ใกล้ Start = ง่าย) |
+| FR-11 |  เงื่อนไขจบเกม    |   Victory เมื่อช่วยปูเป้ได้สำเร็จและเดินถึง Exit และช่ Game Over เมื่อ HP <= 0 |
+| FR-12 |  ระบบ Monster   |   มี Monster อย่างน้อย 3 ชนิด ที่มี stat/พฤติกรรมต่างกัน |
 
 ## 2.4 Non-Functional Requirements (NFR)
 | หัวข้อ            | ข้อกำหนด |
@@ -152,7 +153,7 @@ feature ของโปรเจกต์นี้
 
 ## 3.01 Exploration
 
-ผู้เล่นต้องจะต้องตามหาภรรยาใน Dungeon ก่อนที่จะผจญภัยต่อสู้กับ Moster และ Boss ถึงจะสามารถออกจาก Dungeon  ได้สำเร็จ
+ผู้เล่นต้องสำรวจ Dungeon และตามหา ปูเป้ ก่อนที่จะผจญภัยต่อสู้กับ Monster และ Boss ถึงจะสามารถออกจาก Dungeon  ได้สำเร็จ
 Map
 
 ใช้ Grid เช่น:
@@ -186,7 +187,6 @@ Map
 | `D` | เดินขวา |
 | `I` | เปิดกระเป๋าไอเทม |
 | `Q` | ออกจากเกม |
-| `P` | หยุดเกมชั่วคราว |
 
 
 ผู้เล่นไม่สามารถเดินทะลุ Wall ได้
@@ -207,17 +207,20 @@ Random Encounter // สุ่ม Event
 Resolve Event // จัดการ Event
 ```
 
-เมื่อพบ Event ระบบจะดำเนินผลตามประเภทของ Event เช่น Monster 25%, Trap 7%, Treasure 8%, Potion 4%, Merchant 9%, Nothing 52%
+| Event | Probability (%) | ผลลัพธ์ |
+| :--- | :---: | :--- |
+| **Potion** | 4% | ได้ Potion |
+| **Trap** | 7% | Player เสีย HP |
+| **Treasure** | 8% | ได้เงินหรือ Item |
+| **Merchant** | 9% | เข้าสู่ Shop |
+| **Monster** | 25% | เข้าสู่ Combat |
+| **Nothing** | 52% | ไม่มีเหตุการณ์เกิดขึ้น |
 
-| Event    | ผลลัพธ์             |
-| -------- | -------------------|
-| Monster  | เข้าสู่ Combat        |
-| Trap     | Player เสีย HP      |
-| Treasure | ได้เงินหรือ Item      |
-| Potion   | ได้ Potion          |
-| Merchant | เข้าสู่ Shop          |
-| Nothing  | ไม่มีเหตุการณ์เกิดขึ้น    |
-
+## Event
+ - Trap เสีย  1–20 HP
+ - Treasure ได้เงิน 1–150 (ได้แค่เงิน ไม่ได้ item)
+ - Potion สุ่มจาก 4 ชนิด แล้วให้ผู้เล่นเลือก Take หรือ Leave
+ - tile สุ่ม event ได้ครั้งเดียว
 ---
 
 ## 3.02 Combat
@@ -262,7 +265,6 @@ Run // หนี
   ```
 #### Combat จะดำเนินต่อจนกว่าฝ่ายใดฝ่ายหนึ่งจะ HP เหลือ 0 หรือผู้เล่นและมอนเตอร์สามารถ Run ได้สำเร็จ
 
-*****: สูตรคำนวณ Damage / Critical / Miss Chance ของกลุ่ม --> <!-- TODO: สูตร/เงื่อนไขของ Counter, Defend (ลดดาเมจกี่ % เป็นต้น)
 ---
 
 ## 3.03 Item
@@ -279,9 +281,9 @@ Item หลักของเกม ได้แก่
 | Increase DEF | เพิ่ม DEF 2 หน่วย               |
 | Smoke Bomb   | หนีจากการต่อสู้สำเร็จ 80% ต่อ 1 ลูก |
 
-การใช้ Item จะทำให้ Item นั้นถูกนำออกจาก Inventory
+* Smoke Bomb: อยู่ในร้านค้าเท่านั้น
 
-*****เพิ่มเติม : ราคาซื้อ/ขายของแต่ละ Item
+การใช้ Item จะทำให้ Item นั้นถูกนำออกจาก Inventory
 
 ---
 
@@ -341,25 +343,29 @@ Hard Monster
 Exit
 ```
 
-ห่างจาก Exit 50 ช่องขึ้นไป
-→ Normal Monster
+| Distance to Exit | Monster Type | Difficulty Level |
+| :---: | :--- | :---: | :--- |
+| **0 – 2** | 💀 **BOSS** | Extreme | 
+| **3 – 14** | ⚔️ **ELITE MONS** | Hard | 
+| **15 ขึ้นไป** | 👾 **NORMAL MONS** | Normal |
 
-ห่างจาก Exit 20–49 ช่อง
-→ Normal / Elite Monster
+เกมใช้ **Manhattan Distance** ในการคำนวณระยะห่างระหว่างตำแหน่งของผู้เล่นกับ Exit
 
-ห่างจาก Exit 1–19 ช่อง
-→ Elite Monster
+### Manhattan Distance Formula
 
-จุด Boss
-→ Boss Monster
+```
+Distance = |x1 - x2| + |y1 - y2|
+```
 
 Monster List
-<!-- TODO: ตารางรายชื่อ Monster  3 ชนิด พร้อม stat/พฤติกรรม -->
-|  ชื่อ มอนเตอร์    |	HP	  | ATK	 | DEF	 | 
-| -------------  | -----  | ----  | ------ | 
-| Normal Monster | 100    | 10    | 5      | 
-| Elite Monster  | 200    | 30    | 20     | 
-| Boss Monster   | 350    | 40    | 40     | 
+| ประเภทมอนสเตอร์ | HP | ATK | DEF | LUC | AGI | Coin |
+| --- | --- | --- | --- | --- | --- | --- |
+| NORMAL MONS | 100 | 10 | 5 | 5 | 5 | 35 |
+| ELITE MONS | 200 | 30 | 20 | 5 | 5 | 110 |
+| BOSS | 350 | 65 | 60 | 5 | 5 | 9999 |
+
+ สูตร Damage: (ATK Player − DEF Monster) × ตัวคูณ × Critical โดย Critical คือ ×2 เมื่อ LUC × 0.01 > random และถ้าผลลัพธ์ ≤ 0 จะได้ 0.1
+ 
 
 # ถ้า monster เป็นฝ่าย เลือก Action ( ฝ่ายโจมตี )
 |  ชื่อ มอนเตอร์    |    การโจมตี       |      การสไตรค์        |    การหลบหนี       |
@@ -375,13 +381,13 @@ Monster List
 | Elite Monster  | Def Chance : 40%  | Counter Chance : 40%  | Run Chance : 20%  |
 | Boss Monster   | Def Chance : 50%  | Counter Chance : 50%  | Run Chance : 0%   |
 
-*****
 
 ---
 
 ## 3.07 Exit & Ending
 
 หลังจากผู้เล่นช่วยเหลือปูเป้แล้ว ผู้เล่นจะต้องพาเธอเดินทางไปยังพื้นที่ของ Boss เพื่อหาทางออกจาก Dungeon
+ *Smoke Bomb ถ้าใช้กับ Boss จะเป็นการได้รับฉากจบแบบที่ 4
 
 ผลลัพธ์ของเกมมีทั้งหมด **4 รูปแบบ**
 
@@ -458,7 +464,7 @@ BAD ENDING
 
 ---
 
-## 3.09 Game Over
+## 3.08 Game Over
 
 ผู้เล่นจะเข้าสู่ **Game Over** เมื่อ HP ลดลงจนเหลือ 0 หรือต่ำกว่า
 
@@ -472,7 +478,7 @@ Game Over
 
 ---
 
-## 3.10 Quit
+## 3.09 Quit
 
 ผู้เล่นสามารถกด `Q` เพื่อออกจากเกม
 
@@ -486,9 +492,7 @@ Are you sure you want to quit? (Y/N)
 ## 4. Architecture
 
 ## 4.1 Project Structure
-<!-- ความหมายของ Project Structure : โครงสร้างหลักของระบบ ที่บอกว่าระบบของเราจะถูกแบ่งเป็นส่วนประกอบ (Components) อะไรบ้าง และแต่ละส่วนจะคุยกันหรือส่งข้อมูลหากันอย่างไร -->
-```text
-*****
+
 my-game-project/
 ├── src/
 │   ├── domains/               # ส่วนข้อมูลหลักและ Logic ของเกม (Domain/Entities)
@@ -531,7 +535,7 @@ my-game-project/
 ```
 
 ## 4.2
-***** แนบ Class Diagram
+Class Diagram
 <img width="8192" height="5703" alt="image" src="https://github.com/user-attachments/assets/bc8223d6-6d18-4cb1-90d0-990c339485a1" />
 
 ---
@@ -576,7 +580,6 @@ bun test
 ```
 
 ## 7. Known Limitations
-//หัวข้อที่ใช้อธิบายว่าระบบหรือโค้ดที่เราเขียนขึ้นมา มีอะไรบ้างที่ยังทำไม่ได้ มีขอบเขตสิ้นสุดตรงไหน หรือมีเงื่อนไขอะไรที่อาจทำให้ระบบทำงานได้ไม่เต็มที่
 
 ```
 ID	ข้อจำกัด	รายละเอียด
@@ -606,4 +609,3 @@ This project was created using `bun init` in bun v1.4.0. [Bun](https://bun.com) 
 |10.Siraphat      | Pun   | 68162110297-7 | Doc             |
 |11.Nanphiphat    | Pump  | 67162110529-1 | Presentation Lead |
 |12.Phatcharathon | Time  | 68162110290-7 | code            |
-*****
