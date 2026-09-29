@@ -14,7 +14,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowUp", "up"],
         ["arrow-up", "up"],
         ["arrow_up", "up"],
-    ])("ควรแปลง %s เป็น MOVE up", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE up", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -28,7 +28,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowDown", "down"],
         ["arrow-down", "down"],
         ["arrow_down", "down"],
-    ])("ควรแปลง %s เป็น MOVE down", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE down", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -42,7 +42,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowLeft", "left"],
         ["arrow-left", "left"],
         ["arrow_left", "left"],
-    ])("ควรแปลง %s เป็น MOVE left", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE left", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -56,7 +56,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowRight", "right"],
         ["arrow-right", "right"],
         ["arrow_right", "right"],
-    ])("ควรแปลง %s เป็น MOVE right", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE right", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -86,7 +86,7 @@ describe("parseKeyIntent()", () => {
         ["Q", "QUIT"],
         ["escape", "QUIT"],
         ["ESCAPE", "QUIT"],
-    ])("ควรแปลง key %s เป็น %s", (key, type) => {
+    ] as const)("ควรแปลง key %s เป็น %s", (key, type) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type });
     });
 

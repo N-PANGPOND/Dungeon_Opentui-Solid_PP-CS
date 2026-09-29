@@ -11,6 +11,7 @@
     "test:combat": "bun test ./tests/combatSystem.test.ts",
     "test:console": "bun test ./tests/consoleio.test.ts",
     "test:dungeon": "bun test ./tests/dungeonMap.test.ts",
+    "test:map": "bun test ./tests/mapSystem.test.ts",
     "test:event": "bun test ./tests/event.test.ts",
     "test:gameloop": "bun test ./tests/gameloop.test.ts",
     "test:inventory": "bun test ./tests/inventory.test.ts",
@@ -21,9 +22,7 @@
     "test:state": "bun test ./tests/state.test.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
     "typescript": "^7"
   },
   "dependencies": {
