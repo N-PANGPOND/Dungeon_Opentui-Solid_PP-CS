@@ -10,8 +10,8 @@ const mockRandom = (value: number) => {
 
 describe("MonsterFactory / Monster", () => {
 
-    test("ระยะน้อยกว่า 4 ควรสร้าง BOSS", () => {
-        const monster = MonsterFactory.createMonster(3);
+    test("ระยะน้อยกว่า 3 ควรสร้าง BOSS", () => {
+        const monster = MonsterFactory.createMonster(2);
         expect((monster as any).MonsterType).toBe("BOSS");
     });
 
@@ -46,8 +46,8 @@ describe("MonsterFactory / Monster", () => {
         expect(elite.getCoin()).toBe(110);
 
         expect(boss.getMaxHp()).toBe(350);
-        expect(boss.getAtk()).toBe(50);
-        expect(boss.getDef()).toBe(55);
+        expect(boss.getAtk()).toBe(65);
+        expect(boss.getDef()).toBe(60);
         expect(boss.getCoin()).toBe(9999);
     });
 
