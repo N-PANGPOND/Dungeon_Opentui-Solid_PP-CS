@@ -491,6 +491,7 @@ Are you sure you want to quit? (Y/N)
 ## 4. Architecture
 
 ## 4.1 Project Structure
+```text
 
 my-game-project/
 ├── src/
