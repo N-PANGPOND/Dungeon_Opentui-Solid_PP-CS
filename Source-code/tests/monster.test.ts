@@ -79,6 +79,28 @@ describe("MonsterFactory / Monster", () => {
     });
 });
 
+    test("ELITE MONS ที่ random = 0 ควรเลือก Attack", () => {
+        const monster = MonsterFactory.createMonster(10);
+        const restore = mockRandom(0);
+
+        try {
+            expect(monster.decideAttackingAction()).toBe(AttackingType.Attack);
+        } finally {
+            restore();
+        }
+    });
+
+    test("ELITE MONS ที่ random = 0.99 ควรเลือก Run ใน Defensive phase", () => {
+        const monster = MonsterFactory.createMonster(10);
+        const restore = mockRandom(0.99);
+
+        try {
+            expect(monster.decideDefensiveAction()).toBe(DefensiveType.Run);
+        } finally {
+            restore();
+        }
+    });
+
     test("BOSS ที่ random = 0.99 ควรเลือก Strike", () => {
         const monster = MonsterFactory.createMonster(2);
         const restore = mockRandom(0.99);

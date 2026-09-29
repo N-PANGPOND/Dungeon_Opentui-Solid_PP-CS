@@ -2,6 +2,7 @@ import { describe, expect, it, mock } from "bun:test";
 import {
     ConsoleIO,
     INVENTORY_MAX_SLOTS,
+    normalizeKeyName,
     parseKeyIntent,
 } from "../ConsoleIO/ConsoleIO";
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
@@ -125,6 +126,48 @@ describe("parseKeyIntent()", () => {
 
     it("หน้า INVENTORY key x ควรเป็น DISCARD_ITEM", () => {
         expect(parseKeyIntent("x", "INVENTORY")).toEqual({ type: "DISCARD_ITEM" });
+    });
+        it.each([
+        ["kp0", "0"],
+        ["kp1", "1"],
+        ["kp2", "2"],
+        ["kp3", "3"],
+        ["kp4", "4"],
+        ["kp5", "5"],
+        ["kp6", "6"],
+        ["kp7", "7"],
+        ["kp8", "8"],
+        ["kp9", "9"],
+    ])("Numpad %s ควรแปลงเป็น %s", (key, expected) => {
+        expect(normalizeKeyName(key)).toBe(expected);
+    });
+
+    it.each([
+        ["ไ", "w"],
+        ["ฟ", "a"],
+        ["ห", "s"],
+        ["ก", "d"],
+        ["ร", "i"],
+        ["ๆ", "q"],
+    ])("ปุ่ม %s ควรทำงานเหมือนปุ่ม %s", (thaiKey, qwertyKey) => {
+        expect(normalizeKeyName(thaiKey)).toBe(qwertyKey);
+    });
+        it.each([
+        ["1", AttackingType.Attack],
+        ["2", AttackingType.Strike],
+        ["3", AttackingType.UseItem],
+        ["4", AttackingType.Run],
+        ["5", DefensiveType.Defend],
+        ["6", DefensiveType.Counter],
+        ["7", DefensiveType.UseItem],
+        ["8", DefensiveType.Run],
+    ])("Numpad %s ควรใช้เป็น Combat Action ได้", (key, action) => {
+        const normalized = normalizeKeyName(key);
+
+        expect(parseKeyIntent(normalized, "COMBAT")).toEqual({
+            type: "COMBAT_ACTION",
+            action,
+        });
     });
 });
 
