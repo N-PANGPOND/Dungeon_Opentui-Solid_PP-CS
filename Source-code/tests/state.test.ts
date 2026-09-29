@@ -429,8 +429,7 @@ describe("GameState - ทดสอบครอบคลุม", () => {
             Over: false,
             monster: {},
             Escaped: false,
-        }
-    ));
+    }));
 
         game.handleCombatAction(AttackingType.Attack);
 
@@ -504,4 +503,5 @@ describe("GameState - ทดสอบครอบคลุม", () => {
             text: `Monster Drop Coin ${monsterCoin}`,
         });
     });
+
 });

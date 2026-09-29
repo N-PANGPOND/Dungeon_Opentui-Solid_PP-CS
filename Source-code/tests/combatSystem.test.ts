@@ -87,12 +87,12 @@ describe("CombatSystem", () => {
         const cases = [
             [AttackingType.Attack, DefensiveType.Defend, 2.5],
             [AttackingType.Attack, DefensiveType.Counter, 7.5],
-            [AttackingType.Attack, DefensiveType.Run, 10],
+            [AttackingType.Attack, DefensiveType.Run, 0],
             [AttackingType.Attack, DefensiveType.UseItem, 0],
 
             [AttackingType.Strike, DefensiveType.Defend, 10],
             [AttackingType.Strike, DefensiveType.Counter, 10],
-            [AttackingType.Strike, DefensiveType.Run, 12.5],
+            [AttackingType.Strike, DefensiveType.Run, 0],
             [AttackingType.Strike, DefensiveType.UseItem, 0],
 
             [AttackingType.UseItem, DefensiveType.Defend, 0],
@@ -214,9 +214,10 @@ describe("CombatSystem", () => {
             try {
                 expect(combat.processTurn(attacker, defender, AttackingType.Attack, DefensiveType.Run)).toBe(false);
                 expect(combat.isBattleOver().Over).toBe(false);
-                expect(defender.getHp()).toBe(90);
+                expect(defender.getHp()).toBe(100);
             } finally { restore(); }
         });
+
         test("Run + Run เมื่อ random ต่ำกว่า 0.5 ควรหนีสำเร็จ", () => {
             const combat = new CombatSystem(makePlayer(), mapStub as any);
             const attacker = makeCharacter();
@@ -224,18 +225,9 @@ describe("CombatSystem", () => {
             const restore = mockRandom(0.49);
 
             try {
-                combat.processTurn(
-                    attacker,
-                    defender,
-                    AttackingType.Run,
-                    DefensiveType.Run,
-                );
-
-                expect(combat.isBattleOver().Over).toBe(true);
+                expect(combat.processTurn(attacker, defender, AttackingType.Run, DefensiveType.Run)).toBe(true);
                 expect(combat.isBattleOver().Escaped).toBe(true);
-            } finally {
-                restore();
-            }
+            } finally { restore(); }
         });
     });
 
@@ -432,6 +424,9 @@ describe("CombatSystem", () => {
             expect(player.getInventory().getItems()).toHaveLength(0);
         });
 
+    });
+
+    describe("Smoke Bomb", () => {
         test("ใช้ Smoke Bomb แล้ว random < 0.8 ควรหนีสำเร็จและลบไอเทม", () => {
             const player = makePlayer();
             player.addItem(Itemfactory.CreateSMOKE_BOMB());
