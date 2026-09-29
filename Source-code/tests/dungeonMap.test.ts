@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { DungeonMap, type MapConfig } from "../Source-code/DungeonMap/DungeonMap";
-import { MapObject } from "../Source-code/Type-Enum/enum";
+import { DungeonMap, type MapConfig } from "../DungeonMap/DungeonMap";
+import { MapObject } from "../Type-Enum/enum";
 
 const makeConfig = (overrides: Partial<MapConfig> = {}): MapConfig => ({
     spawnPos: { x: 0, y: 0 },

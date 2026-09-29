@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
-import { GameState } from "../Source-code/Game/State";
-import { DungeonMap, type MapConfig } from "../Source-code/DungeonMap/DungeonMap";
-import { EndingType, AttackingType } from "../Source-code/Type-Enum/enum";
-import { Item } from "../Source-code/Item-Inventory/Item";
+import { GameState } from "../Game/State";
+import { DungeonMap, type MapConfig } from "../DungeonMap/DungeonMap";
+import { EndingType, AttackingType } from "../Type-Enum/enum";
+import { Item } from "../Item-Inventory/Item";
 
 describe("GameState - ทดสอบครอบคลุม", () => {
     let game: GameState;
@@ -96,12 +96,6 @@ describe("GameState - ทดสอบครอบคลุม", () => {
             const moved = game.movePlayer("left");
 
             expect(moved).toBe(false);
-            expect(game.player.Position).toEqual({ x: 0, y: 0 });
-        });
-
-        test("ตอน pause ควรคืน false และไม่ขยับ", () => {
-            (game as any).isPause = true;
-            expect(game.movePlayer("right")).toBe(false);
             expect(game.player.Position).toEqual({ x: 0, y: 0 });
         });
 
@@ -424,18 +418,6 @@ describe("GameState - ทดสอบครอบคลุม", () => {
 
         expect(game.player.getInventory().getItems()).toEqual([a]);
         expect(game.selectedSlot).toBeNull();
-    });
-
-    test("Pause ควรสลับสถานะ pause ที่ใช้ควบคุมการเดิน", () => {
-        const state = game as any;
-        expect(state.isPause).toBe(false);
-
-        state.Pause();
-        expect(state.isPause).toBe(true);
-        expect(game.movePlayer("right")).toBe(false);
-
-        state.Pause();
-        expect(state.isPause).toBe(false);
     });
 
     test("โจมตีแล้ว Monster ยังไม่ตายควรยังอยู่หน้า COMBAT", () => {

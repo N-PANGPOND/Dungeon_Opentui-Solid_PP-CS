@@ -3,8 +3,8 @@ import {
     ConsoleIO,
     INVENTORY_MAX_SLOTS,
     parseKeyIntent,
-} from "../Source-code/ConsoleIO/ConsoleIO";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
+} from "../ConsoleIO/ConsoleIO";
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
 describe("parseKeyIntent()", () => {
     it.each([
@@ -14,7 +14,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowUp", "up"],
         ["arrow-up", "up"],
         ["arrow_up", "up"],
-    ])("ควรแปลง %s เป็น MOVE up", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE up", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -28,7 +28,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowDown", "down"],
         ["arrow-down", "down"],
         ["arrow_down", "down"],
-    ])("ควรแปลง %s เป็น MOVE down", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE down", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -42,7 +42,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowLeft", "left"],
         ["arrow-left", "left"],
         ["arrow_left", "left"],
-    ])("ควรแปลง %s เป็น MOVE left", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE left", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -56,7 +56,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowRight", "right"],
         ["arrow-right", "right"],
         ["arrow_right", "right"],
-    ])("ควรแปลง %s เป็น MOVE right", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE right", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -82,17 +82,15 @@ describe("parseKeyIntent()", () => {
     it.each([
         ["i", "OPEN_INVENTORY"],
         ["I", "OPEN_INVENTORY"],
-        ["p", "PAUSE"],
-        ["P", "PAUSE"],
         ["q", "QUIT"],
         ["Q", "QUIT"],
         ["escape", "QUIT"],
         ["ESCAPE", "QUIT"],
-    ])("ควรแปลง key %s เป็น %s", (key, type) => {
+    ] as const)("ควรแปลง key %s เป็น %s", (key, type) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type });
     });
 
-    it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
+    it.each(["", "x", "0", "9", "p", "P", "enter", "space", "ArrowX"])(
         "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
         (key) => {
             expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type: "UNKNOWN" });

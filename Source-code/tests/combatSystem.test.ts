@@ -1,8 +1,8 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
-import { CombatSystem } from "../Source-code/System/CombatSystem";
-import { Character, Player } from "../Source-code/Character/character";
-import { Itemfactory } from "../Source-code/Item-Inventory/Item";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
+import { CombatSystem } from "../System/CombatSystem";
+import { Character, Player } from "../Character/character";
+import { Itemfactory } from "../Item-Inventory/Item";
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
 const mapStub = {
     getExitPos: () => ({ x: 59, y: 59 }),

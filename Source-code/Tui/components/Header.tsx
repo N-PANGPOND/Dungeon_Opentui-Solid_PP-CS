@@ -3,7 +3,7 @@
 // แสดงชื่อเกมและ Floor ปัจจุบัน
 // =============================================================
 
-import { theme, pad,center } from "../theme";
+import { theme } from "../theme";
 
 interface HeaderProps {
   screen?: string;
