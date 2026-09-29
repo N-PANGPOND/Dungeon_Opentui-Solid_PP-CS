@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { Character, Player } from "../Source-code/Character/character";
-import { Item } from "../Source-code/Item-Inventory/Item";
+import { Character, Player } from "../Character/character";
+import { Item } from "../Item-Inventory/Item";
 
 describe("Character", () => {
     const createCharacter = () => new Character({

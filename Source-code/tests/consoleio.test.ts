@@ -3,8 +3,8 @@ import {
     ConsoleIO,
     INVENTORY_MAX_SLOTS,
     parseKeyIntent,
-} from "../Source-code/ConsoleIO/ConsoleIO";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
+} from "../ConsoleIO/ConsoleIO";
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
 describe("parseKeyIntent()", () => {
     it.each([
@@ -82,8 +82,6 @@ describe("parseKeyIntent()", () => {
     it.each([
         ["i", "OPEN_INVENTORY"],
         ["I", "OPEN_INVENTORY"],
-        ["p", "PAUSE"],
-        ["P", "PAUSE"],
         ["q", "QUIT"],
         ["Q", "QUIT"],
         ["escape", "QUIT"],
@@ -92,7 +90,7 @@ describe("parseKeyIntent()", () => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type });
     });
 
-    it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
+    it.each(["", "x", "0", "9", "p", "P", "enter", "space", "ArrowX"])(
         "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
         (key) => {
             expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type: "UNKNOWN" });

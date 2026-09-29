@@ -1,6 +1,6 @@
 import { Monster, Player,MonsterFactory, Character} from "../Character/character";
 import { calculateDamage,EvadeCheck } from "../shared/pure-function"
-import type { MonsterType,stats, Weights,position,logType } from "../Type-Enum/type";
+import type { stats, logType } from "../Type-Enum/type";
 import { AttackingType,DefensiveType } from "../Type-Enum/enum";
 import { DungeonMap } from "../DungeonMap/DungeonMap";
 

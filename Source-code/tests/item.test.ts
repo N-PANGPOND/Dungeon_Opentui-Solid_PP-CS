@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, beforeEach } from "bun:test";
-import { Item, Itemfactory } from "../Source-code/Item-Inventory/Item";
-import { Character } from "../Source-code/Character/character";
+import { Item, Itemfactory } from "../Item-Inventory/Item";
+import { Character } from "../Character/character";
 
 describe("Item", () => {
     let character: Character;

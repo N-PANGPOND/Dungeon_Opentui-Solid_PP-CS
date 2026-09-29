@@ -1,6 +1,5 @@
 import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 import type { Direction,logType, gameScreen } from "../Type-Enum/type";
-import { render, useKeyboard, useRenderer } from "@opentui/solid"
 import { GameState } from "../Game/State";
 import { getCombat } from "../Tui/gameBridge";
 import type { EnemyUIProps, InventoryUIProps, PlayerUIProps } from "../Tui/uiTypes";
@@ -10,7 +9,6 @@ export type GameInputIntent =
     | { type: "MOVE"; direction: Direction }
     | { type: "COMBAT_ACTION"; action: AttackingType | DefensiveType }
     | { type: "OPEN_INVENTORY" }
-    | { type: "PAUSE" }
     | { type: "QUIT" }
     | { type: "UNKNOWN" }
     | { type: "SELECT_SLOT"; index: number }
@@ -79,8 +77,6 @@ export function parseKeyIntent(key: string, screen: gameScreen): GameInputIntent
             return { type: "COMBAT_ACTION", action: DefensiveType.Run };
         case "i":
             return { type: "OPEN_INVENTORY" };
-        case "p":
-            return { type: "PAUSE" };
         case "q":
         case "escape":
             return { type: "QUIT" };
@@ -152,20 +148,4 @@ export class ConsoleIO {
         }));
       return { items, maxSlots: INVENTORY_MAX_SLOTS };
     }
-
-
-    // ไม่น่าได้ใช้แล้วพวกนี้ มั้งนะ
-    // public Clear(): void {
-    //     this.setMessage("");
-    // }
-    
-    // public ShowStatus(status: string): void {
-    //     this.setStatus(status);
-    // }
-
-    //renderMap(map: DungeonMap, playerPos: Position): void {
-        // ทำทีหลัง
-    //}
-
-
 }

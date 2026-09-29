@@ -1,7 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
-import { Inventory } from "../Source-code/Item-Inventory/Inventory";
-import { Item } from "../Source-code/Item-Inventory/Item";
-import { Character } from "../Source-code/Character/character";
+import { Inventory } from "../Item-Inventory/Inventory";
+import { Item } from "../Item-Inventory/Item";
+import { Character } from "../Character/character";
 
 const makeCharacter = () => new Character({
     maxHp: 100, hp: 100, atk: 10, def: 5, luc: 5, agi: 5, coin: 0,

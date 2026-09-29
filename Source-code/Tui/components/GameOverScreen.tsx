@@ -3,7 +3,7 @@
 // แสดงเมื่อ player ตาย (GAMEOVER screen)
 // =============================================================
 
-import { theme, renderBar, pad, center } from "../theme";
+import { theme, pad } from "../theme";
 import type { PlayerUIProps } from "../uiTypes";
 
 interface GameOverScreenProps {
