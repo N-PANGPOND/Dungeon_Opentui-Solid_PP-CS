@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { MonsterFactory } from "../Source-code/Character/character";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
+import { MonsterFactory } from "../Character/character";
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
 const mockRandom = (value: number) => {
     const original = Math.random;

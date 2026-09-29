@@ -1,7 +1,7 @@
 import { describe, expect, test, mock } from "bun:test";
-import { Shop } from "../Source-code/Event/Shop";
-import { Item, Itemfactory } from "../Source-code/Item-Inventory/Item";
-import { Player } from "../Source-code/Character/character";
+import { Shop } from "../Event/Shop";
+import { Itemfactory } from "../Item-Inventory/Item";
+import { Player } from "../Character/character";
 
 const makePlayer = (coin = 100) =>
     new Player(
