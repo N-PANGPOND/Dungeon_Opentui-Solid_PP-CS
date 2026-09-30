@@ -210,11 +210,11 @@ Resolve Event // จัดการ Event
 | Event | Probability (%) | ผลลัพธ์ |
 | :--- | :---: | :--- |
 | **Potion** | 4% | ได้ Potion |
-| **Trap** | 7% | Player เสีย HP |
-| **Treasure** | 8% | ได้เงินหรือ Item |
-| **Merchant** | 9% | เข้าสู่ Shop |
+| **Trap** | 6% | Player เสีย HP |
+| **Treasure** | 7% | ได้เงินหรือ Item |
+| **Merchant** | 8% | เข้าสู่ Shop |
 | **Monster** | 25% | เข้าสู่ Combat |
-| **Nothing** | 52% | ไม่มีเหตุการณ์เกิดขึ้น |
+| **Nothing** | 50% | ไม่มีเหตุการณ์เกิดขึ้น |
 
 ## Event
  - Trap เสีย  1–20 HP
