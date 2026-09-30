@@ -59,12 +59,12 @@ Map
 
 ```text
 ██████████████
-█🦸          ██ 
+█🦸         ██ 
 ████████     ██
 █            ██
 █    ██████████
-█        🚪██
-█████████████
+█         🚪██
+██████████████
 ```
 
 ความหมาย:
@@ -92,6 +92,12 @@ Map
 | `S` | โหมดขายของใน SHOP |
 | `L` | ออกจาก SHOP |
 | `1-8` | เลือกช่องไอเทมชิ้นที่ 1 ถึง 8 |
+ระหว่างต่อสู้
+| Key | Action |
+| `1` | โจมตีปกติ หรือ ป้องกันปกติ ตาม Turnของผู้เล่น |
+| `2` | โจมตีหนัก หรือ สวนกลับ ตาม Turnของผู้เล่น |
+| `3` | เปิด/ปิดกระเป๋า เพื่อใช้ไอเทม |
+| `4` | หนี จากการต่อสู้ |
 
 ** ผู้เล่นไม่สามารถเดินทะลุ Wall ได้ **
 
@@ -121,11 +127,11 @@ Resolve Event // เล่น Event นั้นให้จบ
 | **Nothing** | 50% | ไม่มีเหตุการณ์เกิดขึ้น |
 
 ## Event
- - Potion : ได้รับ Potion, High Potion แบบสุ่มโดยสามารถเลือก Take หรือ Leave 
+ - Potion : ได้รับ Potion, High Potion , Atk Potion , Def Potion แบบสุ่มโดยสามารถเลือก Take หรือ Leave 
  - Trap : เสีย 1–20 HP
  - Treasure : ได้เงิน 1–150 Coin
  - Merchant : เข้าสู่ระบบ Shop เพื่อใช้ Coin ซื้อไอเทมหรือขายของในกระเป๋า
- - Monster : ตัดเข้าสู่ระบบ Combat เพื่อสู้กับมอนสเตอร์
+ - Monster : เข้าสู่ระบบ Combat เพื่อสู้กับมอนสเตอร์
  - Nothing : ไม่เกิดเหตุการณ์อะไร
 
   ** 1 ช่องจะสุ่ม event ได้ครั้งเดียวเท่านั้น **
@@ -137,7 +143,7 @@ Resolve Event // เล่น Event นั้นให้จบ
  
  #####  Action นั้นมี 2 Phase คือ การโจมตี เเละ การป้องกัน โดยที่ ถ้า Player โจมตี Monster จะป้องกัน ถ้า Monster โจมตี Player จะป้องกัน 
  
- ##### Player จะเป็นคนเริ่ม Turn ก่อนเสมอ
+ ##### Player จะเป็นคนเริ่ม Turn โจมตีก่อนเสมอ
 
 ผู้เล่นสามารถเลือก Action:
 
@@ -220,7 +226,7 @@ Slot 3 = High Potion
 
 ผู้เล่นสามารถเลือก:
 
-- Buy — ซื้อ Item โดยใช้ Cion
+- Buy — ซื้อ Item โดยใช้ Coin
 - Sell — ขาย Item ที่มีอยู่ใน Inventory เพื่อรับเงิน [ การขายจะให้เงินคืนผู้เล่น 80% จากราคา item ] 
 - Leave — ออกจาก Shop และกลับเข้าสู่ Exploration
 
@@ -242,11 +248,11 @@ Monster จะมีความยากแตกต่างกันตาม
 ```text
 Start
   ↓
-Easy Monster
+Normal Monster
   ↓
-Random Monster
+Elite Monster
   ↓
-Hard Monster
+Boss Monster
   ↓
 Exit
 ```
@@ -271,7 +277,8 @@ Monster List
 | ELITE MONS | 200 | 30 | 20 | 5 | 5 | 110 |
 | BOSS | 350 | 65 | 60 | 5 | 5 | 9999 |
 
- ** สูตร Damage: (ATK Player − DEF Monster) × ตัวคูณ × Critical โดย Critical คือ ×2 เมื่อ LUC × 0.01 > random และถ้าผลลัพธ์ ≤ 0 จะได้ 0.1 **
+ ** สูตร Damage: (ATK Player − DEF Monster) × ตัวคูณ × Critical โดย Critical จะ ×2 มีโอกาสออก 10% 
+ และถ้า ดาเมจ ≤ 0 จะได้ 0.1 ตลอด **
  
 
 # ถ้า monster เป็นฝ่าย เลือก Action ( ฝ่ายโจมตี )
@@ -294,9 +301,9 @@ Monster List
 ## 3.07 Exit & Ending
 
 หลังจากผู้เล่นช่วยเหลือปูเป้แล้ว ผู้เล่นจะต้องพาเธอเดินทางไปยังพื้นที่ของ Boss เพื่อหาทางออกจาก Dungeon
- *Smoke Bomb ถ้าใช้กับ Boss จะเป็นการได้รับฉากจบแบบที่ 4
+ *Smoke Bomb ถ้าใช้กับ Boss จะเป็นการได้รับฉากจบแบบที่ 3
 
-ผลลัพธ์ของเกมมีทั้งหมด **4 รูปแบบ**
+ผลลัพธ์ของเกมมีทั้งหมด **3 รูปแบบ**
 
 #### 1. Happy Ending — เอ็มและปูเป้รอด(Victory)
 
@@ -314,28 +321,14 @@ Monster List
 HAPPY ENDING (VICTORY)
 ```
 
-#### 2. Bad Ending — ผู้เล่นเสียชีวิต
-
-ผู้เล่นพ่ายแพ้ในการต่อสู้กับ Boss และเสียชีวิต ทำให้ไม่สามารถพาปูเป้ออกจาก Dungeon ได้
-
-```text
-Boss Battle
-   ↓
-Player HP = 0
-   ↓
-เอ็มเสียชีวิต
-   ↓
-ปูเป้เสียใจและฆ่าตัวตายตาม
-   ↓
-BAD ENDING
-```
-
-#### 3. Bad Ending — ผู้เล่นหนีกลับมาตั้งหลัก
+#### 2. Bad Ending — ผู้เล่นใช้ Smoke Bomb ตอนสู้กับบอส กับปูเป้
 
 เมื่อผู้เล่นมี HP เหลือน้อย ผู้เล่นสามารถใช้ Smoke Bomb เพื่อถอยกลับมาตั้งหลักได้ แต่ปูเป้ไม่สามารถหลบหนีตามออกมาได้ทันและถูก Boss ฆ่า
  หลังจากฟื้นตัว ผู้เล่นสามารถกลับมาต่อสู้และเอาชนะ Boss ได้สำเร็จ แต่ไม่สามารถช่วยปูเป้ได้อีกแล้ว
 
 ```text
+ไปรับ ปูเป้
+   ↓
 HP เหลือน้อย
    ↓
 ใช้ Smoke Bomb
@@ -351,18 +344,18 @@ HP เหลือน้อย
 BAD ENDING
 ```
 
-#### 4. Bad Ending — เอ็มหนีออกไปคนเดียว
+#### 3. Bad Ending — ผู้เล่นใช้ Smoke Bomb ตอนสู้กับบอส คนเดียว
 
-ผู้เล่นใช้ Smoke Bomb เพื่อหลบหนีออกจาก Dungeon แต่ไม่สามารถพาปูเป้ออกมาด้วยได้
+เมื่อผู้เล่นมี HP เหลือน้อย ผู้เล่นสามารถใช้ Smoke Bomb เพื่อถอยกลับมาตั้งหลักได้ แต่สะดุดล้มและเสียชีวิต
 
 ```text
-Boss Battle
+HP เหลือน้อย
    ↓
 ใช้ Smoke Bomb
    ↓
-เอ็มหนีออกจาก Dungeon
+เอ็มหนีออกมาได้ และล้ม
    ↓
-ปูเป้ออกมาไม่ได้
+ถูก Boss ฆ่า
    ↓
 BAD ENDING
 ```
@@ -393,47 +386,82 @@ Game Over
 ## 4. Architecture
 
 ## 4.1 Project Structure
-```text
-
-my-game-project/
-├── src/
-│   ├── domains/               # ส่วนข้อมูลหลักและ Logic ของเกม (Domain/Entities)
-│   │   ├── character/         # ระบบตัวละคร
-│   │   │   ├── character.ts
-│   │   │   ├── attack-type.ts  # Enum: Normal, Skill, Ult
-│   │   │   └── defense-type.ts # Enum: Normal, Block, Dodge
-│   │   ├── player/            # ผู้เล่นและกระเป๋าเก็บของ
-│   │   │   ├── player.ts
-│   │   │   └── inventory.ts
-│   │   └── items/             # ไอเทมภายในเกม
-│   │       ├── item.ts
-│   │       └── item-factory.ts # Factory Pattern สำหรับสร้างไอเทม
-│   │
-│   ├── systems/               # ระบบควบคุมและกลไกหลักของเกม (Systems/Core)
-│   │   ├── game-loop.ts       # คลาสหลัก GameLoop
-│   │   ├── game-state.ts      # จัดการสถานะและการบันทึกเกม (GameState, FileHandler)
-│   │   ├── map/               # ระบบแผนที่และการเคลื่อนที่
-│   │   │   ├── map-system.ts
-│   │   │   └── map-provider.ts
-│   │   ├── interaction/       # ระบบการโต้ตอบในเกม
-│   │   │   ├── interaction-main.ts
-│   │   │   ├── event.ts       # ระบบเหตุการณ์สุ่มหรือเนื้อเรื่อง
-│   │   │   └── shop.ts        # ระบบร้านค้าและการซื้อขาย
-│   │   └── monsters/          # ระบบจัดการมอนสเตอร์
-│   │       └── monster-factory.ts
-│   │
-│   ├── utils/                 # เครื่องมือช่วยเหลือทั่วไป
-│   │   └── constant-type.ts   # ประเภทค่าคงที่ต่าง ๆ (เช่น ConsoleUI)
-│   │
-│   └── main.ts                # จุดเริ่มต้นของแอปพลิเคชัน (Entry Point)
-│
-├── dist/                      # โฟลเดอร์สำหรับโค้ด JavaScript ที่ Compile แล้ว
-├── tests/                     # โฟลเดอร์สำหรับเขียน Unit Test แยกตามโมดูล
-├── package.json               # ไฟล์จัดการ Dependencies และ Scripts ของโปรเจกต์
-├── tsconfig.json              # ไฟล์ตั้งค่าสำหรับ TypeScript Compiler
-└── README.md                  # เอกสารอธิบายวิธีการติดตั้งและรันโปรเจกต์
-
-
+```
+/                                             root ของ repo
+├── documentation/                            ไฟล์เอกสาร
+│   ├── GroupMember.md                        เก็บรายชื่อสมาชิกในกลุ่ม
+│   └── Requirements.md                       ความต้องการของเกม
+├── Source-code/                              โค้ดทั้งหมด (รัน bun ที่นี่)
+│   ├── assets/
+│   │   ├── Event/
+│   │   │   └── event.json                    pixel art ของ อีเวนต์/มอนสเตอร์
+│   │   ├── map/
+│   │   │   └── map.json                      ข้อมูลแมพทั้ง 3 จุดเกิด จุดที่เมียอยู่ ทางออก
+│   │   └── story/
+│   │       └── story.json                    เนื้อเรื่องของเกม
+│   ├── Character/
+│   │   └── character.ts                      เก็บค่าพลังพื้นฐานของ ผู้เล่น/มอนสเตอร์
+│   ├── ConsoleIO/
+│   │   └── ConsoleIO.ts                      แปลงปุ่ม → Intent และข้อมูลเกม → UI props
+│   ├── DungeonMap/
+│   │   └── DungeonMap.ts                     เก็บ grid แผนที่แล้วเช็คว่าเดินได้ไหม, หาตำแหน่ง เมีย/จุดเกิด/ทางออก
+│   ├── Event/
+│   │   ├── Event.ts                          เหตุการณ์สุ่ม Trap / Treasure / Potion / Shop
+│   │   └── Shop.ts                           ร้านค้า ซื้อ-ขาย ไอเทม
+│   ├── Game/
+│   │   ├── gameloop.ts                       รับ key → Intent → GameStateState.ts
+│   │   └── gameState.ts                      สถานะของเกม, สุ่มอีเวนต์ทุกช่องที่เดิน, ระบบต่อสู้, เช็คแพ้/ชนะ
+│   ├── Item-Inventory/
+│   │   ├── Inventory.ts                      กระเป๋าของผู้เล่น เก็บไอเทมได้สูงสุด 8 ช่อง
+│   │   └── Item.ts                           เก็บ ชื่อ-ราคา และเอฟเฟกต์ของไอเทม
+│   ├── shared/
+│   │   └── pure-function.ts                  เก็บ Pure fn - calculateDamage, getRandomAction, EvadeCheck
+│   ├── System/
+│   │   ├── CombatSystem.ts                   ระบบต่อสู้แบบผลัดกันรุก-รับ
+│   │   └── mapSystem.ts                      สุ่มแมพจาก map.json 1 แมพ ก่อนเริ่มเกม
+│   ├── tests/                                Unit Test ชื่อไฟล์ตรงกับระบบที่เทสทั้งหมด (bun test)
+│   │   ├── character.test.ts
+│   │   ├── combatSystem.test.ts
+│   │   ├── consoleio.test.ts
+│   │   ├── dungeonMap.test.ts
+│   │   ├── event.test.ts
+│   │   ├── gameBridge.test.ts
+│   │   ├── gameloop.test.ts
+│   │   ├── inventory.test.ts
+│   │   ├── item.test.ts
+│   │   ├── mapSystem.test.ts
+│   │   ├── monster.test.ts
+│   │   ├── pure-function.test.ts
+│   │   ├── shop.test.ts
+│   │   └── state.test.ts
+│   ├── Tui/                                  UI Layer (OpenTUI + Solid)
+│   │   ├── components/                       คอมโพเนนต์วาดหน้าจอ (ไม่มี game logic)
+│   │   │   ├── ActionLog.tsx
+│   │   │   ├── ActionPanel.tsx
+│   │   │   ├── CombatView.tsx
+│   │   │   ├── DungeonView.tsx
+│   │   │   ├── EventSplashScreen.tsx
+│   │   │   ├── GameOverScreen.tsx
+│   │   │   ├── GameOverSmokeBoss.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── InventoryPanel.tsx
+│   │   │   ├── InventoryView.tsx
+│   │   │   ├── PlayerPanel.tsx
+│   │   │   ├── ShopView.tsx
+│   │   │   ├── StoryText.tsx
+│   │   │   └── VictoryScreen.tsx
+│   │   ├── gameBridge.ts                     จุดเชื่อมเดียวระหว่าง UI กับ Game Logic
+│   │   ├── theme.ts                          สี/ไอคอน/ฟังก์ชันช่วยจัดข้อความ
+│   │   ├── tui.tsx                           อีเวนต์คีย์บอร์ด/สลับหน้าจอ/เดินเรื่องสตอรี่
+│   │   └── uiTypes.ts                        interface ของ props ที่ UI ใช้
+│   ├── Type-Enum/
+│   │   ├── enum.ts                           AttackingType, DefensiveType, MapObject, EndingType
+│   │   └── type.ts                           stats, position, MonsterType, Weights, logType, Direction, gameScreen, storyType, item
+│   ├── bun.lock                              ล็อกเวอร์ชัน dependency
+│   ├── bunfig.toml                           รายชื่อ dependency
+│   ├── package.json                          ตั้งค่า Bun
+│   └── tsconfig.json                         ตั้งค่า TypeScript compiler
+└── README.md                                 คู่มือแบบเต็ม มีครบทุกอย่าง
 ```
 
 ## 4.2

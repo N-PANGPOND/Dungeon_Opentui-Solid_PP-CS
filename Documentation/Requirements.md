@@ -1,64 +1,35 @@
-# Requirements: [Dungeon Escape]
+# Requirements - ความต้องการของระบบ (Dungeon Escape)
 
-## 1. Overview
-| หัวข้อ     | รายละเอียด |
-|-----------|-----------|
-| ชื่อโปรเจกต์ | Dungeon Escape|
-| วัตถุประสงค์ | นันทนาการ |
-| ผู้ใช้งานเป้าหมาย | CsRmuti |
-| ขอบเขต (Scope) | Game Console Terminal 2d |
 
-## 2. Common Requirements
-ทุกโปรเจกต์ต้องมี requirement เหล่านี้เหมือนกัน
 
-| หัวข้อ         | ข้อกำหนด                     |
-|--------------|-----------------------------|
-| Interface    | Console เช่น TUI             |
-| Language     | Typescript                  |
-| Runtime      | Bun                         |
-| OOP          | Class and Interface         |
-| FP           | Pure Function, Higher-order |
-| Architecture | แยก logic ออกจาก I/O        |
-| Testing      | Core Logic                  |
-| Persistence  | JSON file                   |
-| Docs         | README + Class Diagram      |
+คือเอกสารที่บอกว่า "เกมนี้ต้องทำอะไรได้บ้าง ถึงจะถือว่าเสร็จสมบูรณ์" โดยแบ่งเป็นข้อๆ ชัดเจน
 
-## 3. Functional Requirements (FR)
-ระบุ feature เฉพาะของโปรเจกต์นี้
+
+
+## 1. Functional Requirements (FR)
 
 | ID   | ชื่อ Requirement | รายละเอียด |
-|---:|
-FR-01    ระบบเดิน    ผู้เล่นต้องสามารถเดินได้ ไม่ทะลุกำแพง
-FR-02    สุ่มอีเวนต์    ระหว่างเดินมีโอกาสเจอ Monster, Trap, Treasure, Potion, Merchant (Shop), Nothing โดยกำหนด probability ของแต่ละแบบได้
-FR-03    ระบบต่อสู้    Turn-based; Attacker เลือกได้จาก Attack/Strike/Use Item/Run, Defender เลือกได้จาก Defend/Counter/Use Item/Run
-FR-04    ระบบร้านค้า    ผู้เล่นทำได้ 3 อย่าง: Buy, Sell, Leave
-FR-05    ระบบ Inventory    มีของได้ไม่เกิน 8 ช่อง, ของแต่ละชิ้นนับแยก ไม่รวมกัน (ไม่ stack)
-FR-06    ระบบไอเทม    มีอย่างน้อย 4 ชนิด: Potion, High Potion, Increase ATK, Increase DEF พร้อมบอกสรรพคุณและ effect ของแต่ละชิ้น
-FR-07    ระบบจัดการ Game    เปลี่ยนหน้าจอ/state ได้ เช่น Explore, Combat, Shop, Inventory, Victory, Game Over
-FR-08    ระบบ Player    มี stat อย่างน้อย HP, ATK, DEF
-FR-09    ระบบหมอก (Fog of War)    ผู้เล่นมองเห็นได้แค่รอบตัวในรัศมีที่กำหนด, tile ที่เคยเห็นแต่พ้นระยะจะจำ layout ไว้แบบจาง
-FR-10     ระบบ Mob Decide    Monster ตัดสินใจเลือก action เองได้ระหว่าง Combat
-FR-11     ระบบหยุดเกม (Pause)    กด P เพื่อหยุดทุกอย่างชั่วคราว ไม่รับ key อื่นจนกว่าจะกด P ซ้ำเพื่อเล่นต่อ (แยกจาก Q ที่ใช้ Quit ออกจากเกมถาวร)
-FR-13     ระบบปรับความยากตามระยะทาง    คำนวณระยะจากแต่ละจุดถึง Exit แล้วปรับความเก่งของ Monster ตาม (ใกล้ Exit = ยาก, ใกล้ Start = ง่าย)
-FR-14     เงื่อนไขจบเกม    Victory เมื่อเดินถึง Exit, Game Over เมื่อ HP <= 0
-FR-15     ระบบ Monster    มี Monster อย่างน้อย 3 ชนิด ที่มี stat/พฤติกรรมต่างกัน
+|---|--- | --- |
+|FR-01: | ระบบการเคลื่อนที่ภายในเกม | ผู้เล่นสามารถเลือกกดเดินได้ 4 ทิศทาง (W, A, S, D) ไปตามทาง และ ไม่สามารถเดินทะลุกำแพงได้ การทำงานของระบบเดิน คือ รับปุ่มกดจากหน้าจอ TUI ➔ แล้วแปลงเป็น GameInputIntent ➔ แล้วส่งต่อให้ GameLoop และ GameState ต่อ เพื่อคำนวณการย้ายตำแหน่งตัวละครผู้เล่นบนแผนที่ใน DungeonMap โดยมีระบบตรวจสอบการชนกำแพง (Collision Check)|   
+|FR-02: | ระบบสุ่มอีเวนต์ภายในแมพ (Random Encounter) | ทุกครั้งที่ผู้เล่นเดิน มีโอกาสสุ่มเจอเหตุการณ์ต่างๆ ตาม Probability ที่กำหนดเอาไว้ใน Event.ts ได้แก่ Monster (25%), Trap (6%), Treasure (8%), Potion (4%), Merchant (7%) และ Nothing (50%)|   
+|FR-03:| ระบบการต่อสู้แบบ Turn-based | Dungeon Escape รองรับระบบการต่อสู้แบบสลับตาเล่น โดยที่แบ่งเป็น Phase โจมตีกับป้องกัน   ฝ่ายโจมตี (Attacker): จะเลือกได้ Attack, Strike, Use Item, Run   ฝ่ายป้องกัน (Defender): จะเลือกได้ Defend, Counter, Use Item, Run การทำงาน จะคำนวณค่า Stat, Damage, Miss Chance และ Critical ผ่าน Pure Functions.ts ในระบบ CombatSystem.ts|   
+|FR-04: |ระบบร้านค้า (Shop System)| เมื่อเราพบ Merchant จากการเดินเจอ Event ผู้เล่นสามารถเลือกทำได้ 3 อย่าง ได้แก่ ซื้อไอเทม (Buy) โดย กดตัวเลข 1-5 แล้วระบบจะเช็คจำนวน Coin ที่อยู่ในตัวผู้เล่น แล้วหักออกตามจำนวนราคา , ระบบขายไอเทมจะคืนเงินให้ 80% ของราคาเดิม (Sell) และ กด L/Esc เพื่อกดออกจากร้านค้า (Leave)|   
+|FR-05:| ระบบจัดการช่องเก็บของ (Inventory) |ตัวเราสามารถเก็บไอเทมได้สูงสุด 8 ช่อง โดยที่ไอเทมแต่ละชิ้นจะนับแยกช่องกัน และไม่สามารถซ้อนทับกันได้ (Non-stackable)   
+|FR-06: |ระบบไอเทม (Item System) |Dungeon Escape มีไอเทมอยู่ 5 อย่าง คือ Potion: ฟื้น HP 25 หน่วย  , High Potion: ฟื้น HP 50 หน่วย ,  Increase ATK Potion : เพิ่มพลังโจมตี (ATK) 3 หน่วย ,  Increase DEF Potion: เพิ่มพลังป้องกัน (DEF) 2 หน่วย เเละ  Smoke Bomb: เพิ่มโอกาสหนีจากการต่อสู้สำเร็จ 80% ต่อ 1 ลูก |  
+|FR-07:| ระบบจัดการสถานะเกม (Game State Management) |มีการ สลับหน้าจอ/State ของเกมได้ตามสถานการณ์ที่เจอ เช่น หน้าจอเเมพ (Explore) , หน้าจอต่อสู้กับมอนเตอร์ (Combat) , หน้าจอตอนเจอ Merchant, หน้าต่าง Inventory , หน้าจอ Victory และ หน้าจอ Game Over|   
+|FR-08:| ระบบการเเสดงหน้าต่างค่าพลังผู้เล่น (Player Stat) |ผู้เล่นมีค่าสถานะพื้นฐานหลักอย่างน้อย 3 ค่า คือ HP (พลังชีวิต), ATK (พลังโจมตี) และ DEF (พลังป้องกัน)|     
+|FR-9: |ระบบการตัดสินใจของมอนสเตอร์ (Mob Decide) | ระบบ Monster จะมีการสุ่ม/เลือก Action ในการต่อสู้ (ทั้งสอง Phase ทั้งโจมตีและป้องกัน) ได้เองตามค่า Probability ที่กำหนดไว้ ของมอนสเตอร์แต่ละประเภท|   
+|FR-10:| ระบบปรับความยากตามระยะทาง (Distance Difficulty) |เราได้มีการคำนวณระยะทางจากตำแหน่งปัจจุบันไปยังจุดทางออก (Exit) เพื่อปรับระดับความเก่งของ Monster ถ้าห่างจากทางออก 50+ ช่อง: Normal Monster   ถ้าห่างจากทางออก 49–20 ช่อง: Normal Monster / Elite Monster   ถ้าห่างจากทางออก 19–10 ช่อง: Elite Monster   จุด 9-1 Boss: Boss Monster |  
+|FR-11:| เงื่อนไขการที่จะจบเกม (Ending Conditions / Win-Lose) |เงื่อนไขในการชนะ (Victory / Happy Ending): จะตรวจสอบเมื่อผู้เล่นช่วยเหลือภรรยา (ปูเป้) เอาชนะ Boss ได้สำเร็จ |และต้องเดินทางไปถึงทางออก (Exit)   เงื่อนไขในการแพ้ (Game Over / Bad Ending): ก็ต่อเมื่อ HP ของผู้เล่นลดลงเหลือ 0 จากการต่อสู้หรือติดกับดัก ระบบจะสลับหน้าจอไปที่ GameOverScreen |  
+|FR-12:| ระบบประเภทมอนสเตอร์ (Monster Types) |ระบบมอนเตอร์มี Monster อย่างน้อย 3 ชนิดที่มี Stat และพฤติกรรมการต่อสู้ที่แตกต่างกันอย่างชัดเจน ได้แก่ Normal Monster, Elite Monster และ Boss Monster จะถูกสร้างผ่าน MonsterFactory|
 
-## 4. Non-Functional Requirements (NFR)
-| หัวข้อ         | ข้อกำหนด |
-|---------------|----------|
-| Performance   | เกมดีไม่มีบัค |
-| Usability     | เช่น UX ของ TUI, keyboard shortcut |
-| Reliability   | เช่น error handling, validation |
-| Maintainability | เช่น code style, lint rule |
+ ---
 
-## 5. Data Model
-- โครงสร้างข้อมูลหลัก (Entity/Class)
+ ## 2. Non-Functional Requirements (NFR)
 
-## 9. Milestones (ถ้ามี)
-| Phase | รายละเอียด | กำหนดเสร็จ |
-|-------|-----------|------------|
-| 1 | คิด Requirement | 2026-09-04 |✅
-|   | ต้องรู้จัก commit github และ ต้อง Collab repo ทุกคน | 2026-09-04 |
-|   | แบ่งทีม          | 2026-09-04 |
-|   | ทำ class diagram | 2026-09-04 |
-|   | ทำ demo ให้ผู้เล่นเดินได้ กับมี โครง tui | 2026-09-09 |
+| ID   | ชื่อ Requirement | รายละเอียด |
+|---|--- | --- |
+ |NFR-01:| ด้านประสิทธิภาพและการแสดงผล (Performance & Rendering) |ตัวเกมทำงานบน Terminal/Console ได้อย่างลื่นไหล ไม่มีบัค กลไก TUI: เคลียร์ Terminal เก่าทิ้งเพื่อแสดงผลแบบ Frame-by-Frame ผ่าน Terminal UI Render โดยวาดหน้าจอใหม่ทับเฟรมเดิมทุกครั้งที่มีการอัปเดต State หรือการเคลื่อนที่ เพื่อไม่ให้เกิดข้อความต่อสายยาวลงด้านล่าง  
+ |NFR-02: |ด้านความสะดวกในการใช้งาน (Usability & UX) |ออกแบบ User Experience บน TUI ให้ใช้งานง่ายผ่าน Keyboard Shortcut หลัก เช่น W/A/S/D (เดิน), I (เปิดกระเป๋า), P (หยุดเกม) และ Q (ออกจากเกม)   
+ |NFR-03: |ด้านความน่าเชื่อถือและการจัดการข้อผิดพลาด (Reliability & Validation) | มีระบบ Error Handling และ Input Validation ที่แข็งแกร่ง   การจัดการ Invalid Command: ระบบกรองปุ่มกดผ่าน normalizeKeyName หากผู้เล่นกดปุ่มที่ไม่เกี่ยวข้อง เกมจะไม่ Crash ไม่รัน Logic ที่ผิดพลาด และจะแจ้งเตือนผ่าน Action Log  
+ |NFR-04: |ด้านการบำรุงรักษาและการจัดเก็บข้อมูล (Maintainability & Persistence) |โค้ดถูกเขียนตามมาตรฐาน TypeScript มีการแยก Domain Logic ออกจาก I/O อย่างชัดเจน มีชุดคำสั่งทดสอบ Unit Test รองรับ และจัดเก็บข้อมูลเกมผ่านไฟล์ JSON File 
