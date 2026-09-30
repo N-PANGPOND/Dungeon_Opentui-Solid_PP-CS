@@ -15,7 +15,7 @@ export function getRandomAction(monsterType: MonsterType, randomValue: number, w
 }
 
 export function EvadeCheck(character: Character, randomValue: number): boolean {
-    const evadeChance = character.getAgi();
+    const evadeChance = character.getAgi() * 0.0035;
     return randomValue < evadeChance;
 }
 

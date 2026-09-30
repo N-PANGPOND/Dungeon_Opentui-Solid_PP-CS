@@ -168,21 +168,26 @@ export class CombatSystem {
         const calDamage = this.calculateDamage(damageSource, damageTarget, multiplier);
         const damage = calDamage.damage;
         const hpBefore = damageTarget.getHp();
-
-        damageTarget.takeDamage(damage);
-
-        const targetName = damageTarget === this.player ? "Player" : "Monster";
-        const sourceName = damageSource === this.player ? "Player" : "Monster";
-        if (calDamage.critical) {
+        if (this.checkEvasion(defensive) && isCounter) {
             this.ShowMessage({
                 type: "System",
-                text: `${sourceName} Critical Hit ${damage} Damage!`,
+                text: `${defensive === this.player ? "Player" : "Monster"} Evade!`,
+            });
+        }else{
+            damageTarget.takeDamage(damage);
+            const targetName = damageTarget === this.player ? "Player" : "Monster";
+            const sourceName = damageSource === this.player ? "Player" : "Monster";
+            if (calDamage.critical) {
+                this.ShowMessage({
+                    type: "System",
+                    text: `${sourceName} Critical Hit ${damage} Damage!`,
+                });
+            }
+            this.ShowMessage({
+                type: "System",
+                text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
             });
         }
-        this.ShowMessage({
-            type: "System",
-            text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
-        });
         return escape
     }
 
