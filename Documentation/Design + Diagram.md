@@ -67,6 +67,7 @@ flowchart LR
     Calc["calculateDamage (Pure Function)critical = luc × 0.01 &gt; random ? 2 : 1 damage = (atk − def) × multiplier × critical ถ้า damage ≤ 0 → ใช้ 0.1"] --> Out["Output { damage: number, critical: boolean }"]
     Out --> Take["processTurn() target.takeDamage(damage) แก้ HP นอกฟังก์ชัน pure"]
     ```
+    
 
 
 
