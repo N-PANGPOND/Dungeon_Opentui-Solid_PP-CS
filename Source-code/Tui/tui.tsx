@@ -7,7 +7,6 @@ import { render, useKeyboard, useRenderer } from "@opentui/solid";
 import { batch, createSignal, Match, Show, Switch } from "solid-js";
 import path from "path";
 
-import { soundSystem } from "../System/SoundSystem";
 import { GameLoop } from "../Game/gameloop";
 import { ConsoleIO, normalizeKeyName } from "../ConsoleIO/ConsoleIO";
 
@@ -38,24 +37,6 @@ import {
   getSelectedSlot,
 } from "./gameBridge";
 import { GameOverSmokeBoss } from "./components/GameOverSmokeBoss";
-
-// ─── Sound Setup ────────────────────────────────────────────────────────────
-const soundDir = path.join(import.meta.dir, "../assets/sound");
-soundSystem.loadManifest({
-  footstep:   path.join(soundDir, "footstep.mp3"),
-  encounter:  path.join(soundDir, "encounter.mp3"),
-  attack:     path.join(soundDir, "attack.mp3"),
-  strike:     path.join(soundDir, "strike.mp3"),
-  hit:        path.join(soundDir, "hit.mp3"),
-  evade:      path.join(soundDir, "evade.mp3"),
-  victory:    path.join(soundDir, "victory.mp3"),
-  gameOver:   path.join(soundDir, "gameover.mp3"),
-  coin:       path.join(soundDir, "coin.mp3"),
-  potion:     path.join(soundDir, "potion.mp3"),
-  menuSelect: path.join(soundDir, "menuSelect.mp3"),
-  menuConfirm:path.join(soundDir, "menuConfirm.mp3"),
-});
-
 
 // ─── App Component ────────────────────────────────────────────────────────────
 // การอ่านข้อมูลจาก Game Logic ทั้งหมดอยู่ใน ./gameBridge — ไฟล์นี้ทำแค่ต่อสัญญาณ UI
