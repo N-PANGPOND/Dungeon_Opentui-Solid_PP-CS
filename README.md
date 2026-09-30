@@ -564,19 +564,49 @@ bun test
 
 ระบบที่ควรทดสอบ ได้แก่
 
--Movement
--Collision
--Combat
--Damage Calculation
--Inventory
--Item Effect
--Random Event
--Monster Decision
--Monster Difficulty
--Game State
+- Movement
+- Collision
+- Combat
+- Damage Calculation
+- Inventory
+- Item Effect
+- Random Event
+- Monster Decision
+- Monster Difficulty
+- Game State
 
-******: สรุปผลการเทสจริง เช่น จำนวน test case, coverage
 ```
+# สรุปผลการทดสอบ (Test Results Summary)
+
+## สถิติการทดสอบ (Test Execution Metrics)
+
+- **จำนวน Test Case ทั้งหมด:** 376 Cases (14 ไฟล์ทดสอบ)
+- **ผ่าน (Passed):** 376 Cases (100%)
+- **ไม่ผ่าน (Failed):** 0 Cases (0%)
+
+---
+
+## ความครอบคลุมของการทดสอบ (Test Coverage)
+
+- **Code Coverage:** 99.18% (Line Coverage), 89.64% (Function Coverage)
+- **Feature Coverage:** 100% (14 จาก 14 Functional Feature มี test ครอบคลุม ได้แก่ Character/Player, Monster, Combat, Event, Shop,
+    Inventory, Item, Dungeon Map, Map System, Game Loop, Game State, Console/Input, Game Bridge และ Pure Function)
+
+---
+
+## สรุปรายการข้อผิดพลาดที่พบ (Defect / Bug Summary)
+
+**จำนวน Bug ทั้งหมดที่พบ:** 9 รายการ
+
+### แบ่งตามระดับความรุนแรง (Severity)
+
+| ระดับความรุนแรง | จำนวน | แก้ไขแล้ว |
+|---|---:|---:|
+| Critical / Blocker | 0 รายการ | 0 รายการ |
+| High / Major | 5 รายการ | 5 รายการ |
+| Medium / Low | 4 รายการ | 4 รายการ |
+
+**สถานะ Bug ปัจจุบัน:** แก้ไขแล้ว 9 รายการ / คงเหลือ 0 รายการ
 
 ## 7. Known Limitations
 
