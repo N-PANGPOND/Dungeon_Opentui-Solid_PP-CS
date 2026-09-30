@@ -3,19 +3,19 @@ import {
     getRandomAction,
     EvadeCheck,
     calculateDamage
-} from "../Source-code/shared/pure-function";
+} from "../shared/pure-function";
 
 import {
     AttackingType,
     DefensiveType
-} from "../Source-code/Type-Enum/enum";
+} from "../Type-Enum/enum";
 
 import type {
     MonsterType,
     Weights
-} from "../Source-code/Type-Enum/type";
+} from "../Type-Enum/type";
 
-import { Character } from "../Source-code/Character/character";
+import { Character } from "../Character/character";
 
 describe("pure-function.ts", () => {
     const attackWeights: Weights = {

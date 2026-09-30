@@ -2,9 +2,10 @@ import { describe, expect, it, mock } from "bun:test";
 import {
     ConsoleIO,
     INVENTORY_MAX_SLOTS,
+    normalizeKeyName,
     parseKeyIntent,
-} from "../Source-code/ConsoleIO/ConsoleIO";
-import { AttackingType, DefensiveType } from "../Source-code/Type-Enum/enum";
+} from "../ConsoleIO/ConsoleIO";
+import { AttackingType, DefensiveType } from "../Type-Enum/enum";
 
 describe("parseKeyIntent()", () => {
     it.each([
@@ -14,7 +15,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowUp", "up"],
         ["arrow-up", "up"],
         ["arrow_up", "up"],
-    ])("ควรแปลง %s เป็น MOVE up", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE up", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -28,7 +29,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowDown", "down"],
         ["arrow-down", "down"],
         ["arrow_down", "down"],
-    ])("ควรแปลง %s เป็น MOVE down", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE down", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -42,7 +43,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowLeft", "left"],
         ["arrow-left", "left"],
         ["arrow_left", "left"],
-    ])("ควรแปลง %s เป็น MOVE left", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE left", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -56,7 +57,7 @@ describe("parseKeyIntent()", () => {
         ["ArrowRight", "right"],
         ["arrow-right", "right"],
         ["arrow_right", "right"],
-    ])("ควรแปลง %s เป็น MOVE right", (key, direction) => {
+    ] as const)("ควรแปลง %s เป็น MOVE right", (key, direction) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({
             type: "MOVE",
             direction,
@@ -82,17 +83,15 @@ describe("parseKeyIntent()", () => {
     it.each([
         ["i", "OPEN_INVENTORY"],
         ["I", "OPEN_INVENTORY"],
-        ["p", "PAUSE"],
-        ["P", "PAUSE"],
         ["q", "QUIT"],
         ["Q", "QUIT"],
         ["escape", "QUIT"],
         ["ESCAPE", "QUIT"],
-    ])("ควรแปลง key %s เป็น %s", (key, type) => {
+    ] as const)("ควรแปลง key %s เป็น %s", (key, type) => {
         expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type });
     });
 
-    it.each(["", "x", "0", "9", "enter", "space", "ArrowX"])(
+    it.each(["", "x", "0", "9", "p", "P", "enter", "space", "ArrowX"])(
         "key %s ที่ไม่รู้จักควรเป็น UNKNOWN",
         (key) => {
             expect(parseKeyIntent(key, "DUNGEON")).toEqual({ type: "UNKNOWN" });
@@ -127,6 +126,48 @@ describe("parseKeyIntent()", () => {
 
     it("หน้า INVENTORY key x ควรเป็น DISCARD_ITEM", () => {
         expect(parseKeyIntent("x", "INVENTORY")).toEqual({ type: "DISCARD_ITEM" });
+    });
+        it.each([
+        ["kp0", "0"],
+        ["kp1", "1"],
+        ["kp2", "2"],
+        ["kp3", "3"],
+        ["kp4", "4"],
+        ["kp5", "5"],
+        ["kp6", "6"],
+        ["kp7", "7"],
+        ["kp8", "8"],
+        ["kp9", "9"],
+    ])("Numpad %s ควรแปลงเป็น %s", (key, expected) => {
+        expect(normalizeKeyName(key)).toBe(expected);
+    });
+
+    it.each([
+        ["ไ", "w"],
+        ["ฟ", "a"],
+        ["ห", "s"],
+        ["ก", "d"],
+        ["ร", "i"],
+        ["ๆ", "q"],
+    ])("ปุ่ม %s ควรทำงานเหมือนปุ่ม %s", (thaiKey, qwertyKey) => {
+        expect(normalizeKeyName(thaiKey)).toBe(qwertyKey);
+    });
+        it.each([
+        ["1", AttackingType.Attack],
+        ["2", AttackingType.Strike],
+        ["3", AttackingType.UseItem],
+        ["4", AttackingType.Run],
+        ["5", DefensiveType.Defend],
+        ["6", DefensiveType.Counter],
+        ["7", DefensiveType.UseItem],
+        ["8", DefensiveType.Run],
+    ])("Numpad %s ควรใช้เป็น Combat Action ได้", (key, action) => {
+        const normalized = normalizeKeyName(key);
+
+        expect(parseKeyIntent(normalized, "COMBAT")).toEqual({
+            type: "COMBAT_ACTION",
+            action,
+        });
     });
 });
 

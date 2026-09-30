@@ -35,32 +35,11 @@ export const ActionPanel = (props: ActionPanelProps) => {
   const borderColor = () => (isShop() ? theme.colors.info : isChoice() ? theme.colors.success : isCombat() ? theme.colors.combat : theme.colors.borderPanel);
 
   const row1 = () => {
-    if (isShop()) return "1-5      Buy Item";
-    if (isChoice()) return `1  ${theme.icons.potion} Take Potion`;
-    if (isAutoEvent()) return "   (Please wait...)";
-    if (isCombat()) return attacking() ? `1  ${theme.icons.atk} Attack` : `1  ${theme.icons.def} Defend`;
-    return "W/A/S/D  Move";
+    return attacking() ? `1  ${theme.icons.atk} Attack` : `1  ${theme.icons.def} Defend`;
   };
 
   const row2 = () => {
-    if (isShop()) return "S        Sell Mode (1-8)";
-    if (isChoice()) return `2  ${theme.icons.bullet} Leave / Skip`;
-    if (isAutoEvent()) return "   Auto-returning";
-    if (isCombat()) return attacking() ? `2  ${theme.icons.bullet} Strike` : `2  ${theme.icons.bullet} Counter`;
-    return "Arrow    Move";
-  };
-
-  const row3 = () => {
-    if (isShop()) return "B        Buy Mode";
-    if (isChoice() || isAutoEvent()) return " ";
-    if (isCombat()) return `3  ${theme.icons.potion} Use Item`;
-    return "I        Inventory";
-  };
-
-  const row4 = () => {
-    if (isShop()) return "L / ESC  Leave Shop";
-    if (isCombat()) return `4  ${theme.icons.bullet} Run`;
-    return "ESC      Quit";
+    return attacking() ? `2  ${theme.icons.bullet} Strike` : `2  ${theme.icons.bullet} Counter`;
   };
 
   return (

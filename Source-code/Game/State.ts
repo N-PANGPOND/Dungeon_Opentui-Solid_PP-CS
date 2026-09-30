@@ -44,10 +44,6 @@ export class GameState {
   public selectedSlot: number | null = null;
 
   private isGetWife: boolean;
-  private isWifeExitFight: boolean = false;
-  private wifeExitFightDone: boolean = false;
-  private endingCause: EndingType = EndingType.NONE;
-  private isPause: boolean;
   private inventoryReturnScreen: "DUNGEON" | "COMBAT" = "DUNGEON";
   private combatSystem: CombatSystem;
   private eventTriggeredTiles: Set<string> = new Set<string>();
@@ -61,9 +57,7 @@ export class GameState {
     this.exploredTiles = new Set<position>();
     this.selectedSlot = null;
     this.isGetWife = false;
-    this.isPause = false;
     this.combatSystem = new CombatSystem(this.player,this.currentMap, (log) => this.ShowMessage(log));
-   //this.eventSystem = new GameEvent();
   }
 
   // ─── Pending Event Getter / Clear ─────────────────────────────────────────
@@ -76,12 +70,8 @@ export class GameState {
     this.pendingEvent = null;
   }
 
-  private Pause(): void {
-    this.isPause = !this.isPause;
-  }
-
   public movePlayer(direction: Direction): boolean {
-    if (this.isPause || this.gameScreen !== "DUNGEON") return false;
+    if (this.gameScreen !== "DUNGEON") return false;
 
     const nextPos: position = {
       x: this.player.Position.x,
@@ -118,7 +108,6 @@ export class GameState {
 
   public checkTileEvent(): void {
   const pos = this.player.Position;
-  const isAtExit = pos.x === this.currentMap.getExitPos().x && pos.y === this.currentMap.getExitPos().y;
   
   if (pos.x === this.currentMap.wifePos.x && pos.y === this.currentMap.wifePos.y) {
     if (!this.isGetWife) {
@@ -141,11 +130,11 @@ export class GameState {
       action: () => void;
     }[] = [
       { name: "monster", weight: 0.25, action: () => this.eventCombat() },
-      { name: "Trap", weight: 0.07, action: () => this.eventTrap() },
-      { name: "Treasure", weight: 0.08, action: () => this.eventTreasure() },
+      { name: "Trap", weight: 0.06, action: () => this.eventTrap() },
+      { name: "Treasure", weight: 0.07, action: () => this.eventTreasure() },
       { name: "Potion", weight: 0.04, action: () => this.eventPotion() },
-      { name: "shop", weight: 0.09, action: () => this.eventShop() },
-      { name: "Nothing", weight: 0.52, action: () => this.eventNothing() },
+      { name: "shop", weight: 0.08, action: () => this.eventShop() },
+      { name: "Nothing", weight: 0.50, action: () => this.eventNothing() },
     ];
 
     const totalWeight = tileEvents.reduce((sum, event) => sum + event.weight, 0);
@@ -278,31 +267,21 @@ export class GameState {
     const battleResult = this.combatSystem.isBattleOver();
 
     if (this.player.isDead()) {
-      if (this.isWifeExitFight) {
-        this.endingCause = EndingType.BAD_END_DIED_TO_BOSS;
-        this.isWifeExitFight = false;
-      }
       this.gameScreen = "GAMEOVER";
       return;
     }
 
     if (battleResult.Over) {
-      if (this.isWifeExitFight) {
-        this.wifeExitFightDone = true;
-        this.isWifeExitFight = false;
-        this.ShowMessage({ type: "System", text: "You defeated the boss! Time to rescue Pupe and escape the dungeon. " });
-      } else {
-        if (battleResult.Escaped) {
-          if (battleResult.Escaper === "PLAYER") {
-            this.ShowMessage({ type: "System", text: "You Escaped From Battle!" });
-          } else if (battleResult.Escaper === "MONSTER") {
-            this.ShowMessage({ type: "System", text: "Monster Escaped From Battle!" });
-          }
-        } else {
-          this.ShowMessage({ type: "System", text: "You Defeated The Monster!" });
-          this.player.adjustCoin(battleResult.monster.getCoin());
-          this.ShowMessage({ type: "System", text: `Monster Drop Coin ${battleResult.monster.getCoin()}` });
+      if (battleResult.Escaped) {
+        if (battleResult.Escaper === "PLAYER") {
+          this.ShowMessage({ type: "System", text: "You Escaped From Battle!" });
+        } else if (battleResult.Escaper === "MONSTER") {
+          this.ShowMessage({ type: "System", text: "Monster Escaped From Battle!" });
         }
+      } else {
+        this.ShowMessage({ type: "System", text: "You Defeated The Monster!" });
+        this.player.adjustCoin(battleResult.monster.getCoin());
+        this.ShowMessage({ type: "System", text: `Monster Drop Coin ${battleResult.monster.getCoin()}` });
       }
       this.gameScreen = "DUNGEON";
     }
@@ -314,7 +293,6 @@ export class GameState {
 public checkEnding(): EndingType {
   const reachedExit = this.currentMap.getDistanceToExit(this.player.Position) === 0;
   if (!reachedExit) return EndingType.NONE;
-  // if (this.isGetWife && !this.wifeExitFightDone) return EndingType.NONE;
   return this.isGetWife ? EndingType.GOOD_END : EndingType.BAD_END;
 }
 

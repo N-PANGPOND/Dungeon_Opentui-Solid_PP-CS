@@ -17,7 +17,6 @@ export const theme = {
     hpHigh:       "#22c55e",
     hpMid:        "#f59e0b",
     hpLow:        "#ef4444",
-    expColor:     "#06b6d4",
     danger:       "#ef4444",
     warning:      "#f59e0b",
     success:      "#22c55e",
@@ -28,7 +27,6 @@ export const theme = {
     exit:         "#60a5fa",
     wife:         "#f472b6",
     wall:         "#64748b",
-    floor:        "#1e293b",
     // Convenience aliases used by GameOverScreen/VictoryScreen
     hp:           "#22c55e",
     atk:          "#f59e0b",
@@ -38,27 +36,21 @@ export const theme = {
   border: {
     outer:   "double"   as const,
     panel:   "single"   as const,
-    rounded: "rounded"  as const,
-    none:    "none"     as const,
   },
 
   icons: {
     player:  "🦸",
-    enemy:   "👹",
-    boss:    "💀",
     exit:    "🚪",
     wife:    "💗",
     hp:      "♥",
     atk:     "⚔",
     def:     "◈",
     coin:    "●",
-    exp:     "★",
     potion:  "⊕",
     sword:   "†",
     key:     "⚷",
     smoke:   "◈",
     title:   "⚔",
-    arrow:   "▶",
     bullet:  "•",
     wall:     ["██","█▒","▒█","▓▒"],
     floor:   "  ",
@@ -101,14 +93,6 @@ export function fmtNum(value: number): string {
 export function pad(str: string, length: number, char: string = " "): string {
   if (str.length >= length) return str.slice(0, length);
   return str + char.repeat(length - str.length);
-}
-
-export function center(str: string, width: number): string {
-  if (str.length >= width) return str.slice(0, width);
-  const totalPad = width - str.length;
-  const left = Math.floor(totalPad / 2);
-  const right = totalPad - left;
-  return " ".repeat(left) + str + " ".repeat(right);
 }
 
 export function itemIcon(name: string): string {

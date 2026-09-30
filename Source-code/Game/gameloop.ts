@@ -3,7 +3,6 @@ import { ConsoleIO, parseKeyIntent } from "../ConsoleIO/ConsoleIO";
 import type { GameInputIntent } from "../ConsoleIO/ConsoleIO";
 import { GameState } from "./State";
 import type { logType } from "../Type-Enum/type";
-import type { gameScreen } from "../Type-Enum/type";
 
 export class GameLoop {
     private isRunning: boolean;
@@ -54,9 +53,7 @@ export class GameLoop {
             case "DISCARD_ITEM":
                 this.gameState.discardSelectedItem();
                 break;
-            case "PAUSE":
             case "UNKNOWN":
-                // TODO: Implement this input intent.
                 break;
         }
 
@@ -77,10 +74,6 @@ export class GameLoop {
     public end(): void {
         this.isRunning = false;
         this.consoleIO.ShowMessage({ type: "System", text: "จบเกม ขอบคุณที่เล่น" });
-    }
-
-    public getConsoleIo():ConsoleIO {
-        return this.consoleIO
     }
 
     public getGameState():GameState{

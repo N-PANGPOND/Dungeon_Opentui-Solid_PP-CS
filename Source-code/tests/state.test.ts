@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
-import { GameState } from "../Source-code/Game/State";
-import { DungeonMap, type MapConfig } from "../Source-code/DungeonMap/DungeonMap";
-import { EndingType, AttackingType } from "../Source-code/Type-Enum/enum";
-import { Item } from "../Source-code/Item-Inventory/Item";
+import { GameState } from "../Game/State";
+import { DungeonMap, type MapConfig } from "../DungeonMap/DungeonMap";
+import { EndingType, AttackingType } from "../Type-Enum/enum";
+import { Item } from "../Item-Inventory/Item";
 
 describe("GameState - ทดสอบครอบคลุม", () => {
     let game: GameState;
@@ -96,12 +96,6 @@ describe("GameState - ทดสอบครอบคลุม", () => {
             const moved = game.movePlayer("left");
 
             expect(moved).toBe(false);
-            expect(game.player.Position).toEqual({ x: 0, y: 0 });
-        });
-
-        test("ตอน pause ควรคืน false และไม่ขยับ", () => {
-            (game as any).isPause = true;
-            expect(game.movePlayer("right")).toBe(false);
             expect(game.player.Position).toEqual({ x: 0, y: 0 });
         });
 
@@ -426,18 +420,6 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         expect(game.selectedSlot).toBeNull();
     });
 
-    test("Pause ควรสลับสถานะ pause ที่ใช้ควบคุมการเดิน", () => {
-        const state = game as any;
-        expect(state.isPause).toBe(false);
-
-        state.Pause();
-        expect(state.isPause).toBe(true);
-        expect(game.movePlayer("right")).toBe(false);
-
-        state.Pause();
-        expect(state.isPause).toBe(false);
-    });
-
     test("โจมตีแล้ว Monster ยังไม่ตายควรยังอยู่หน้า COMBAT", () => {
         game.eventCombat();
 
@@ -452,6 +434,74 @@ describe("GameState - ทดสอบครอบคลุม", () => {
         game.handleCombatAction(AttackingType.Attack);
 
         expect(game.gameScreen).toBe("COMBAT");
+    });
+    test("Player หนีออกจาก Combat สำเร็จแล้วควรกลับ DUNGEON", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: true,
+            Escaper: "PLAYER",
+            monster: {} as any,
+        })
+    );
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(logs.at(-1)?.text).toBe("You Escaped From Battle!");
+    });
+
+    test("Monster หนีออกจาก Combat สำเร็จแล้วควรกลับ DUNGEON", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: true,
+            Escaper: "MONSTER",
+            monster: {} as any,
+        })
+    );
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(logs.at(-1)?.text).toBe("Monster Escaped From Battle!");
+});
+
+    test("Monster ตายแล้วควรกลับ DUNGEON และได้รับ coin จาก Monster", () => {
+        game.eventCombat();
+
+        const combat = (game as any).combatSystem;
+        const monsterCoin = 35;
+
+        combat.startbattle = mock(() => {});
+        combat.isBattleOver = mock(() => ({
+            Over: true,
+            Escaped: false,
+            Escaper: null,
+            monster: {
+                getCoin: () => monsterCoin,
+            }
+        }
+    ));
+
+        const coinBefore = game.player.getCoin();
+
+        game.handleCombatAction(AttackingType.Attack);
+
+        expect(game.gameScreen).toBe("DUNGEON");
+        expect(game.player.getCoin()).toBe(coinBefore + monsterCoin);
+        expect(logs).toContainEqual({
+            type: "System",
+            text: `Monster Drop Coin ${monsterCoin}`,
+        });
     });
 
 });

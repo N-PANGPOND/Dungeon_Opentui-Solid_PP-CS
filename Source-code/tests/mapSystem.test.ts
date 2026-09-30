@@ -1,6 +1,6 @@
 import { describe, expect, test, afterEach } from "bun:test";
-import { mapSystem } from "../Source-code/System/mapSystem";
-import { DungeonMap } from "../Source-code/DungeonMap/DungeonMap";
+import { mapSystem } from "../System/mapSystem";
+import { DungeonMap } from "../DungeonMap/DungeonMap";
 
 describe("mapSystem", () => {
     const originalRandom = Math.random;

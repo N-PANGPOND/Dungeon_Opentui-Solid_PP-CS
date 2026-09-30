@@ -1,6 +1,6 @@
-import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
-import { GameLoop } from "../Source-code/Game/gameloop";
-import { AttackingType } from "../Source-code/Type-Enum/enum";
+import { describe, expect, test, beforeEach, mock } from "bun:test";
+import { GameLoop } from "../Game/gameloop";
+import { AttackingType } from "../Type-Enum/enum";
 
 describe("GameLoop - ทดสอบครอบคลุม", () => {
     let loop: GameLoop;
@@ -11,9 +11,8 @@ describe("GameLoop - ทดสอบครอบคลุม", () => {
         loop = new GameLoop((log) => logs.push(log));
     });
 
-    test("constructor ควรสร้าง loop ที่ยังไม่เริ่ม พร้อม GameState และ ConsoleIO", () => {
+    test("constructor ควรสร้าง loop ที่ยังไม่เริ่ม พร้อม GameState", () => {
         expect(loop.getGameState()).toBeDefined();
-        expect(loop.getConsoleIo()).toBeDefined();
         expect((loop as any).isRunning).toBe(false);
         expect(loop.getGameState().gameScreen).toBe("DUNGEON");
     });
@@ -228,7 +227,4 @@ describe("GameLoop - ทดสอบครอบคลุม", () => {
         expect(loop.getGameState()).toBe(loop.getGameState());
     });
 
-    test("getConsoleIo ควรคืน ConsoleIO instance เดิม", () => {
-        expect(loop.getConsoleIo()).toBe(loop.getConsoleIo());
-    });
 });

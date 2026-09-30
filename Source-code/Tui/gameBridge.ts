@@ -11,10 +11,7 @@
 // =============================================================
 
 import type { GameState } from "../Game/State";
-import type { EnemyUIProps, EventScreenUIProps, InventoryUIProps, PlayerUIProps, ShopUIProps, UIScreen } from "./uiTypes";
-
-// Inventory.maxSlots เป็น private (ค่าคือ 8) — ถ้าเปลี่ยนที่ Inventory.ts ให้แก้ค่านี้ตาม
-export const INVENTORY_MAX_SLOTS = 8;
+import type { EventScreenUIProps, ShopUIProps, UIScreen } from "./uiTypes";
 
 // ─── Event Screen ───────────────────────────────────────────────────────────────
 
@@ -51,17 +48,6 @@ export function getShopUIProps(gs: GameState): ShopUIProps | null {
     playerCoins: gs.player.getCoin(),
   };
 }
-
-export function getInventoryUIProps(gs: GameState): InventoryUIProps {
-  const items = gs.player
-    .getInventory()
-    .getItems()
-    .map((item) => ({
-      name: item.item.name,
-      description: item.item.description,
-    }));
-  return { items, maxSlots: INVENTORY_MAX_SLOTS };
-} 
 
 export function getSelectedSlot(gs: GameState): number | null {
   return gs.selectedSlot;
