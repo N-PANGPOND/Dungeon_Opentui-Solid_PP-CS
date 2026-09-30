@@ -219,7 +219,6 @@ Resolve Event // จัดการ Event
 ## Event
  - Trap เสีย  1–20 HP
  - Treasure ได้เงิน 1–150 (ได้แค่เงิน ไม่ได้ item)
- - Potion สุ่มจาก 4 ชนิด แล้วให้ผู้เล่นเลือก Take หรือ Leave
  - tile สุ่ม event ได้ครั้งเดียว
 ---
 
@@ -312,9 +311,9 @@ Slot 3 = High Potion
 
 ผู้เล่นสามารถเลือก:
 
--Buy — ซื้อ Item โดยใช้เงิน
--Sell — ขาย Item ที่มีอยู่ใน Inventory เพื่อรับเงิน [ การขายจะให้เงินคืนผู้เล่น 80% จากราคา item ] 
--Leave — ออกจาก Shop และกลับเข้าสู่ Exploration
+- Buy — ซื้อ Item โดยใช้เงิน
+- Sell — ขาย Item ที่มีอยู่ใน Inventory เพื่อรับเงิน [ การขายจะให้เงินคืนผู้เล่น 80% จากราคา item ] 
+- Leave — ออกจาก Shop และกลับเข้าสู่ Exploration
 
 # สิ่งที่สามารถซื้อ/ขายได้ ใน Shop
 | Item         | Effect                        |  Price  | Sell |
