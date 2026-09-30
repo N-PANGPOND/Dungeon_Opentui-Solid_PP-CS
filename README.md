@@ -466,7 +466,8 @@ Game Over
 
 ## 4.2
 Class Diagram
-<img width="8192" height="5703" alt="image" src="https://github.com/user-attachments/assets/bc8223d6-6d18-4cb1-90d0-990c339485a1" />
+<img width="6756" height="7024" alt="image" src="https://github.com/user-attachments/assets/c07acd70-0be4-4e77-86b7-12ba23100678" />
+
 
 ---
 
