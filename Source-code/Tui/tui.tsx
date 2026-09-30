@@ -183,9 +183,6 @@ const App = () => {
         return;
       }
       if (storyLineIndex() >= getStoryLineCount(story()!) - 1 || (name === "s" && story() !== 'start')) {
-        if (story() === 'badEndSmokeBomb'||story() === 'useBombWithBoss') {
-          setScreen("BADSMOKEBOMB")
-        }
         setStory(null);
         setStoryLineIndex(0);
       }else{
@@ -328,10 +325,10 @@ const App = () => {
           ต้องใช้ Switch/Match — component ของ Solid รันครั้งเดียว
           `if (screen() === ...) return` จะเช็กแค่ตอนสร้างและไม่อัปเดตตามภายหลัง */}
       <Switch>
-        <Match when={screen() === "BADSMOKEBOMB"}>
+        <Match when={screen() === "GAMEOVER" && countShowSmokebombBoss >= 1}>
           <GameOverSmokeBoss player={player()!} />
         </Match>
-        <Match when={screen() === "GAMEOVER"}>
+        <Match when={screen() === "GAMEOVER" && countShowSmokebombBoss < 1}>
           <GameOverScreen player={player()!} />
         </Match>
         <Match when={screen() === "VICTORY"}>
