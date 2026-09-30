@@ -1,4 +1,4 @@
-Game Flowchart
+1.Game Flowchart
 ```
 graph TD
     Start(["เริ่มเกม (new GameLoop -> start)"]) --> MapGen["สร้างแผนที่ดันเจี้ยน mapSystem.randomMaps()"]
@@ -47,7 +47,7 @@ graph TD
    
 <img width="6756" height="7024" alt="image" src="https://github.com/user-attachments/assets/c07acd70-0be4-4e77-86b7-12ba23100678" />
 
-4. Data Flow
+3. Data Flow
 ``` 
 flowchart LR
     Rand["Math.random() impure (อยู่ใน CombatSystem)"] --> RandIn
