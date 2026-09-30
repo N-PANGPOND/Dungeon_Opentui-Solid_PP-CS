@@ -19,11 +19,11 @@ export function EvadeCheck(character: Character, randomValue: number): boolean {
     return randomValue < evadeChance;
 }
 
-export function calculateDamage(damageSource: Character, damageTarget: Character, multiplier: number, random: number): number {
+export function calculateDamage(damageSource: Character, damageTarget: Character, multiplier: number, random: number): {damage:number,critical:boolean} {
     if (multiplier <= 0 || random <= 0) {
         throw new Error("multiplier or random Shouldn't less than 0");
     }
     const critical = (damageSource.getLuc() * 0.01) > random ? 2 : 1;
     const Damage = (damageSource.getAtk() - damageTarget.getDef()) * multiplier * critical 
-    return Damage <= 0 ? 0.1 : Damage
+    return {damage:Damage <= 0 ? 0.1 : Damage,critical:critical === 2 ? true : false}
 }
