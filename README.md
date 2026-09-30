@@ -211,7 +211,7 @@ Resolve Event // จัดการ Event
 | :--- | :---: | :--- |
 | **Potion** | 4% | ได้ Potion |
 | **Trap** | 6% | Player เสีย HP |
-| **Treasure** | 7% | ได้เงินหรือ Item |
+| **Treasure** | 7% | ได้เงิน |
 | **Merchant** | 8% | เข้าสู่ Shop |
 | **Monster** | 25% | เข้าสู่ Combat |
 | **Nothing** | 50% | ไม่มีเหตุการณ์เกิดขึ้น |
@@ -344,9 +344,9 @@ Exit
 ```
 | Distance to Exit | Monster Type | Difficulty Level |
 | :---: | :--- | :---: |
-| **0 – 2** | 💀 **BOSS** | Extreme |
-| **3 – 14** | ⚔️ **ELITE MONS** | Hard |
-| **15 ขึ้นไป** | 👾 **NORMAL MONS** | Normal |
+| **0 – 2** |  **BOSS** | Extreme |
+| **3 – 14** |  **ELITE MONS** | Hard |
+| **15 ขึ้นไป** |  **NORMAL MONS** | Normal |
 
 เกมใช้ **Manhattan Distance** ในการคำนวณระยะห่างระหว่างตำแหน่งของผู้เล่นกับ Exit
 
