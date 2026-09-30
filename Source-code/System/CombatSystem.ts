@@ -109,7 +109,7 @@ export class CombatSystem {
         };
     }
 
-    calculateDamage(damageSource: Character, damageTarget: Character,multiplier:number): number {
+    calculateDamage(damageSource: Character, damageTarget: Character,multiplier:number): {damage:number,critical:boolean} {
         return calculateDamage(damageSource, damageTarget,multiplier,Math.random());
     }
 
@@ -165,17 +165,29 @@ export class CombatSystem {
         const isCounter = defensiveAct === DefensiveType.Counter && AttackerAct === AttackingType.Strike;
         const damageTarget = isCounter ? Attacker : defensive;
         const damageSource = isCounter ? defensive : Attacker;
-        const damage = this.calculateDamage(damageSource, damageTarget, multiplier);
+        const calDamage = this.calculateDamage(damageSource, damageTarget, multiplier);
+        const damage = calDamage.damage;
         const hpBefore = damageTarget.getHp();
-
-        damageTarget.takeDamage(damage);
-
-        const targetName = damageTarget === this.player ? "Player" : "Monster";
-        const sourceName = damageSource === this.player ? "Player" : "Monster";
-        this.ShowMessage({
-            type: "System",
-            text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
-        });
+        if (this.checkEvasion(defensive) && isCounter) {
+            this.ShowMessage({
+                type: "System",
+                text: `${defensive === this.player ? "Player" : "Monster"} Evade!`,
+            });
+        }else{
+            damageTarget.takeDamage(damage);
+            const targetName = damageTarget === this.player ? "Player" : "Monster";
+            const sourceName = damageSource === this.player ? "Player" : "Monster";
+            if (calDamage.critical) {
+                this.ShowMessage({
+                    type: "System",
+                    text: `${sourceName} Critical Hit ${damage} Damage!`,
+                });
+            }
+            this.ShowMessage({
+                type: "System",
+                text: `${sourceName} โจมตี ${targetName} เข้า ${damage} damage, HP เหลือ ${damageTarget.getHp()}/${damageTarget.getMaxHp()} (จาก ${hpBefore})`,
+            });
+        }
         return escape
     }
 
