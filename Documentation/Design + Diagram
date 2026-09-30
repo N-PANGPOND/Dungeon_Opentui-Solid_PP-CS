@@ -1,4 +1,5 @@
 Game Flowchart
+```
 graph TD
     Start(["เริ่มเกม (new GameLoop -> start)"]) --> MapGen["สร้างแผนที่ดันเจี้ยน mapSystem.randomMaps()"]
     MapGen --> Render["วาดหน้าจอ resolveScreen() / ShowPlayer / ShowEnemy / ShowInventory"]
@@ -40,6 +41,7 @@ graph TD
     CheckEnd -- "ยังไม่จบเกม" --> Render
     CheckEnd -- "เกมจบแล้ว" --> EndingType["แสดงหน้า GAMEOVER / VICTORY (checkEnding → GOOD_END / BAD_END)"]
     EndingType --> End(["GameLoop.end() -> จบเกม"])
+```
 
 2. Class Diagram
 <img width="6756" height="7024" alt="image" src="https://github.com/user-attachments/assets/c07acd70-0be4-4e77-86b7-12ba23100678" />
