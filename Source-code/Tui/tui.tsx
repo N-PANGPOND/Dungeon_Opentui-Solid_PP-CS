@@ -5,7 +5,6 @@
 
 import { render, useKeyboard, useRenderer } from "@opentui/solid";
 import { batch, createSignal, Match, Show, Switch } from "solid-js";
-import path from "path";
 
 import { GameLoop } from "../Game/gameloop";
 import { ConsoleIO, normalizeKeyName } from "../ConsoleIO/ConsoleIO";
