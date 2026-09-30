@@ -42,7 +42,7 @@ graph TD
     EndingType --> End(["GameLoop.end() -> จบเกม"])
 
 2. Class Diagram
-
+<img width="6756" height="7024" alt="image" src="https://github.com/user-attachments/assets/c07acd70-0be4-4e77-86b7-12ba23100678" />
 
 
 
